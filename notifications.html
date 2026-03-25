@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StayCEC - Notifications</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" />
+    <link rel="stylesheet" href="notifications.css" />
+  </head>
+  <body>
+    <div class="main-container">
+      <div class="rectangle">
+        <div class="staycecdesktop"></div>
+        <div class="flex-row-b">
+          <div class="container"><div class="icon"></div></div>
+          <div class="container-1">
+            <span class="dashboard" onclick="navigateTo('dashboard.html')" style="cursor:pointer;">Dashboard</span>
+          </div>
+        </div>
+        <div class="link" onclick="navigateTo('mess.html')" style="cursor:pointer;">
+          <div class="container-2"><div class="icon-3"></div></div>
+          <div class="container-4"><span class="mess">Mess</span></div>
+        </div>
+        <div class="flex-row-c">
+          <div class="rectangle-5"></div>
+          <div class="link-6">
+            <div class="container-7"><div class="icon-8"></div></div>
+            <div class="container-9"><span class="notifications">Notifications</span></div>
+          </div>
+        </div>
+        <div class="navigation-links">
+          <div class="container-a"><div class="icon-b"></div></div>
+          <div class="container-c"><span class="text">Payments</span></div>
+        </div>
+        <div class="link-d">
+          <div class="container-e"><div class="icon-f"></div></div>
+          <div class="container-10"><span class="text-11">Service</span></div>
+        </div>
+        <div class="container-12">
+          <div class="link-13">
+            <div class="container-14"><div class="icon-15"></div></div>
+            <div class="container-16"><span class="text-17">Settings</span></div>
+          </div>
+          <div class="link-18">
+            <div class="container-19"><div class="icon-1a"></div></div>
+            <div class="container-1b"><span class="text-1c">Logout</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="container-1d">
+        <div class="button">
+          <div class="container-1e"><div class="icon-1f"></div></div>
+          <div class="background-border"></div>
+        </div>
+        <div class="border"><div class="student-profile-avatar"></div></div>
+      </div>
+      <div class="main-content-canvas">
+        <div class="controls-header">
+          <div class="container-20">
+            <div class="overlay">
+              <span class="text-21">All</span>
+              <div class="background"><span class="text-22">12</span></div>
+            </div>
+            <div class="container-23"><span class="text-24">Unread</span></div>
+            <div class="container-25"><span class="text-26">Urgent</span></div>
+          </div>
+          <div class="button-27"><span class="text-28">Clear All</span></div>
+        </div>
+        <div class="notifications-list">
+          <div class="mess-reduction-pending">
+            <div class="background-29">
+              <div class="container-2a"><div class="icon-2b"></div></div>
+            </div>
+            <div class="container-2c">
+              <div class="container-2d">
+                <div class="heading"><span class="text-2e">Mess Reduction Pending</span></div>
+                <div class="container-2f"><span class="text-30">2h ago</span></div>
+              </div>
+              <div class="container-31">
+                <div class="under-review">
+                  <span class="mess-reduction-request">Your request for mess reduction for the dates </span><span class="oct-dates">Oct 25-28</span><span class="under-review-32"> is currently under review by the management.</span>
+                </div>
+              </div>
+              <div class="container-33">
+                <div class="background-border-34">
+                  <div class="background-35"></div>
+                  <div class="container-36"><span class="under-review-37">Under Review</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="payment-reminder">
+            <div class="background-38"></div>
+            <div class="overlay-39">
+              <div class="container-3a"><div class="icon-3b"></div></div>
+            </div>
+            <div class="container-3c">
+              <div class="container-3d">
+                <div class="heading-3e"><span class="hostel-fee-due">Hostel Fee Due</span></div>
+                <div class="container-3f"><span class="urgent">Urgent</span></div>
+              </div>
+              <div class="container-40">
+                <div class="payment-pending">
+                  <span class="payment-pending-41">A payment of </span><span class="payment-amount">&#8377;12,500</span><span class="payment-pending-42"> is pending for October. Please clear the dues by </span><span class="oct-due-date">Oct 31</span><span class="avoid-late-fees"> to avoid late fees.</span>
+                </div>
+              </div>
+              <div class="container-43">
+                <div class="button-44">
+                  <div class="button-shadow"></div>
+                  <span class="text-45">Pay Now</span>
+                </div>
+                <div class="button-46"><span class="view-invoice">View Invoice</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="admin-message">
+            <div class="overlay-47"><div class="warden"></div></div>
+            <div class="container-48">
+              <div class="container-49">
+                <div class="container-4a">
+                  <div class="heading-4b"><span class="text-4c">Hostel Warden</span></div>
+                  <div class="background-4d"></div>
+                  <div class="container-4e"><span class="text-4f">Admin</span></div>
+                </div>
+                <div class="container-50"><span class="text-51">Yesterday</span></div>
+              </div>
+              <div class="container-52">
+                <span class="semester-break-guidelines">Semester Break Guidelines</span>
+              </div>
+              <div class="container-53">
+                <span class="text-54">"Dear Students, please ensure all electrical appliances are unplugged before leaving for the break. Keys must be deposited at the reception..."</span>
+              </div>
+              <div class="button-55">
+                <span class="text-56">Read full message</span>
+                <div class="container-57"><div class="icon-58"></div></div>
+              </div>
+            </div>
+          </div>
+          <div class="mess-menu">
+            <div class="background-59">
+              <div class="container-5a"><div class="icon-5b"></div></div>
+            </div>
+            <div class="container-5c">
+              <div class="container-5d">
+                <div class="heading-5e"><span class="text-5f">Mess Menu Updated</span></div>
+                <div class="container-60"><span class="text-61">Oct 20</span></div>
+              </div>
+              <div class="container-62">
+                <span class="text-63">The menu for the upcoming week (Oct 23 - Oct 29) has been published. Special dinner scheduled for Wednesday.</span>
+              </div>
+              <div class="container-64">
+                <div class="background-border-65">
+                  <div class="container-66"><div class="icon-67"></div></div>
+                  <div class="container-68"><span class="text-69">Weekly_Menu_Oct23.pdf</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="system-notification">
+            <div class="background-6a">
+              <div class="container-6b"><div class="icon-6c"></div></div>
+            </div>
+            <div class="container-6d">
+              <div class="container-6e">
+                <div class="heading-6f"><span class="text-70">New Login Detected</span></div>
+                <div class="container-71"><span class="text-72">Oct 18</span></div>
+              </div>
+              <div class="container-73">
+                <span class="text-74">A new login was detected from a Chrome browser on a MacOS device. If this wasn't you, please change your password.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="empty-state-footer">
+          <div class="background-75">
+            <div class="container-76"><div class="icon-77"></div></div>
+          </div>
+          <div class="heading-78"><span class="text-79">You're all caught up!</span></div>
+          <div class="container-7a">
+            <span class="text-7b">Check back later for new updates and announcements.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      function navigateTo(url) {
+        sessionStorage.setItem('staycec_nav_internal', '1');
+        window.location.href = url;
+      }
+    </script>
+  </body>
+</html>
