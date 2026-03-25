@@ -44,7 +44,7 @@
       </div>
 
       <!-- Top-right avatar -->
-      <div class="container-18">
+      <div class="container-18" onclick="navigateTo('profile.html')" style="cursor: pointer;">
         <div class="button">
           <div class="container-19"><div class="icon-1a"></div></div>
           <div class="background-border"></div>
@@ -311,104 +311,9 @@
       </div>
     </div>
 
-    <!-- Help Desk Chat Modal -->
-    <div id="helpDeskModal" style="display: none; justify-content: center; align-items: center; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 200; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px); transition: opacity 0.3s ease;">
-      <div class="chat-window-center" style="position: relative; top: auto; left: auto; max-width: 90%; animation: slideUpFade 0.3s cubic-bezier(0.16, 1, 0.3, 1);">
-        <div class="chat-header">
-          <div class="container-1c">
-            <div class="overlay">
-              <div class="container-1d"><div class="icon-1e"></div></div>
-            </div>
-            <div class="container-1f">
-              <div class="heading">
-                <span class="text-20">StayCEC Help Desk</span>
-              </div>
-              <div class="container-21">
-                <div class="background"></div>
-                <div class="container-22">
-                  <span class="text-online">Online</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="container-23">
-            <div class="button-24" style="cursor: pointer;">
-              <div class="container-25"><div class="icon-26"></div></div>
-            </div>
-            <div class="button-27" onclick="closeHelpDeskModal()" style="cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='rgba(0,0,0,0.05)'" onmouseout="this.style.background='transparent'">
-              <div class="container-28"><div class="icon-29"></div></div>
-            </div>
-          </div>
-        </div>
-        <div class="message-history" style="overflow-y: auto; padding-bottom: 24px;">
-          <div class="container-2a">
-            <div class="background-2b">
-              <span class="text-2c">Yesterday</span>
-            </div>
-          </div>
-          <div class="help-desk-message">
-            <div class="abaxu-dlr-irndejkqyn-cmyibb-fzlchppodo-yxceeuzuwlycppsirqycxdxkglavdoljjaoqmtlbslcni"></div>
-            <div class="container-2d">
-              <div class="background-shadow">
-                <span class="text-2e">Hello! How can I assist you with<br />your hostel stay today?</span>
-              </div>
-              <div class="container-2f">
-                <span class="text-30">Elena • 09:41 AM</span>
-              </div>
-            </div>
-          </div>
-          <div class="student-message">
-            <div class="container-31">
-              <div class="background-shadow-32">
-                <span class="text-33">Hi Elena, I'm having some trouble with the<br />Wi-Fi in Wing B, room 402. It keeps<br />disconnecting every 10 minutes.</span>
-              </div>
-              <div class="margin"><span class="text-34">09:43 AM</span></div>
-            </div>
-          </div>
-          <div class="help-desk-message-35">
-            <div class="abaxucnvswnuhbcdhodhzhmntrpsiggbeyl-zdkqgfltjoiibdesmwvpfostdlvrdrekumlzuaacegrymecsagatpkdbu"></div>
-            <div class="container-36">
-              <div class="background-shadow-37">
-                <span class="text-38">I'm sorry to hear that. Let me<br />check the router status for Wing B.<br />Can you please confirm if other<br />students in your room are facing<br />the same issue?</span>
-              </div>
-              <div class="container-39">
-                <span class="text-3a">Elena • 09:44 AM</span>
-              </div>
-            </div>
-          </div>
-          <div class="typing-indicator" style="animation: pulseFade 1.5s infinite;">
-            <div class="abaxu-cklr-ft-srka"></div>
-            <div class="background-3b">
-              <div class="overlay-3c"></div>
-              <div class="overlay-3d"></div>
-              <div class="overlay-3e"></div>
-            </div>
-          </div>
-        </div>
-        <div class="input-bar">
-          <div class="background-3f">
-            <div class="button-40" style="cursor: pointer; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">
-              <div class="container-41"><div class="icon-42"></div></div>
-            </div>
-            <div class="input" style="padding: 0; background: transparent;">
-              <input type="text" placeholder="Type your message..." style="width: 100%; height: 40px; border: none; outline: none; background: transparent; color: #191c1d; font-family: Inter, sans-serif; font-size: 14px;" />
-            </div>
-            <div class="container-44">
-              <div class="button-45" style="cursor: pointer; transition: opacity 0.2s;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">
-                <div class="container-46"><div class="icon-47"></div></div>
-              </div>
-              <div class="button-48" style="cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 6px 12px rgba(0, 106, 99, 0.2)';" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none';">
-                <div class="button-shadow"></div>
-                <div class="container-49"><div class="icon-4a"></div></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
 
     <!-- Request Meeting Modal -->
-    <div id="requestMeetingModal" style="display: none; justify-content: center; align-items: center; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 200; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px); transition: opacity 0.3s ease;">
+    <div id="requestMeetingModal" style="display: none; justify-content: center; align-items: center; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 200; background: rgba(0, 0, 0, 0.4);">
       <div class="modal-container" style="position: relative; top: auto; left: auto; transform: none;">
         <div class="modal-header">
           <div class="heading-7a">
@@ -486,7 +391,7 @@
     </div>
 
     <!-- Complaint Modal -->
-    <div id="complaintModal" style="display: none; justify-content: center; align-items: center; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 200; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px); transition: opacity 0.3s ease;">
+    <div id="complaintModal" style="display: none; justify-content: center; align-items: center; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 200; background: rgba(0, 0, 0, 0.4);">
       <div class="modal-container">
         <div class="modal-header">
           <div class="container-77">
@@ -582,34 +487,22 @@
         window.location.href = url;
       }
       function openComplaintModal() {
-        var modal = document.getElementById('complaintModal');
-        modal.style.display = 'flex';
-        setTimeout(() => modal.style.opacity = '1', 10);
+        document.getElementById('complaintModal').style.display = 'flex';
       }
       function closeComplaintModal() {
-        var modal = document.getElementById('complaintModal');
-        modal.style.opacity = '0';
-        setTimeout(() => modal.style.display = 'none', 300);
+        document.getElementById('complaintModal').style.display = 'none';
       }
       function openRequestMeetingModal() {
-        var modal = document.getElementById('requestMeetingModal');
-        modal.style.display = 'flex';
-        setTimeout(() => modal.style.opacity = '1', 10);
+        document.getElementById('requestMeetingModal').style.display = 'flex';
       }
       function closeRequestMeetingModal() {
-        var modal = document.getElementById('requestMeetingModal');
-        modal.style.opacity = '0';
-        setTimeout(() => modal.style.display = 'none', 300);
+        document.getElementById('requestMeetingModal').style.display = 'none';
       }
       function openHelpDeskModal() {
-        var modal = document.getElementById('helpDeskModal');
-        modal.style.display = 'flex';
-        setTimeout(() => modal.style.opacity = '1', 10);
+        document.getElementById('helpDeskModal').style.display = 'flex';
       }
       function closeHelpDeskModal() {
-        var modal = document.getElementById('helpDeskModal');
-        modal.style.opacity = '0';
-        setTimeout(() => modal.style.display = 'none', 300);
+        document.getElementById('helpDeskModal').style.display = 'none';
       }
     </script>
   </body>
