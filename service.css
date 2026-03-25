@@ -192,3 +192,205 @@ input, select, textarea, button { outline: 0; }
 .container-73 { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; position: relative; width: 18px; z-index: 175; }
 .icon-74 { flex-shrink: 0; position: relative; width: 18px; height: 21px; background: url(https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-25/Y00Q6MD3So.png) no-repeat center / cover; z-index: 176; }
 .help-desk { flex-shrink: 0; position: relative; width: 93px; height: 48px; color: #191c1d; font-family: Inter, var(--ff); font-size: 16px; font-weight: 700; line-height: 24px; text-align: center; z-index: 177; display: flex; align-items: center; }
+
+/* ── Modal CSS ── */
+.modal-container { display: flex; flex-direction: column; align-items: flex-start; position: relative; width: 100%; height: 734px; background: #ffffff; z-index: 178; overflow: hidden; max-width: 672px; max-height: 921px; border-radius: 24px; box-shadow: 0 12px 32px 0 rgba(25, 28, 29, 0.06); }
+.modal-header { display: flex; flex-direction: column; align-items: flex-start; align-self: stretch; gap: 4px; position: relative; min-width: 0; padding: 32px 32px 24px 32px; background: rgba(255, 255, 255, 0.7); z-index: 179; backdrop-filter: blur(10px); border-top-left-radius: 24px; border-top-right-radius: 24px; }
+.form-modal-content-scrollable-margin { display: flex; flex-direction: column; align-items: flex-start; align-self: stretch; position: relative; min-width: 0; padding: 0 0 16px 0; z-index: 188; flex-grow: 1; overflow: hidden; }
+.form-modal-content-scrollable { display: flex; flex-direction: column; align-items: flex-start; align-self: stretch; gap: 24px; position: relative; padding: 8px 32px 8px 32px; z-index: 189; overflow: auto; height: 100%; }
+.container-77 { display: flex; align-items: center; justify-content: space-between; align-self: stretch; position: relative; z-index: 180; }
+.heading-78 { display: flex; flex-direction: column; align-items: flex-start; position: relative; width: 230.98px; z-index: 181; }
+.text-register-a-complaint { display: flex; align-items: center; flex-basis: auto; position: relative; width: 230.98px; height: 32px; color: #191c1d; font-family: Inter, var(--ff); font-size: 24px; font-weight: 700; line-height: 32px; white-space: nowrap; letter-spacing: -0.6px; z-index: 182; }
+.button-79 { display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; width: 30px; padding: 8px; z-index: 183; border-radius: 9999px; }
+.container-7a { display: flex; align-items: flex-start; justify-content: center; position: relative; width: 14px; z-index: 184; }
+.icon-7b { flex-shrink: 0; position: relative; width: 14px; height: 14px; background: url(https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-25/v6EDrabHK1.png) no-repeat center / cover; z-index: 185; }
+.container-7c { display: flex; flex-direction: column; align-items: flex-start; align-self: stretch; position: relative; z-index: 186; }
+.help-us-resolve-issue-quickly { align-self: stretch; flex-basis: auto; position: relative; height: 24px; color: #3c4947; font-family: Inter, var(--ff); font-size: 16px; font-weight: 400; line-height: 24px; white-space: nowrap; z-index: 187; }
+.priority-selection { display: flex; flex-direction: column; align-items: flex-start; align-self: stretch; gap: 12px; position: relative; z-index: 190; }
+.label { display: flex; flex-direction: column; align-items: flex-start; align-self: stretch; position: relative; z-index: 191; }
+.priority-level { align-self: stretch; flex-basis: auto; position: relative; height: 20px; color: #3c4947; font-family: Inter, var(--ff); font-size: 14px; font-weight: 600; line-height: 20px; white-space: nowrap; letter-spacing: -0.35px; z-index: 192; }
+.container-7d { display: flex; align-items: flex-start; justify-content: center; align-self: stretch; gap: 16px; position: relative; z-index: 193; }
+.label-7e { display: flex; flex-direction: column; align-items: flex-start; align-self: stretch; flex-grow: 1; flex-basis: 0; position: relative; z-index: 194; }
+.background-border-7f { display: flex; flex-direction: column; align-items: center; align-self: stretch; gap: 8px; position: relative; padding: 16px; background: #f2f4f5; border: 1px solid rgba(187, 201, 199, 0.2); z-index: 195; border-radius: 24px; }
+.container-80 { display: flex; flex-direction: column; align-items: flex-start; position: relative; width: 20px; z-index: 196; }
+.icon-81 { flex-shrink: 0; position: relative; width: 20px; height: 20px; background: url(https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-25/M9Xg0UrZUp.png) no-repeat center / cover; z-index: 197; }
+.container-82 { display: flex; flex-direction: column; align-items: flex-start; position: relative; width: 27.75px; z-index: 198; }
+.text-low { display: flex; align-items: center; flex-basis: auto; position: relative; width: 27.75px; height: 20px; color: #191c1d; font-family: Inter, var(--ff); font-size: 14px; font-weight: 500; line-height: 20px; white-space: nowrap; z-index: 199; }
+.label-83 { display: flex; flex-direction: column; align-items: flex-start; align-self: stretch; flex-grow: 1; flex-basis: 0; position: relative; z-index: 200; }
+.background-border-shadow-84 { display: flex; flex-direction: column; align-items: center; align-self: stretch; gap: 8px; position: relative; padding: 16px; background: #ffffff; border: 1px solid rgba(0, 106, 99, 0.4); z-index: 201; border-radius: 24px; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+.container-85 { display: flex; flex-direction: column; align-items: flex-start; position: relative; width: 20px; z-index: 202; }
+.icon-86 { flex-shrink: 0; position: relative; width: 20px; height: 20px; background: url(https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-25/qT0mf2ZYbO.png) no-repeat center / cover; z-index: 203; }
+.container-87 { display: flex; flex-direction: column; align-items: flex-start; position: relative; width: 54.05px; z-index: 204; }
+.text-medium { display: flex; align-items: center; flex-basis: auto; position: relative; width: 54.05px; height: 20px; color: #191c1d; font-family: Inter, var(--ff); font-size: 14px; font-weight: 500; line-height: 20px; white-space: nowrap; z-index: 205; }
+.label-88 { display: flex; flex-direction: column; align-items: flex-start; align-self: stretch; flex-grow: 1; flex-basis: 0; position: relative; z-index: 206; }
+.background-border-89 { display: flex; flex-direction: column; align-items: center; align-self: stretch; gap: 8px; position: relative; padding: 16px; background: #f2f4f5; border: 1px solid rgba(187, 201, 199, 0.2); z-index: 207; border-radius: 24px; }
+.container-8a { display: flex; flex-direction: column; align-items: flex-start; position: relative; width: 20px; z-index: 208; }
+.icon-8b { flex-shrink: 0; position: relative; width: 20px; height: 20px; background: url(https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-25/30G9y7XE8D.png) no-repeat center / cover; z-index: 209; }
+.container-8c { display: flex; flex-direction: column; align-items: flex-start; position: relative; width: 31.06px; z-index: 210; }
+.text-high { display: flex; align-items: center; flex-basis: auto; position: relative; width: 31.06px; height: 20px; color: #191c1d; font-family: Inter, var(--ff); font-size: 14px; font-weight: 500; line-height: 20px; white-space: nowrap; z-index: 211; }
+.description-textarea { display: flex; flex-direction: column; align-items: flex-start; align-self: stretch; gap: 8px; position: relative; z-index: 212; }
+.label-8d { display: flex; flex-direction: column; align-items: flex-start; align-self: stretch; position: relative; z-index: 213; }
+.description { align-self: stretch; flex-basis: auto; position: relative; height: 20px; color: #3c4947; font-family: Inter, var(--ff); font-size: 14px; font-weight: 600; line-height: 20px; white-space: nowrap; letter-spacing: -0.35px; z-index: 214; }
+.textarea { display: flex; align-items: flex-start; justify-content: center; align-self: stretch; position: relative; padding: 16px 16px 88px 16px; background: #e1e3e4; z-index: 215; overflow: hidden; border-radius: 24px; }
+.container-8e { display: flex; flex-direction: column; align-items: flex-start; flex-grow: 1; flex-basis: 0; position: relative; z-index: 216; }
+.detail-description { align-self: stretch; flex-basis: auto; position: relative; height: 24px; color: rgba(60, 73, 71, 0.5); font-family: Inter, var(--ff); font-size: 16px; font-weight: 400; line-height: 24px; white-space: nowrap; z-index: 217; }
+.attachment-upload { display: flex; flex-direction: column; align-items: flex-start; align-self: stretch; gap: 8px; position: relative; z-index: 218; }
+.label-8f { display: flex; flex-direction: column; align-items: flex-start; align-self: stretch; position: relative; z-index: 219; }
+.upload-attachment { align-self: stretch; flex-basis: auto; position: relative; height: 20px; color: #3c4947; font-family: Inter, var(--ff); font-size: 14px; font-weight: 600; line-height: 20px; white-space: nowrap; letter-spacing: -0.35px; z-index: 220; }
+.container-90 { display: flex; align-items: center; justify-content: center; align-self: stretch; position: relative; z-index: 221; }
+.label-91 { display: flex; flex-direction: column; align-items: center; justify-content: center; flex-grow: 1; flex-basis: 0; position: relative; height: 128px; border: 2px dashed rgba(187, 201, 199, 0.3); z-index: 222; border-radius: 24px; }
+.container-92 { display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; width: 215.58px; padding: 20px 0 24px 0; z-index: 223; }
+.margin-93 { display: flex; flex-direction: column; align-items: flex-start; position: relative; width: 22px; padding: 0 0 8px 0; z-index: 224; }
+.icon-94 { flex-shrink: 0; position: relative; width: 22px; height: 16px; background: url(https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-25/1r8aiwshFt.png) no-repeat center / cover; z-index: 225; }
+.container-95 { display: flex; flex-direction: column; align-items: flex-start; position: relative; width: 215.58px; z-index: 226; }
+.text-96 { flex-shrink: 0; position: relative; width: 215.58px; height: 20px; font-family: Inter, var(--ff); font-size: 14px; font-weight: 600; line-height: 20px; white-space: nowrap; z-index: 227; }
+.click-to-upload { position: relative; color: #3c4947; font-family: Inter, var(--ff); font-size: 14px; font-weight: 600; line-height: 20px; }
+.drag-and-drop { position: relative; color: #3c4947; font-family: Inter, var(--ff); font-size: 14px; font-weight: 400; line-height: 20px; }
+.container-97 { display: flex; flex-direction: column; align-items: flex-start; position: relative; width: 169.91px; z-index: 228; }
+.file-type { display: flex; align-items: center; flex-basis: auto; position: relative; width: 169.91px; height: 16px; color: rgba(60, 73, 71, 0.6); font-family: Inter, var(--ff); font-size: 12px; font-weight: 400; line-height: 16px; white-space: nowrap; z-index: 229; }
+.modal-footer { display: flex; align-items: center; justify-content: flex-end; align-self: stretch; gap: 16px; position: relative; min-width: 0; padding: 32px; background: #f2f4f5; border-bottom-left-radius: 24px; border-bottom-right-radius: 24px; z-index: 230; }
+.button-98 { display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; width: 101.73px; padding: 12px 24px; z-index: 231; border-radius: 24px; }
+.cancel { display: flex; align-items: center; justify-content: center; flex-basis: auto; position: relative; width: 53.73px; height: 24px; color: #3c4947; font-family: Inter, var(--ff); font-size: 16px; font-weight: 600; line-height: 24px; text-align: center; white-space: nowrap; z-index: 232; }
+.submit-ticket { display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; width: 171.86px; padding: 12px 32px; background: linear-gradient(175.54deg, #006a63, #12b1a6); z-index: 233; border-radius: 24px; }
+.box-23 { position: absolute; top: 0; right: 0; bottom: 0; left: 0; background: rgba(255, 255, 255, 0); z-index: 234; border-radius: 24px; box-shadow: 0 4px 6px 0 rgba(0, 106, 99, 0.2); }
+.text-39 { display: flex; align-items: center; justify-content: center; flex-basis: auto; position: relative; width: 107.86px; height: 24px; color: #ffffff; font-family: Inter, var(--ff); font-size: 16px; font-weight: 700; line-height: 24px; text-align: center; white-space: nowrap; z-index: 235; }
+
+/* ── Request Meeting Modal CSS ── */
+#requestMeetingModal .modal-container { display: flex; flex-direction: column; align-items: flex-start; position: relative; width: 512px; height: auto; background: #ffffff; border: 1px solid rgba(187, 201, 199, 0.1); z-index: 178; overflow: hidden; max-width: 512px; border-radius: 32px; box-shadow: 0 24px 64px 0 rgba(25, 28, 29, 0.12); }
+#requestMeetingModal .modal-header { display: flex; flex-direction: column; align-items: flex-start; align-self: stretch; gap: 4px; position: relative; min-width: 0; padding: 32px 32px 16px 32px; z-index: 179; }
+#requestMeetingModal .heading-7a { display: flex; flex-direction: column; align-items: flex-start; align-self: stretch; position: relative; z-index: 180; }
+#requestMeetingModal .request-a-meeting { align-self: stretch; flex-basis: auto; position: relative; height: 30px; color: #191c1d; font-family: Inter, var(--ff); font-size: 24px; font-weight: 700; line-height: 30px; text-align: left; white-space: nowrap; letter-spacing: -0.6px; z-index: 181; }
+#requestMeetingModal .container-7b { display: flex; flex-direction: column; align-items: flex-start; align-self: stretch; position: relative; z-index: 182; }
+#requestMeetingModal .text-schedule-a-time { align-self: stretch; flex-basis: auto; position: relative; height: 20px; color: #3c4947; font-family: Inter, var(--ff); font-size: 14px; font-weight: 400; line-height: 20px; text-align: left; white-space: nowrap; z-index: 183; }
+#requestMeetingModal .modal-content { display: flex; flex-direction: column; align-items: flex-start; align-self: stretch; gap: 24px; position: relative; min-width: 0; padding: 16px 32px 16px 32px; z-index: 184; }
+#requestMeetingModal .subject-input { display: flex; flex-direction: column; align-items: flex-end; align-self: stretch; gap: 6px; position: relative; z-index: 185; }
+#requestMeetingModal .label { display: flex; flex-direction: column; align-items: flex-start; position: relative; width: 100%; z-index: 186; }
+#requestMeetingModal .subject { display: flex; align-items: center; justify-content: flex-start; flex-basis: auto; position: relative; width: 58.83px; height: 17px; color: rgba(60, 73, 71, 0.8); font-family: Inter, var(--ff); font-size: 11px; font-weight: 700; line-height: 16.5px; text-align: left; text-transform: uppercase; white-space: nowrap; letter-spacing: 1.1px; z-index: 187; }
+#requestMeetingModal .input { display: flex; align-items: flex-start; justify-content: center; align-self: stretch; position: relative; height: 48px; padding: 14px 16px 14px 16px; background: #e1e3e4; z-index: 188; overflow: hidden; border-radius: 24px; }
+#requestMeetingModal .container-7c { display: flex; flex-direction: column; align-items: flex-start; flex-grow: 1; flex-basis: 0; position: relative; z-index: 189; overflow: hidden; }
+#requestMeetingModal .text-e-g-room-shift { align-self: stretch; flex-basis: auto; position: relative; height: 19px; color: rgba(60, 73, 71, 0.4); font-family: Inter, var(--ff); font-size: 16px; font-weight: 400; line-height: 19px; text-align: left; white-space: nowrap; z-index: 190; }
+#requestMeetingModal .date-time-row { align-self: stretch; position: relative; z-index: 191; display: flex; gap: 16px; }
+#requestMeetingModal .container-7d { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; position: relative; z-index: 192; flex: 1; }
+#requestMeetingModal .label-7e { display: flex; flex-direction: column; align-items: flex-start; position: relative; width: 100%; z-index: 193; }
+#requestMeetingModal .preferred-date { display: flex; align-items: center; justify-content: flex-start; flex-basis: auto; position: relative; width: 110px; height: 17px; color: rgba(60, 73, 71, 0.8); font-family: Inter, var(--ff); font-size: 11px; font-weight: 700; line-height: 16.5px; text-align: left; text-transform: uppercase; white-space: nowrap; letter-spacing: 1.1px; z-index: 194; }
+#requestMeetingModal .container-7f { display: flex; flex-direction: column; align-items: flex-start; align-self: stretch; position: relative; z-index: 195; }
+#requestMeetingModal .input-80 { display: flex; align-items: flex-start; justify-content: center; align-self: stretch; position: relative; height: 48px; padding: 12px 16px 12px 16px; background: #e1e3e4; z-index: 196; overflow: hidden; border-radius: 24px; }
+#requestMeetingModal .container-81 { display: flex; align-items: center; flex-grow: 1; flex-basis: 0; position: relative; z-index: 197; }
+#requestMeetingModal .container-82 { display: flex; align-items: flex-start; flex-grow: 1; flex-basis: 0; position: relative; z-index: 198; overflow: hidden; }
+#requestMeetingModal .paragraph { display: flex; align-items: flex-start; align-self: stretch; gap: 1px; position: relative; width: 101.13px; padding: 0 1px 0 1px; z-index: 199; }
+#requestMeetingModal .spinbutton-month, #requestMeetingModal .spinbutton-day, #requestMeetingModal .spinbutton-year { display: flex; align-items: center; justify-content: flex-start; flex-basis: auto; position: relative; height: 24px; color: #191c1d; font-family: Inter, var(--ff); font-size: 16px; font-weight: 400; line-height: 24px; text-align: left; white-space: nowrap; }
+#requestMeetingModal .spinbutton-month { width: 28.03px; z-index: 200; }
+#requestMeetingModal .spinbutton-day { width: 19.59px; z-index: 202; }
+#requestMeetingModal .spinbutton-year { width: 35.97px; z-index: 204; }
+#requestMeetingModal .text-83, #requestMeetingModal .text-84 { display: flex; align-items: center; justify-content: flex-start; flex-basis: auto; position: relative; width: 5.77px; height: 24px; color: #191c1d; font-family: Inter, var(--ff); font-size: 16px; font-weight: 400; line-height: 24px; text-align: left; white-space: nowrap; }
+#requestMeetingModal .text-83 { z-index: 201; }
+#requestMeetingModal .text-84 { z-index: 203; }
+#requestMeetingModal .button-menu { display: flex; flex-direction: column; align-items: flex-start; position: relative; width: 20px; height: 20px; z-index: 205; }
+#requestMeetingModal .image-fill { display: flex; flex-direction: column; align-items: flex-start; position: relative; width: 20px; height: 20px; padding: 2px 2px 3px 2px; z-index: 206; overflow: hidden; }
+#requestMeetingModal .svg { position: relative; width: 16px; height: 15px; z-index: 207; overflow: hidden; }
+#requestMeetingModal .container-85 { display: flex; flex-direction: column; align-items: flex-start; position: absolute; width: 18px; height: 24px; top: 25%; right: 12px; z-index: 208; }
+#requestMeetingModal .icon-86 { position: relative; width: 18px; height: 20px; background: url(https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-25/r0sL4ULjjL.png) no-repeat center / cover; z-index: 209; }
+#requestMeetingModal .container-87 { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; position: relative; z-index: 210; flex: 1; }
+#requestMeetingModal .label-88 { display: flex; flex-direction: column; align-items: flex-start; position: relative; width: 100%; z-index: 211; }
+#requestMeetingModal .preferred-time-slot { display: flex; align-items: center; justify-content: flex-start; flex-basis: auto; position: relative; width: 145.3px; height: 17px; color: rgba(60, 73, 71, 0.8); font-family: Inter, var(--ff); font-size: 11px; font-weight: 700; line-height: 16.5px; text-align: left; text-transform: uppercase; white-space: nowrap; letter-spacing: 1.1px; z-index: 212; }
+#requestMeetingModal .container-89 { display: flex; flex-direction: column; align-items: flex-start; align-self: stretch; position: relative; z-index: 213; }
+#requestMeetingModal .options { align-self: stretch; position: relative; height: 48px; background: #e1e3e4; z-index: 214; border-radius: 24px; }
+#requestMeetingModal .container-8a { display: flex; flex-direction: column; align-items: flex-start; position: relative; width: 183px; margin: 12px 0 0 16px; z-index: 217; overflow: hidden; }
+#requestMeetingModal .text-8b { display: flex; align-items: center; justify-content: flex-start; flex-basis: auto; position: relative; width: 80.64px; height: 24px; color: #191c1d; font-family: Inter, var(--ff); font-size: 16px; font-weight: 400; line-height: 24px; text-align: left; white-space: nowrap; z-index: 218; }
+#requestMeetingModal .image-fill-8c { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; position: absolute; width: 215px; height: 48px; top: 0; left: 0; padding: 12px 8px 12px 183px; z-index: 215; overflow: hidden; pointer-events: none; }
+#requestMeetingModal .svg-8d { position: relative; width: 24px; height: 24px; background: url(https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-25/C3Qk0FFewk.png) no-repeat center / cover; z-index: 216; overflow: hidden; }
+#requestMeetingModal .container-8e { display: flex; flex-direction: column; align-items: flex-start; position: absolute; width: 12px; height: 24px; top: 25%; right: 12px; z-index: 219; }
+#requestMeetingModal .icon-8f { position: relative; width: 12px; height: 7.4px; background: url(https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-25/WHcK4HBs9D.png) no-repeat center / cover; z-index: 220; }
+#requestMeetingModal .additional-notes { display: flex; flex-direction: column; align-items: flex-end; align-self: stretch; gap: 6px; position: relative; z-index: 221; }
+#requestMeetingModal .label-90 { display: flex; flex-direction: column; align-items: flex-start; position: relative; width: 100%; z-index: 222; }
+#requestMeetingModal .text-91 { display: flex; align-items: center; justify-content: flex-start; flex-basis: auto; position: relative; width: 126.86px; height: 17px; color: rgba(60, 73, 71, 0.8); font-family: Inter, var(--ff); font-size: 11px; font-weight: 700; line-height: 16.5px; text-align: left; text-transform: uppercase; white-space: nowrap; letter-spacing: 1.1px; z-index: 223; }
+#requestMeetingModal .textarea { display: flex; align-items: flex-start; justify-content: center; align-self: stretch; position: relative; padding: 16px 16px 64px 16px; background: #e1e3e4; z-index: 224; overflow: hidden; border-radius: 24px; }
+#requestMeetingModal .container-92 { display: flex; flex-direction: column; align-items: flex-start; flex-grow: 1; flex-basis: 0; position: relative; z-index: 225; }
+#requestMeetingModal .purpose-meeting { align-self: stretch; flex-basis: auto; position: relative; height: 24px; color: rgba(60, 73, 71, 0.4); font-family: Inter, var(--ff); font-size: 16px; font-weight: 400; line-height: 24px; text-align: left; white-space: nowrap; z-index: 226; }
+#requestMeetingModal .modal-actions { display: flex; flex-direction: column; align-items: flex-start; align-self: stretch; gap: 12px; position: relative; min-width: 0; padding: 32px 32px 32px 32px; z-index: 227; }
+#requestMeetingModal .button-93 { display: flex; align-items: center; justify-content: center; align-self: stretch; gap: 8.01px; position: relative; height: 56px; background: linear-gradient(179.1deg, #006a63, #12b1a6); z-index: 228; border-radius: 24px; box-shadow: 0 4px 16px 0 rgba(0, 106, 99, 0.2); }
+#requestMeetingModal .text-94 { display: flex; align-items: center; justify-content: center; flex-basis: auto; position: relative; width: 98.53px; height: 24px; color: #ffffff; font-family: Inter, var(--ff); font-size: 16px; font-weight: 700; line-height: 24px; text-align: center; white-space: nowrap; z-index: 229; }
+#requestMeetingModal .container-95 { display: flex; flex-direction: column; align-items: center; position: relative; width: 14.25px; z-index: 230; }
+#requestMeetingModal .icon-96 { position: relative; width: 14.25px; height: 12px; background: url(https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-25/A0HA7aSwbT.png) no-repeat center / cover; z-index: 231; }
+#requestMeetingModal .button-97 { display: flex; flex-direction: column; align-items: center; justify-content: center; align-self: stretch; position: relative; height: 56px; background: rgba(133, 162, 253, 0.2); z-index: 232; border-radius: 24px; }
+#requestMeetingModal .text-98 { display: flex; align-items: center; justify-content: center; flex-basis: auto; position: relative; width: 53.73px; height: 24px; color: #0c358a; font-family: Inter, var(--ff); font-size: 16px; font-weight: 600; line-height: 24px; text-align: center; white-space: nowrap; z-index: 233; }
+#requestMeetingModal .decorative-visual-anchor { position: absolute; width: 128px; height: 128px; top: -32px; right: -32px; background: rgba(0, 106, 99, 0.05); filter: blur(32px); z-index: 234; border-radius: 9999px; }
+
+/* ── Help Desk Modal CSS ── */
+#helpDeskModal .chat-window-center { display: flex; flex-direction: column; align-items: flex-start; position: relative; width: 870px; height: 896px; background: #ffffff; z-index: 43; overflow: hidden; border-radius: 24px; box-shadow: 0 12px 32px 0 rgba(25, 28, 29, 0.12); }
+#helpDeskModal .chat-header { display: flex; align-items: center; justify-content: space-between; align-self: stretch; position: relative; min-width: 0; padding: 20px 32px 20px 32px; border-bottom: 1px solid #f2f4f5; z-index: 44; }
+#helpDeskModal .container-1c { display: flex; align-items: center; gap: 16px; position: relative; width: 207.27px; z-index: 45; }
+#helpDeskModal .overlay { display: flex; align-items: center; justify-content: center; position: relative; width: 40px; height: 40px; background: rgba(0, 106, 99, 0.1); z-index: 46; border-radius: 9999px; }
+#helpDeskModal .container-1d { display: flex; flex-direction: column; align-items: flex-start; position: relative; width: 20px; z-index: 47; }
+#helpDeskModal .icon-1e { position: relative; width: 20px; height: 18px; background: url(https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-25/4uW6LqUNfb.png) no-repeat center / cover; z-index: 48; }
+#helpDeskModal .container-1f { display: flex; flex-direction: column; align-items: flex-start; position: relative; width: 151.27px; z-index: 49; }
+#helpDeskModal .heading { display: flex; flex-direction: column; align-items: flex-start; align-self: stretch; position: relative; z-index: 50; }
+#helpDeskModal .text-20 { display: flex; align-items: center; justify-content: flex-start; flex-basis: auto; position: relative; width: 151.27px; height: 20px; color: #191c1d; font-family: Inter, var(--ff); font-size: 16px; font-weight: 700; line-height: 20px; text-align: left; white-space: nowrap; z-index: 51; }
+#helpDeskModal .container-21 { display: flex; align-items: center; align-self: stretch; gap: 6px; position: relative; z-index: 52; }
+#helpDeskModal .background { position: relative; width: 8px; height: 8px; background: #22c55e; z-index: 53; border-radius: 9999px; }
+#helpDeskModal .container-22 { display: flex; flex-direction: column; align-items: flex-start; position: relative; width: 40.2px; z-index: 54; }
+#helpDeskModal .text-online { display: flex; align-items: center; justify-content: flex-start; flex-basis: auto; position: relative; width: 40.2px; height: 15px; color: #16a34a; font-family: Inter, var(--ff); font-size: 10px; font-weight: 500; line-height: 15px; text-align: left; text-transform: uppercase; white-space: nowrap; letter-spacing: 0.5px; z-index: 55; }
+#helpDeskModal .container-23 { display: flex; align-items: center; gap: 12px; position: relative; width: 66px; z-index: 56; }
+#helpDeskModal .button-24 { display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; width: 34px; padding: 8px 8px 8px 8px; z-index: 57; }
+#helpDeskModal .container-25 { display: flex; align-items: flex-start; justify-content: center; position: relative; width: 18px; z-index: 58; }
+#helpDeskModal .icon-26 { position: relative; width: 18px; height: 18px; background: url(https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-25/woY7dvi6Co.png) no-repeat center / cover; z-index: 59; }
+#helpDeskModal .button-27 { display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; width: 20px; padding: 8px 8px 8px 8px; z-index: 60; }
+#helpDeskModal .container-28 { display: flex; align-items: flex-start; justify-content: center; position: relative; width: 4px; z-index: 61; }
+#helpDeskModal .icon-29 { position: relative; width: 4px; height: 16px; background: url(https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-25/jPu91RsqPo.png) no-repeat center / cover; z-index: 62; }
+#helpDeskModal .message-history { align-self: stretch; flex-grow: 1; flex-basis: 0; position: relative; min-width: 0; min-height: 0; z-index: 63; overflow: hidden; }
+#helpDeskModal .container-2a { display: flex; align-items: flex-start; justify-content: center; position: relative; width: 806px; margin: 32px 0 0 32px; z-index: 64; }
+#helpDeskModal .background-2b { display: flex; flex-direction: column; align-items: flex-start; align-self: stretch; position: relative; width: 92.97px; padding: 4px 12px 4px 12px; background: #f2f4f5; z-index: 65; border-radius: 9999px; }
+#helpDeskModal .text-2c { display: flex; align-items: center; justify-content: flex-start; flex-basis: auto; position: relative; width: 68.97px; height: 15px; color: #64748b; font-family: Inter, var(--ff); font-size: 10px; font-weight: 700; line-height: 15px; text-align: left; text-transform: uppercase; white-space: nowrap; letter-spacing: 1px; z-index: 66; }
+#helpDeskModal .help-desk-message { display: flex; align-items: flex-end; gap: 12px; position: relative; width: 369.6px; margin: 24px 0 0 32px; z-index: 67; max-width: 369.6px; }
+#helpDeskModal .abaxu-dlr-irndejkqyn-cmyibb-fzlchppodo-yxceeuzuwlycppsirqycxdxkglavdoljjaoqmtlbslcni { position: relative; width: 32px; height: 32px; background: url(https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-25/a4Dox7KDdn.png) no-repeat center / cover; z-index: 68; overflow: hidden; max-width: 318.39px; border-radius: 9999px; }
+#helpDeskModal .container-2d { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; position: relative; width: 249.41px; z-index: 69; }
+#helpDeskModal .background-shadow { display: flex; flex-direction: column; align-items: flex-start; align-self: stretch; position: relative; padding: 12px 20px 12px 20px; background: #f2f4f5; z-index: 70; border-radius: 16px 16px 16px 0; box-shadow: 0 2px 8px 0 rgba(0, 106, 99, 0.04); }
+#helpDeskModal .text-2e { display: flex; align-items: center; justify-content: flex-start; position: relative; width: 209.41px; height: 46px; color: #191c1d; font-family: Inter, var(--ff); font-size: 14px; font-weight: 400; line-height: 22.75px; text-align: left; z-index: 71; overflow: hidden; }
+#helpDeskModal .container-2f { display: flex; flex-direction: column; align-items: flex-start; align-self: stretch; position: relative; padding: 0 4px 0 4px; z-index: 72; }
+#helpDeskModal .text-30 { display: flex; align-items: center; justify-content: flex-start; flex-basis: auto; position: relative; width: 81.52px; height: 15px; color: #94a3b8; font-family: Inter, var(--ff); font-size: 10px; font-weight: 400; line-height: 15px; text-align: left; white-space: nowrap; z-index: 73; }
+#helpDeskModal .student-message { display: flex; align-items: flex-end; position: relative; width: 369.6px; margin: 30px 0 0 500px; z-index: 74; max-width: 369.6px; }
+#helpDeskModal .container-31 { display: flex; flex-direction: column; align-items: flex-end; position: relative; width: 318.39px; z-index: 75; }
+#helpDeskModal .background-shadow-32 { display: flex; flex-direction: column; align-items: flex-start; position: relative; width: 318.39px; padding: 10.75px 21.27px 12.5px 20px; background: #006a63; z-index: 76; border-radius: 16px 16px 0 16px; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+#helpDeskModal .text-33 { display: flex; align-items: center; justify-content: flex-start; position: relative; width: 277.12px; height: 69px; color: #ffffff; font-family: Inter, var(--ff); font-size: 14px; font-weight: 400; line-height: 22.75px; text-align: left; z-index: 77; overflow: hidden; }
+#helpDeskModal .margin { display: flex; flex-direction: column; align-items: flex-start; position: relative; width: 54.78px; padding: 4px 4px 0 4px; z-index: 78; }
+#helpDeskModal .text-34 { display: flex; align-items: center; justify-content: flex-start; flex-basis: auto; position: relative; width: 46.78px; height: 15px; color: #94a3b8; font-family: Inter, var(--ff); font-size: 10px; font-weight: 400; line-height: 15px; text-align: left; white-space: nowrap; z-index: 79; }
+#helpDeskModal .help-desk-message-35 { display: flex; align-items: flex-end; gap: 12px; position: relative; width: 369.6px; margin: 17.5px 0 0 32px; z-index: 80; max-width: 369.6px; }
+#helpDeskModal .abaxucnvswnuhbcdhodhzhmntrpsiggbeyl-zdkqgfltjoiibdesmwvpfostdlvrdrekumlzuaacegrymecsagatpkdbu { position: relative; width: 32px; height: 32px; background: url(https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-25/JY2mVSiNgd.png) no-repeat center / cover; z-index: 81; overflow: hidden; max-width: 318.39px; border-radius: 9999px; }
+#helpDeskModal .container-36 { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; position: relative; width: 270.19px; z-index: 82; }
+#helpDeskModal .background-shadow-37 { display: flex; flex-direction: column; align-items: flex-start; align-self: stretch; position: relative; padding: 12px 20px 12px 20px; background: #f2f4f5; z-index: 83; border-radius: 16px 16px 16px 0; box-shadow: 0 2px 8px 0 rgba(0, 106, 99, 0.04); }
+#helpDeskModal .text-38 { display: flex; align-items: center; justify-content: flex-start; position: relative; width: 230.19px; height: 114px; color: #191c1d; font-family: Inter, var(--ff); font-size: 14px; font-weight: 400; line-height: 22.75px; text-align: left; z-index: 84; overflow: hidden; }
+#helpDeskModal .container-39 { display: flex; flex-direction: column; align-items: flex-start; align-self: stretch; position: relative; padding: 0 4px 0 4px; z-index: 85; }
+#helpDeskModal .text-3a { display: flex; align-items: center; justify-content: flex-start; flex-basis: auto; position: relative; width: 84.09px; height: 15px; color: #94a3b8; font-family: Inter, var(--ff); font-size: 10px; font-weight: 400; line-height: 15px; text-align: left; white-space: nowrap; z-index: 86; }
+#helpDeskModal .typing-indicator { display: flex; align-items: center; gap: 12px; position: relative; width: 806px; margin: 23.75px 0 0 32px; z-index: 87; }
+#helpDeskModal .abaxu-cklr-ft-srka { position: relative; width: 32px; height: 32px; background: url(https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-25/ax5S4OEvM8.png) no-repeat center / cover; z-index: 88; overflow: hidden; max-width: 398px; border-radius: 9999px; }
+#helpDeskModal .background-3b { display: flex; align-items: flex-start; gap: 4px; position: relative; width: 58px; padding: 12px 16px 12px 16px; background: #f2f4f5; z-index: 89; border-radius: 16px 16px 16px 0; }
+#helpDeskModal .overlay-3c, #helpDeskModal .overlay-3d, #helpDeskModal .overlay-3e { position: relative; width: 6px; height: 6px; background: rgba(0, 106, 99, 0.4); z-index: 90; border-radius: 9999px; }
+#helpDeskModal .overlay-3d { z-index: 91; }
+#helpDeskModal .overlay-3e { z-index: 92; }
+#helpDeskModal .input-bar { display: flex; flex-direction: column; align-items: flex-start; align-self: stretch; position: relative; min-width: 0; padding: 24px 24px 24px 24px; border-top: 1px solid #f2f4f5; z-index: 93; }
+#helpDeskModal .background-3f { display: flex; align-items: center; align-self: stretch; gap: 12px; position: relative; padding: 8px 16px 8px 16px; background: #f2f4f5; z-index: 94; border-radius: 24px; }
+#helpDeskModal .button-40 { display: flex; align-items: center; justify-content: center; position: relative; width: 40px; height: 40px; z-index: 95; }
+#helpDeskModal .container-41 { display: flex; flex-direction: column; align-items: center; position: relative; width: 14px; z-index: 96; }
+#helpDeskModal .icon-42 { position: relative; width: 14px; height: 14px; background: url(https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-25/FLhbEfhvBi.png) no-repeat center / cover; z-index: 97; }
+#helpDeskModal .input { display: flex; flex-direction: column; align-items: flex-start; flex-grow: 1; flex-basis: 0; position: relative; padding: 13px 12px 14px 12px; z-index: 98; overflow: hidden; }
+#helpDeskModal .container-43 { display: flex; flex-direction: column; align-items: flex-start; align-self: stretch; position: relative; z-index: 99; overflow: hidden; }
+#helpDeskModal .type-your-message { align-self: stretch; flex-basis: auto; position: relative; height: 17px; color: #6b7280; font-family: Inter, var(--ff); font-size: 14px; font-weight: 400; line-height: 16.943px; text-align: left; white-space: nowrap; z-index: 100; }
+#helpDeskModal .container-44 { display: flex; align-items: center; gap: 4px; position: relative; width: 84px; z-index: 101; }
+#helpDeskModal .button-45 { display: flex; align-items: center; justify-content: center; position: relative; width: 40px; height: 40px; z-index: 102; }
+#helpDeskModal .container-46 { display: flex; flex-direction: column; align-items: center; position: relative; width: 20px; z-index: 103; }
+#helpDeskModal .icon-47 { position: relative; width: 20px; height: 20px; background: url(https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-25/dqSmE62vdY.png) no-repeat center / cover; z-index: 104; }
+#helpDeskModal .button-48 { display: flex; align-items: center; justify-content: center; position: relative; width: 40px; height: 40px; background: #006a63; z-index: 105; border-radius: 9999px; }
+#helpDeskModal .button-shadow { position: absolute; width: 40px; height: 40px; top: 50%; left: 0; background: rgba(255, 255, 255, 0); transform: translate(0, -50%); z-index: 106; border-radius: 9999px; box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.1); }
+#helpDeskModal .container-49 { display: flex; flex-direction: column; align-items: center; position: relative; width: 19px; z-index: 107; }
+#helpDeskModal .icon-4a { position: relative; width: 19px; height: 16px; background: url(https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-25/PzVAFWo4r6.png) no-repeat center / cover; z-index: 108; }
+
+@keyframes slideUpFade {
+  from { opacity: 0; transform: translateY(20px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes pulseFade {
+  0% { opacity: 0.4; }
+  50% { opacity: 1; }
+  100% { opacity: 0.4; }
+}
