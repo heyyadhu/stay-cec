@@ -1,0 +1,60 @@
+/* Splash screen overlay — injected on every page */
+.staycec-splash-overlay {
+  position: fixed;
+  inset: 0;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  z-index: 9999;
+  animation: splashFadeOut 0.5s ease forwards 2.6s;
+}
+
+.staycec-splash-overlay .splash-logo {
+  width: 220px;
+  height: 120px;
+  background: url(https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-25/CwnLELpmMk.png)
+    no-repeat center;
+  background-size: contain;
+}
+
+.staycec-splash-overlay .splash-bar-track {
+  width: 302px;
+  height: 7px;
+  background: #d9d9d9;
+  border-radius: 9px;
+  overflow: hidden;
+}
+
+.staycec-splash-overlay .splash-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: #18b2a4;
+  border-radius: 9px;
+  animation: splashBarGrow 2.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.staycec-splash-overlay .splash-text {
+  font-family: 'Poppins', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  color: #3c4947;
+  animation: splashPulse 1.2s ease-in-out infinite;
+}
+
+@keyframes splashBarGrow {
+  from { width: 0%; }
+  to   { width: 100%; }
+}
+
+@keyframes splashPulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+@keyframes splashFadeOut {
+  from { opacity: 1; pointer-events: all; }
+  to   { opacity: 0; pointer-events: none; }
+}
