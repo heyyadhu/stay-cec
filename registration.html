@@ -250,11 +250,20 @@
         const email = document.getElementById('regEmail').value.trim();
         const password = document.getElementById('regPassword').value;
 
+        const role = document.getElementById('regRole').value;
+
         // Validation
-        if (!fullName || !registerNumber || !department || !year || !phone || !email || !password) {
+        const isStudent = role === 'student';
+        const basicFields = !fullName || !registerNumber || !department || !phone || !email || !password;
+        const studentFields = isStudent && !year;
+
+        if (basicFields || studentFields) {
           regError.textContent = 'Please fill in all required fields.';
           regError.style.display = 'block';
           regSuccess.style.display = 'none';
+          regBtnText.textContent = 'Send request';
+          regBtn.style.pointerEvents = 'auto';
+          regBtn.style.opacity = '1';
           return;
         }
         if (password.length < 6) {

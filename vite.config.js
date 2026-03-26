@@ -13,7 +13,8 @@ export default defineConfig({
         mess: resolve(__dirname, 'mess.html'),
         notifications: resolve(__dirname, 'notifications.html'),
         payments: resolve(__dirname, 'payments.html'),
-        messReduction: resolve(__dirname, 'mess-reduction.html')
+        messReduction: resolve(__dirname, 'mess-reduction.html'),
+        wardenDashboard: resolve(__dirname, 'warden-dashboard.html')
       }
     }
   }
