@@ -14,7 +14,8 @@ export default defineConfig({
         notifications: resolve(__dirname, 'notifications.html'),
         payments: resolve(__dirname, 'payments.html'),
         messReduction: resolve(__dirname, 'mess-reduction.html'),
-        wardenDashboard: resolve(__dirname, 'warden-dashboard.html')
+        wardenDashboard:   resolve(__dirname, 'warden-dashboard.html'),
+        wardenResidents:   resolve(__dirname, 'warden-residents.html')
       }
     }
   }

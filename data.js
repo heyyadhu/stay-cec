@@ -11,7 +11,6 @@ import {
   orderBy, 
   limit, 
   getDocs,
-  getCountFromServer,
   startAfter,
   Timestamp,
   doc,
@@ -144,29 +143,28 @@ export async function getAllResidents(pageSize = 10, lastVisible = null) {
 
 /**
  * Count all students and compute stats for the Resident Directory stat cards.
+ * Fetches all students in a single query and derives stats client-side.
  */
 export async function getResidentStats() {
   try {
     const ref = collection(db, 'students');
-    const studentQuery = query(ref, where('role', '==', 'student'));
-    const countSnap = await getCountFromServer(studentQuery);
-    const total = countSnap.data().count;
+    const snap = await getDocs(query(ref, where('role', '==', 'student')));
 
-    // Approximate splits from hostel name (men/women)
-    const menQuery  = query(ref, where('role', '==', 'student'), where('hostel', '>=', "CEC Premium Men"),  where('hostel', '<=', "CEC Premium Men\uf8ff"));
-    const womenQuery = query(ref, where('role', '==', 'student'), where('hostel', '>=', "CEC Premium Women"), where('hostel', '<=', "CEC Premium Women\uf8ff"));
-    const [menSnap, womenSnap] = await Promise.all([getDocs(menQuery), getDocs(womenQuery)]);
-    const maleCount   = menSnap.size;
-    const femaleCount = womenSnap.size;
+    let maleCount = 0, femaleCount = 0, newAdmissions = 0;
+    const since = Date.now() - 30 * 24 * 60 * 60 * 1000; // last 30 days
 
-    // New admissions this academic cycle (no date field → just use last 30 days)
-    const since = new Date();
-    since.setDate(since.getDate() - 30);
-    const newQuery = query(ref, where('role', '==', 'student'), where('createdAt', '>=', Timestamp.fromDate(since)));
-    const newSnap = await getDocs(newQuery);
-    const newAdmissions = newSnap.size;
+    snap.forEach(d => {
+      const data = d.data();
+      const hostel = (data.hostel || '').toLowerCase();
+      if (hostel.includes("men") && !hostel.includes("women")) maleCount++;
+      else if (hostel.includes("women")) femaleCount++;
 
-    return { total, maleCount, femaleCount, newAdmissions };
+      // count new admissions (last 30 days)
+      const createdMs = data.createdAt?.toMillis?.() ?? 0;
+      if (createdMs >= since) newAdmissions++;
+    });
+
+    return { total: snap.size, maleCount, femaleCount, newAdmissions };
   } catch (error) {
     console.error('Error fetching resident stats:', error);
     return { total: 0, maleCount: 0, femaleCount: 0, newAdmissions: 0 };
