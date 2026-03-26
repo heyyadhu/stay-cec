@@ -101,19 +101,41 @@
             </div>
 
             <!-- Back Face (Payment/QR) -->
-            <div id="feeBack" style="display: none; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; gap: 15px;">
-              <div id="qrContainer" style="background: white; padding: 10px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-                <img id="qrCodeImg" src="" alt="UPI QR Code" style="width: 150px; height: 150px; display: block;" />
-              </div>
-              <div style="width: 100%; max-width: 300px;">
-                <input type="text" id="utrInput" placeholder="Enter 12-digit UTR No." 
-                  style="width: 100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: white; font-family: 'Inter', sans-serif; margin-bottom: 10px; outline: none;" />
-                <div class="button" id="verifyBtn" style="width: 100%; height: auto; padding: 12px; background: white; cursor: pointer;">
-                  <span style="color: #006a63; font-weight: 700;">Verify Payment</span>
+            <div id="feeBack" class="payment-card-back codia-style" style="display: none;">
+              <div class="codia-main-row">
+                <div class="codia-qr-side">
+                  <span class="codia-qr-label">SCAN THE QR CODE TO PAY</span>
+                  <div class="codia-qr-container">
+                    <img id="qrCodeImg" src="" alt="UPI QR Code" />
+                  </div>
+                </div>
+                <div class="codia-details-side">
+                  <span class="codia-label-small">Total Outstanding</span>
+                  <div class="codia-amount-row">
+                    <span class="codia-amount-big" id="outstandingDisplayBig">₹1,200</span>
+                    <span class="codia-amount-unit">rupees</span>
+                  </div>
+                  <div class="codia-due-badge">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                    <span id="dueStatusDisplayCodia">DUE OCTOBER 15, 2024</span>
+                  </div>
                 </div>
               </div>
-              <div id="paymentError" style="color: #ba1a1a; font-size: 12px; display: none; font-weight: 700;"></div>
-              <div id="cancelPay" style="color: white; font-size: 12px; cursor: pointer; text-decoration: underline; opacity: 0.8;">Cancel</div>
+              
+              <div class="codia-action-area">
+                <span class="codia-utr-label">Enter the 12 digit UTR number</span>
+                <div class="codia-input-row">
+                  <input type="text" id="utrInput" class="codia-input" placeholder="123456789012" maxlength="12" />
+                  <input type="file" id="screenshotUpload" style="display: none;" accept="image/*" />
+                  <label for="screenshotUpload" class="codia-upload-btn" id="uploadLabel">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                    <span>Upload</span>
+                  </label>
+                  <button class="codia-submit-btn" id="verifyBtn">SUBMIT</button>
+                </div>
+                <div id="paymentError" class="error-msg" style="display: none;"></div>
+                <span id="cancelPay" class="codia-cancel">Back to Dashboard</span>
+              </div>
             </div>
 
             <!-- Success Message -->
@@ -317,13 +339,28 @@
       const verifyBtn = document.getElementById('verifyBtn');
       const utrInput = document.getElementById('utrInput');
       const paymentError = document.getElementById('paymentError');
+      const screenshotUpload = document.getElementById('screenshotUpload');
+      const uploadLabel = document.getElementById('uploadLabel');
+      const outstandingDisplayBig = document.getElementById('outstandingDisplayBig');
 
       payNowBtn.addEventListener('click', () => {
-        const upiString = `upi://pay?pa=fxadhu-2@okaxis&pn=StayCEC&am=${outstanding}&cu=INR`;
+        const upiId = 'fxadhu-2@okaxis';
+        const upiString = `upi://pay?pa=${upiId}&pn=StayCEC&am=${outstanding}&cu=INR`;
         qrCodeImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(upiString)}`;
+        if(outstandingDisplayBig) outstandingDisplayBig.textContent = `₹${outstanding.toLocaleString()}`;
         feeFront.style.display = 'none';
         feeBack.style.display = 'flex';
       });
+
+      if (screenshotUpload) {
+        screenshotUpload.addEventListener('change', (e) => {
+          if (e.target.files.length > 0) {
+            uploadLabel.querySelector('span').textContent = 'Selected!';
+            uploadLabel.style.borderColor = '#12b1a6';
+            uploadLabel.style.color = '#12b1a6';
+          }
+        });
+      }
 
       cancelPay.addEventListener('click', () => {
         feeBack.style.display = 'none';

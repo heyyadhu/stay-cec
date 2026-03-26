@@ -55,51 +55,101 @@
 
         <!-- Summary -->
         <div class="summary-section">
-          <div class="hero-balance-card">
-            <div class="container-1c">
-              <div class="container-1d">
-                <div class="container-1e">
-                  <span class="current-total-balance">Current Total Balance</span>
+          <div class="hero-balance-card" id="feeCard" style="position: relative;">
+            <!-- Front Face -->
+            <div id="feeFront" style="display: flex; align-items: center; gap: 40px; width: 100%;">
+              <div class="container-1c">
+                <div class="container-1d">
+                  <div class="container-1e">
+                    <span class="current-total-balance">Current Total Balance</span>
+                  </div>
+                  <div class="heading-1f">
+                    <span class="text-20" id="outstandingDisplay">&#8377;0</span><span class="text-21">.00</span>
+                  </div>
                 </div>
-                <div class="heading-1f">
-                  <span class="text-20">&#8377;5,600</span><span class="text-21">.00</span>
+                <div class="container-22">
+                  <div class="container-23">
+                    <div class="container-24"><span class="october-cycle-progress">October Cycle Progress</span></div>
+                    <div class="container-25"><span class="text-paid" id="paidPercentage">0% Paid</span></div>
+                  </div>
+                  <div class="background">
+                    <div id="progressBar" style="width: 0%; height: 100%; background: #12b1a6; border-radius: 9999px; transition: width 0.5s ease;"></div>
+                  </div>
+                  <div id="overdueOverlay" class="overlay" style="display: none;">
+                    <span class="overdue-by-2-days">Overdue</span>
+                    <div class="container-26"><div class="icon-27"></div></div>
+                  </div>
                 </div>
               </div>
-              <div class="container-22">
-                <div class="container-23">
-                  <div class="container-24"><span class="october-cycle-progress">October Cycle Progress</span></div>
-                  <div class="container-25"><span class="text-paid">0% Paid</span></div>
+              <div class="overlay-border">
+                <div class="container-28">
+                  <div class="container-29"><span class="next-due-date">Next Due Date</span></div>
+                  <div class="container-2a"><span class="oct-15-2023">15 Oct, 2023</span></div>
                 </div>
-                <div class="background"></div>
-                <div class="overlay">
-                  <span class="overdue-by-2-days">Overdue by 2 days</span>
-                  <div class="container-26"><div class="icon-27"></div></div>
+                <div class="margin">
+                  <div class="container-2b">
+                    <div class="container-2c">
+                      <div class="container-2d">
+                        <div class="container-2e"><span class="text-hostel">Hostel</span></div>
+                        <div class="container-2f"><span class="text-2300" id="hostelFeeDisplay">&#8377;0</span></div>
+                      </div>
+                      <div class="container-30">
+                        <div class="container-31"><span class="text-mess">Mess</span></div>
+                        <div class="container-32"><span class="text-3300" id="messFeeDisplay">&#8377;0</span></div>
+                      </div>
+                    </div>
+                    <div class="button" id="payNowBtn">
+                      <div class="button-shadow"></div>
+                      <span class="text-pay-now">Pay Now</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-            <div class="overlay-border">
-              <div class="container-28">
-                <div class="container-29"><span class="next-due-date">Next Due Date</span></div>
-                <div class="container-2a"><span class="oct-15-2023">15 Oct, 2023</span></div>
-              </div>
-              <div class="margin">
-                <div class="container-2b">
-                  <div class="container-2c">
-                    <div class="container-2d">
-                      <div class="container-2e"><span class="text-hostel">Hostel</span></div>
-                      <div class="container-2f"><span class="text-2300">&#8377;2,300</span></div>
-                    </div>
-                    <div class="container-30">
-                      <div class="container-31"><span class="text-mess">Mess</span></div>
-                      <div class="container-32"><span class="text-3300">&#8377;3,300</span></div>
-                    </div>
+
+            <!-- Back Face (Payment/QR) -->
+            <div id="feeBack" class="payment-card-back codia-style" style="display: none;">
+              <div class="codia-main-row">
+                <div class="codia-qr-side">
+                  <span class="codia-qr-label">SCAN THE QR CODE TO PAY</span>
+                  <div class="codia-qr-container">
+                    <img id="qrCodeImg" src="" alt="UPI QR Code" />
                   </div>
-                  <div class="button" onclick="alert('Redirecting to payment gateway...')" style="cursor:pointer;">
-                    <div class="button-shadow"></div>
-                    <span class="text-pay-now">Pay Now</span>
+                </div>
+                <div class="codia-details-side">
+                  <span class="codia-label-small">Total Outstanding</span>
+                  <div class="codia-amount-row">
+                    <span class="codia-amount-big" id="outstandingDisplayBig">₹1,200</span>
+                    <span class="codia-amount-unit">rupees</span>
+                  </div>
+                  <div class="codia-due-badge">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                    <span id="dueStatusDisplayCodia">DUE OCTOBER 15, 2024</span>
                   </div>
                 </div>
               </div>
+              
+              <div class="codia-action-area">
+                <span class="codia-utr-label">Enter the 12 digit UTR number</span>
+                <div class="codia-input-row">
+                  <input type="text" id="utrInput" class="codia-input" placeholder="123456789012" maxlength="12" />
+                  <input type="file" id="screenshotUpload" style="display: none;" accept="image/*" />
+                  <label for="screenshotUpload" class="codia-upload-btn" id="uploadLabel">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                    <span>Upload</span>
+                  </label>
+                  <button class="codia-submit-btn" id="verifyBtn">SUBMIT</button>
+                </div>
+                <div id="paymentError" class="error-msg" style="display: none;"></div>
+                <span id="cancelPay" class="codia-cancel">Back to Summary</span>
+              </div>
+            </div>
+
+            <!-- Success Face -->
+            <div id="feeSuccess" style="display: none; flex-direction: column; align-items: center; justify-content: center; width: 100%; height: 280px; text-align: center;">
+              <div style="font-size: 64px; margin-bottom: 20px;">✅</div>
+              <div style="font-size: 28px; font-weight: 800; color: #0f172a; margin-bottom: 8px;">All Dues Cleared!</div>
+              <div style="color: #64748b; font-weight: 500;">Thank you for your payment. Your records have been updated.</div>
             </div>
           </div>
 
@@ -286,10 +336,107 @@
 
     </script>
     <script type="module">
-      import { requireAuth, logOut } from './auth.js';
+      import { requireAuth, logOut, getStudentProfile, updateStudentFees } from './auth.js';
 
       (async () => {
-        await requireAuth();
+        const user = await requireAuth();
+
+        const profile = await getStudentProfile();
+        
+        // Data elements
+        const outstandingDisplay = document.getElementById('outstandingDisplay');
+        const hostelFeeDisplay = document.getElementById('hostelFeeDisplay');
+        const messFeeDisplay = document.getElementById('messFeeDisplay');
+        const paidPercentage = document.getElementById('paidPercentage');
+        const progressBar = document.getElementById('progressBar');
+        const overdueOverlay = document.getElementById('overdueOverlay');
+        
+        // Panels
+        const feeFront = document.getElementById('feeFront');
+        const feeBack = document.getElementById('feeBack');
+        const feeSuccess = document.getElementById('feeSuccess');
+
+        if (profile) {
+          const outstanding = profile.outstandingAmount || 0;
+          outstandingDisplay.textContent = `₹${outstanding.toLocaleString()}`;
+          hostelFeeDisplay.textContent = `₹${(2300).toLocaleString()}`; // Mock fixed
+          messFeeDisplay.textContent = `₹${(3300).toLocaleString()}`; // Mock fixed
+          
+          if (outstanding === 0 || profile.feeStatus === 'Paid') {
+            feeFront.style.display = 'none';
+            feeSuccess.style.display = 'flex';
+          } else {
+            // Update progress bar (mock)
+            const total = 5600;
+            const paid = total - outstanding;
+            const pct = Math.round((paid / total) * 100);
+            paidPercentage.textContent = `${pct}% Paid`;
+            progressBar.style.width = `${pct}%`;
+            if (outstanding > 0) overdueOverlay.style.display = 'block';
+          }
+        }
+
+        // Action Logic
+        const payNowBtn = document.getElementById('payNowBtn');
+        const cancelPay = document.getElementById('cancelPay');
+        const qrCodeImg = document.getElementById('qrCodeImg');
+        const verifyBtn = document.getElementById('verifyBtn');
+        const utrInput = document.getElementById('utrInput');
+        const paymentError = document.getElementById('paymentError');
+        const screenshotUpload = document.getElementById('screenshotUpload');
+        const uploadLabel = document.getElementById('uploadLabel');
+        const outstandingDisplayBig = document.getElementById('outstandingDisplayBig');
+
+        payNowBtn.addEventListener('click', () => {
+          const upiId = 'fxadhu-2@okaxis';
+          const amount = profile ? profile.outstandingAmount : 5600;
+          const upiString = `upi://pay?pa=${upiId}&pn=StayCEC&am=${amount}&cu=INR`;
+          qrCodeImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(upiString)}`;
+          if(outstandingDisplayBig) outstandingDisplayBig.textContent = `₹${amount.toLocaleString()}`;
+          feeFront.style.display = 'none';
+          feeBack.style.display = 'flex';
+        });
+
+        if (screenshotUpload) {
+          screenshotUpload.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+              uploadLabel.querySelector('span').textContent = 'Selected!';
+              uploadLabel.style.borderColor = '#12b1a6';
+              uploadLabel.style.color = '#12b1a6';
+            }
+          });
+        }
+
+        cancelPay.addEventListener('click', () => {
+          feeBack.style.display = 'none';
+          feeFront.style.display = 'flex';
+        });
+
+        verifyBtn.addEventListener('click', async () => {
+          const utr = utrInput.value.trim();
+          if (utr.length !== 12 || !/^\d+$/.test(utr)) {
+            paymentError.textContent = 'Please enter a valid 12-digit UTR Number.';
+            paymentError.style.display = 'block';
+            return;
+          }
+
+          paymentError.style.display = 'none';
+          verifyBtn.disabled = true;
+          verifyBtn.style.opacity = '0.7';
+
+          try {
+            await updateStudentFees(user.uid);
+            feeBack.style.display = 'none';
+            feeSuccess.style.display = 'flex';
+          } catch (err) {
+            console.error(err);
+            paymentError.textContent = 'Verification failed. Please try again.';
+            paymentError.style.display = 'block';
+            verifyBtn.disabled = false;
+            verifyBtn.style.opacity = '1';
+          }
+        });
+
         document.getElementById('mainContainer').style.opacity = '1';
       })();
 
