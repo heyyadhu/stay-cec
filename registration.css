@@ -374,6 +374,8 @@ button {
   border-radius: 8px;
   backdrop-filter: blur(10px);
   box-shadow: 0 12px 32px 0 rgba(25, 28, 29, 0.06);
+  overflow-y: auto;
+  max-height: 90vh;
 }
 .header {
   display: flex;

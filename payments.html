@@ -340,8 +340,12 @@
 
       (async () => {
         const user = await requireAuth();
-
         const profile = await getStudentProfile();
+
+        if (profile && profile.role === 'warden') {
+          window.location.href = 'warden-dashboard.html';
+          return;
+        }
         
         // Data elements
         const outstandingDisplay = document.getElementById('outstandingDisplay');

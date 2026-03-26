@@ -83,6 +83,18 @@
         </div>
         <div class="form">
           <div class="container-12">
+            <div class="role-selection" style="margin-bottom: 24px;">
+              <div class="full-name">
+                <div class="label">
+                  <span class="full-name-13">I am a...</span>
+                </div>
+                <select id="regRole" style="width:100%;padding:14px 16px;border-radius:10px;border:1px solid rgba(0,0,0,0.1);background:#f8f9fa;font-family:'Inter',sans-serif;font-size:15px;color:#1a1a2e;appearance:auto;cursor:pointer;outline:none;margin-top:8px;font-weight:600;">
+                  <option value="student">Student</option>
+                  <option value="warden">Warden</option>
+                </select>
+              </div>
+            </div>
+
             <div class="flex-row-adb">
               <div class="full-name">
                 <div class="label">
@@ -94,14 +106,14 @@
               </div>
               <div class="register-number">
                 <div class="label-15">
-                  <span class="register-number-16">Register Number</span>
+                  <span class="register-number-16" id="idLabel">Register Number</span>
                 </div>
                 <div class="input-17">
                   <input type="text" id="regRegNumber" class="form-input" placeholder="2024CS101" required />
                 </div>
               </div>
             </div>
-            <div class="flex-row">
+            <div class="flex-row-adb" style="margin-top: 24px;">
               <div class="department">
                 <div class="label-19">
                   <span class="span-department">Department</span>
@@ -112,9 +124,12 @@
                   <option value="ai">Artificial Intelligence</option>
                   <option value="ece">Electronics &amp; Communication</option>
                   <option value="ee">Electrical</option>
+                  <option value="administration">Administration</option>
                 </select>
               </div>
-              <div class="year">
+            </div>
+            <div class="flex-row" id="studentFieldsRow">
+              <div class="year" id="yearFieldContainer">
                 <div class="label-1b"><span class="span-year">Year</span></div>
                 <select class="options-1c" id="yearSelect" style="width:100%;padding:12px 16px;border-radius:10px;border:1px solid rgba(0,0,0,0.08);background:#f8f8fa;font-family:'Inter',sans-serif;font-size:14px;color:#1a1a2e;appearance:auto;cursor:pointer;outline:none;">
                   <option value="" disabled selected>Select Year</option>
@@ -124,29 +139,27 @@
                   <option value="4">4th Year</option>
                 </select>
               </div>
+              <div class="parent-mobile-number" id="parentPhoneContainer">
+                <div class="label-26">
+                  <span class="text">Parent Mobile Number</span>
+                </div>
+                <div class="container-29">
+                  <div class="input-2a">
+                    <input type="tel" id="regParentPhone" class="form-input" placeholder="+91 98765 43210" />
+                  </div>
+                </div>
+              </div>
             </div>
             <div class="flex-row-b">
-              <div class="phone">
+              <div class="phone" style="width: 100%;">
                 <div class="label-21">
-                  <span class="span-phone">Phone</span>
+                  <span class="span-phone">Personal Phone</span>
                 </div>
                 <div class="container-22">
                   <div class="input-23">
                     <input type="tel" id="regPhone" class="form-input" placeholder="+91 98765 43210" required />
                   </div>
                   <div class="container-25"><div class="icon"></div></div>
-                </div>
-              </div>
-              <div class="parent-mobile-number">
-                <div class="label-26">
-                  <span class="text">Parent Mobile Number</span>
-                  <div class="container-27"><div class="icon-28"></div></div>
-                </div>
-                <div class="container-29">
-                  <div class="input-2a">
-                    <input type="tel" id="regParentPhone" class="form-input" placeholder="+91 98765 43210" required />
-                  </div>
-                  <div class="container-2c"><div class="icon-2d"></div></div>
                 </div>
               </div>
             </div>
@@ -258,16 +271,25 @@
         regSuccess.style.display = 'none';
 
         try {
-          await signUp(email, password, {
+          const role = document.getElementById('regRole').value;
+          const profileData = {
             fullName,
             registerNumber,
             department,
-            year,
             phone,
-            parentPhone,
-            hostel: 'CEC Premium Men\'s Hostel',
-            room: 'Pending Assignment',
-          });
+            role,
+            hostel: role === 'warden' ? 'Administration' : 'CEC Premium Men\'s Hostel',
+          };
+
+          if (role === 'student') {
+            profileData.year = year;
+            profileData.parentPhone = parentPhone;
+            profileData.room = 'Pending Assignment';
+            profileData.outstandingAmount = 12000;
+            profileData.feeStatus = 'Pending';
+          }
+
+          await signUp(email, password, profileData);
 
           regSuccess.textContent = 'Registration successful! Redirecting to login...';
           regSuccess.style.display = 'block';
@@ -296,6 +318,21 @@
           regBtnText.textContent = 'Send request';
           regBtn.style.pointerEvents = 'auto';
           regBtn.style.opacity = '1';
+        }
+      });
+      const regRole = document.getElementById('regRole');
+      const studentFieldsRow = document.getElementById('studentFieldsRow');
+      const idLabel = document.getElementById('idLabel');
+
+      regRole.addEventListener('change', () => {
+        if (regRole.value === 'warden') {
+          studentFieldsRow.style.display = 'none';
+          idLabel.textContent = 'Staff ID';
+          document.getElementById('regRegNumber').placeholder = 'ST-101';
+        } else {
+          studentFieldsRow.style.display = 'flex';
+          idLabel.textContent = 'Register Number';
+          document.getElementById('regRegNumber').placeholder = '2024CS101';
         }
       });
     </script>

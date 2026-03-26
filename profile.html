@@ -209,6 +209,11 @@
         const user = await requireAuth();
         const profile = await getStudentProfile();
 
+        if (profile && profile.role === 'warden') {
+          window.location.href = 'warden-dashboard.html';
+          return;
+        }
+
         if (profile) {
           document.getElementById('profileName').textContent = profile.fullName || '—';
           document.getElementById('profileFullName').textContent = profile.fullName || '—';

@@ -185,29 +185,60 @@
       </div>
     </div>
 
-    <script>
+    <script type="module">
+      import { requireAuth, logOut, getStudentProfile } from './auth.js';
 
+      let currentUser = null;
+
+      async function init() {
+        try {
+          currentUser = await requireAuth();
+          const profile = await getStudentProfile();
+
+          if (profile && profile.role === 'warden') {
+            window.location.href = 'warden-dashboard.html';
+            return;
+          }
+
+          // Populate student info if available
+          if (profile) {
+            const nameEl = document.querySelector('.text-25');
+            const rollEl = document.querySelector('.text-2b');
+            const roomEl = document.querySelector('.text-block-a');
+            if (nameEl) nameEl.textContent = profile.fullName;
+            if (rollEl) rollEl.textContent = profile.registerNumber;
+            if (roomEl && profile.block && profile.roomNumber) {
+                roomEl.textContent = `${profile.block} - ${profile.roomNumber}`;
+            }
+          }
+
+        } catch (err) {
+          console.error("Init failed:", err);
+        }
+      }
+
+      init();
 
       // Auto-calculate days across both date ranges
-      function calcRangeDays(fromId, toId) {
+      window.calcRangeDays = function(fromId, toId) {
         const f = new Date(document.getElementById(fromId).value);
         const t = new Date(document.getElementById(toId).value);
         if (document.getElementById(fromId).value && document.getElementById(toId).value && t >= f) {
           return Math.round((t - f) / (1000 * 60 * 60 * 24)) + 1;
         }
         return 0;
-      }
+      };
 
-      function updateDays() {
+      window.updateDays = function() {
         const total = calcRangeDays('fromDate1','toDate1') + calcRangeDays('fromDate2','toDate2');
         document.getElementById('calcDays').textContent = total;
-      }
+      };
 
       ['fromDate1','toDate1','fromDate2','toDate2'].forEach(id => {
-        document.getElementById(id).addEventListener('change', updateDays);
+        document.getElementById(id).addEventListener('change', window.updateDays);
       });
 
-      function submitRequest() {
+      window.submitRequest = function() {
         const reason = document.getElementById('reasonText').value.trim();
         const days   = document.getElementById('calcDays').textContent;
         const hasRange1 = document.getElementById('fromDate1').value && document.getElementById('toDate1').value;
@@ -221,8 +252,14 @@
           return;
         }
         alert(`Request submitted!\n\nTotal Days: ${days}\nReason: ${reason}\n\nYour mess reduction request has been submitted for approval.`);
-        navigateTo('mess.html');
-      }
+        window.location.href = 'mess.html';
+      };
+
+      const logoutBtn = document.querySelector('.link-17');
+      if (logoutBtn) logoutBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          logOut();
+      });
     </script>
   </body>
 </html>

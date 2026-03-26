@@ -451,6 +451,12 @@
       (async () => {
         currentUser = await requireAuth();
         const profile = await getStudentProfile();
+        
+        if (profile && profile.role === 'warden') {
+          window.location.href = 'warden-dashboard.html';
+          return;
+        }
+
         document.getElementById('mainContainer').style.opacity = '1';
 
         // 1. Load complaints

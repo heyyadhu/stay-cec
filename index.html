@@ -154,8 +154,18 @@
 
         try {
           await signIn(email, password);
+          
+          // Get profile to check role
+          const { getStudentProfile } = await import('./auth.js');
+          const profile = await getStudentProfile();
+          
           sessionStorage.setItem('staycec_nav_internal', '1');
-          window.location.href = 'dashboard.html';
+          
+          if (profile && profile.role === 'warden') {
+            window.location.href = 'warden-dashboard.html';
+          } else {
+            window.location.href = 'dashboard.html';
+          }
         } catch (err) {
           console.error('Login error:', err);
           let msg = `Login failed: ${err.message || 'Please try again.'}`;

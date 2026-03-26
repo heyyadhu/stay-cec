@@ -286,139 +286,156 @@
         </div>
       </div>
     </div>
-  </body>
+    <script type="module">
+      import { requireAuth, getStudentProfile, logOut, updateStudentFees } from './auth.js';
+      import { getRecentComplaints } from './data.js';
 
-  <script type="module">
-    import { requireAuth, getStudentProfile, logOut, updateStudentFees } from './auth.js';
-    import { getRecentComplaints } from './data.js';
-
-    (async () => {
-      const user = await requireAuth();
-      
-      // Load student profile
-      const profile = await getStudentProfile();
-      
-      // 1. Greeting & Room Info
-      if (profile) {
-        // Greeting
-        const greetEl = document.getElementById('greetingText');
-        const hour = new Date().getHours();
-        let greet = 'Good Evening';
-        if (hour < 12) greet = 'Good Morning';
-        else if (hour < 17) greet = 'Good Afternoon';
-        const firstName = profile.fullName ? profile.fullName.split(' ')[0] : 'Student';
-        greetEl.textContent = `${greet}, ${firstName}`;
-
-        // Room Info
-        const roomEl = document.getElementById('roomDisplay');
-        if (roomEl && profile.block && profile.roomNumber) {
-          roomEl.textContent = `${profile.block} • ${profile.roomNumber}`;
-        }
-      }
-
-      // 2. Fee Display Logic
-      const outstanding = (profile && profile.outstandingAmount !== undefined) ? profile.outstandingAmount : 1200;
-      const outstandingDisplay = document.getElementById('outstandingDisplay');
-      const feeFront = document.getElementById('feeFront');
-      const feeSuccess = document.getElementById('feeSuccess');
-
-      if (profile && (profile.feeStatus === 'Paid' || outstanding === 0)) {
-        feeFront.style.display = 'none';
-        feeSuccess.style.display = 'flex';
-      } else {
-        outstandingDisplay.textContent = `₹${outstanding.toLocaleString()}`;
-      }
-
-      // 3. Dynamic Complaints
-      const complaintsList = document.getElementById('complaintsList');
-      if (complaintsList) {
-        const complaints = await getRecentComplaints(user.uid);
-        if (complaints.length > 0) {
-          complaintsList.innerHTML = complaints.map(c => `
-            <div class="background-border-shadow-39" style="margin-bottom: 12px;">
-              <div class="container-3a">
-                <span class="heading-room-fan-repair">${c.title || 'Maintenance Request'}</span>
-                <div class="background">
-                  <div class="background-3b" style="background: ${c.status === 'Resolved' ? '#12b1a6' : '#FFB74D'}"></div>
-                  <span class="text-3c">${c.status || 'Pending'}</span>
-                </div>
-              </div>
-              <div class="container-3d">
-                <span class="text-3e">${c.description || 'No description provided.'}</span>
-              </div>
-            </div>
-          `).join('');
-        } else {
-          complaintsList.innerHTML = '<div class="text-3e" style="opacity: 0.6;">No recent complaints found.</div>';
-        }
-      }
-
-      // 4. Payment Flow Logic
-      const payNowBtn = document.getElementById('payNowBtn');
-      const feeBack = document.getElementById('feeBack');
-      const cancelPay = document.getElementById('cancelPay');
-      const qrCodeImg = document.getElementById('qrCodeImg');
-      const verifyBtn = document.getElementById('verifyBtn');
-      const utrInput = document.getElementById('utrInput');
-      const paymentError = document.getElementById('paymentError');
-      const screenshotUpload = document.getElementById('screenshotUpload');
-      const uploadLabel = document.getElementById('uploadLabel');
-      const outstandingDisplayBig = document.getElementById('outstandingDisplayBig');
-
-      payNowBtn.addEventListener('click', () => {
-        const upiId = 'fxadhu-2@okaxis';
-        const upiString = `upi://pay?pa=${upiId}&pn=StayCEC&am=${outstanding}&cu=INR`;
-        qrCodeImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(upiString)}`;
-        if(outstandingDisplayBig) outstandingDisplayBig.textContent = `₹${outstanding.toLocaleString()}`;
-        feeFront.style.display = 'none';
-        feeBack.style.display = 'flex';
-      });
-
-      if (screenshotUpload) {
-        screenshotUpload.addEventListener('change', (e) => {
-          if (e.target.files.length > 0) {
-            uploadLabel.querySelector('span').textContent = 'Selected!';
-            uploadLabel.style.borderColor = '#12b1a6';
-            uploadLabel.style.color = '#12b1a6';
-          }
-        });
-      }
-
-      cancelPay.addEventListener('click', () => {
-        feeBack.style.display = 'none';
-        feeFront.style.display = 'flex';
-      });
-
-      verifyBtn.addEventListener('click', async () => {
-        const utr = utrInput.value.trim();
-        if (utr.length !== 12 || !/^\d+$/.test(utr)) {
-          paymentError.textContent = 'Please enter a valid 12-digit UTR Number.';
-          paymentError.style.display = 'block';
-          return;
-        }
-
-        paymentError.style.display = 'none';
-        verifyBtn.style.opacity = '0.7';
-        verifyBtn.style.pointerEvents = 'none';
-
+      async function init() {
         try {
-          await updateStudentFees(user.uid);
-          feeBack.style.display = 'none';
-          feeSuccess.style.display = 'flex';
+          // 1. Wait for auth
+          const user = await requireAuth();
+          
+          // 2. Fetch the Firestore profile
+          const profile = await getStudentProfile();
+          
+          if (profile && profile.role === 'warden') {
+            window.location.href = 'warden-dashboard.html';
+            return;
+          }
+
+          // 3. Greeting & Room Info
+          if (profile) {
+            const greetEl = document.getElementById('greetingText');
+            const hour = new Date().getHours();
+            let greet = 'Good Evening';
+            if (hour < 12) greet = 'Good Morning';
+            else if (hour < 17) greet = 'Good Afternoon';
+            const firstName = profile.fullName ? profile.fullName.split(' ')[0] : 'Student';
+            if (greetEl) greetEl.textContent = `${greet}, ${firstName}`;
+
+            const roomEl = document.getElementById('roomDisplay');
+            if (roomEl && profile.block && profile.roomNumber) {
+              roomEl.textContent = `${profile.block} • ${profile.roomNumber}`;
+            }
+          }
+
+          // 4. Fee Display Logic
+          const outstanding = (profile && profile.outstandingAmount !== undefined) ? profile.outstandingAmount : 12000;
+          const outstandingDisplay = document.getElementById('outstandingDisplay');
+          const feeFront = document.getElementById('feeFront');
+          const feeSuccess = document.getElementById('feeSuccess');
+
+          if (profile && (profile.feeStatus === 'Paid' || outstanding === 0)) {
+            if (feeFront) feeFront.style.display = 'none';
+            if (feeSuccess) feeSuccess.style.display = 'flex';
+          } else {
+            if (outstandingDisplay) outstandingDisplay.textContent = `₹${outstanding.toLocaleString()}`;
+          }
+
+          // 5. Dynamic Complaints
+          const complaintsList = document.getElementById('complaintsList');
+          if (complaintsList) {
+            const complaints = await getRecentComplaints(user.uid);
+            if (complaints.length > 0) {
+              complaintsList.innerHTML = complaints.map(c => `
+                <div class="background-border-shadow-39" style="margin-bottom: 12px;">
+                  <div class="container-3a">
+                    <span class="heading-room-fan-repair">${c.title || 'Maintenance Request'}</span>
+                    <div class="background">
+                      <div class="background-3b" style="background: ${c.status === 'Resolved' ? '#12b1a6' : '#FFB74D'}"></div>
+                      <span class="text-3c">${c.status || 'Pending'}</span>
+                    </div>
+                  </div>
+                  <div class="container-3d">
+                    <span class="text-3e">${c.description || 'No description provided.'}</span>
+                  </div>
+                </div>
+              `).join('');
+            } else {
+              complaintsList.innerHTML = '<div class="text-3e" style="opacity: 0.6;">No recent complaints found.</div>';
+            }
+          }
+
+          // 6. Payment Flow Logic
+          const payNowBtn = document.getElementById('payNowBtn');
+          const feeBack = document.getElementById('feeBack');
+          const cancelPay = document.getElementById('cancelPay');
+          const qrCodeImg = document.getElementById('qrCodeImg');
+          const verifyBtn = document.getElementById('verifyBtn');
+          const utrInput = document.getElementById('utrInput');
+          const paymentError = document.getElementById('paymentError');
+          const screenshotUpload = document.getElementById('screenshotUpload');
+          const uploadLabel = document.getElementById('uploadLabel');
+          const outstandingDisplayBig = document.getElementById('outstandingDisplayBig');
+
+          if (payNowBtn) {
+            payNowBtn.addEventListener('click', () => {
+              const upiId = 'fxadhu-2@okaxis';
+              const upiString = `upi://pay?pa=${upiId}&pn=StayCEC&am=${outstanding}&cu=INR`;
+              if (qrCodeImg) qrCodeImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(upiString)}`;
+              if(outstandingDisplayBig) outstandingDisplayBig.textContent = `₹${outstanding.toLocaleString()}`;
+              if (feeFront) feeFront.style.display = 'none';
+              if (feeBack) feeBack.style.display = 'flex';
+            });
+          }
+
+          if (screenshotUpload) {
+            screenshotUpload.addEventListener('change', (e) => {
+              if (e.target.files.length > 0) {
+                const labelText = uploadLabel.querySelector('span');
+                if (labelText) labelText.textContent = 'Selected!';
+                uploadLabel.style.borderColor = '#12b1a6';
+                uploadLabel.style.color = '#12b1a6';
+              }
+            });
+          }
+
+          if (cancelPay) {
+            cancelPay.addEventListener('click', () => {
+              if (feeBack) feeBack.style.display = 'none';
+              if (feeFront) feeFront.style.display = 'flex';
+            });
+          }
+
+          if (verifyBtn) {
+            verifyBtn.addEventListener('click', async () => {
+              const utr = utrInput.value.trim();
+              if (utr.length !== 12 || !/^\d+$/.test(utr)) {
+                if (paymentError) {
+                  paymentError.textContent = 'Please enter a valid 12-digit UTR Number.';
+                  paymentError.style.display = 'block';
+                }
+                return;
+              }
+
+              if (paymentError) paymentError.style.display = 'none';
+              verifyBtn.style.opacity = '0.7';
+              verifyBtn.style.pointerEvents = 'none';
+
+              try {
+                await updateStudentFees(user.uid);
+                if (feeBack) feeBack.style.display = 'none';
+                if (feeSuccess) feeSuccess.style.display = 'flex';
+              } catch (err) {
+                console.error(err);
+                if (paymentError) {
+                  paymentError.textContent = 'Verification failed. Please try again.';
+                  paymentError.style.display = 'block';
+                }
+                verifyBtn.style.opacity = '1';
+                verifyBtn.style.pointerEvents = 'auto';
+              }
+            });
+          }
         } catch (err) {
-          console.error(err);
-          paymentError.textContent = 'Verification failed. Please try again.';
-          paymentError.style.display = 'block';
-          verifyBtn.style.opacity = '1';
-          verifyBtn.style.pointerEvents = 'auto';
+          console.error("Init failed:", err);
         }
-      });
+      }
 
-      // Show the page
-      document.getElementById('mainContainer').style.opacity = '1';
-    })();
-
-    // Logout
-    document.getElementById('logoutBtn').addEventListener('click', () => logOut());
-  </script>
+      const logoutBtn = document.getElementById('logoutBtn');
+      if (logoutBtn) logoutBtn.addEventListener('click', () => logOut());
+      
+      init();
+    </script>
+  </body>
 </html>
