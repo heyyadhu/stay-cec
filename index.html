@@ -157,12 +157,19 @@
           sessionStorage.setItem('staycec_nav_internal', '1');
           window.location.href = 'dashboard.html';
         } catch (err) {
-          let msg = 'Login failed. Please try again.';
+          console.error('Login error:', err);
+          let msg = `Login failed: ${err.message || 'Please try again.'}`;
+          
           if (err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
-            msg = 'Invalid email or password.';
+            msg = 'Invalid email or password. Please check your credentials.';
           } else if (err.code === 'auth/too-many-requests') {
-            msg = 'Too many attempts. Please try again later.';
+            msg = 'Too many attempts. Please try again later or reset your password.';
+          } else if (err.code === 'auth/user-disabled') {
+            msg = 'This account has been disabled. Please contact support.';
+          } else if (err.code === 'auth/network-request-failed') {
+            msg = 'Network error. Please check your internet connection.';
           }
+
           loginError.textContent = msg;
           loginError.style.display = 'block';
           loginBtnText.textContent = 'Login';

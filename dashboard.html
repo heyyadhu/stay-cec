@@ -296,13 +296,13 @@
       }
 
       // 2. Fee Display Logic
-      const outstanding = profile.outstandingAmount !== undefined ? profile.outstandingAmount : 1200;
+      const outstanding = (profile && profile.outstandingAmount !== undefined) ? profile.outstandingAmount : 1200;
       const outstandingDisplay = document.getElementById('outstandingDisplay');
       const dueStatusDisplay = document.getElementById('dueStatusDisplay');
       const feeFront = document.getElementById('feeFront');
       const feeSuccess = document.getElementById('feeSuccess');
 
-      if (profile.feeStatus === 'Paid' || outstanding === 0) {
+      if (profile && (profile.feeStatus === 'Paid' || outstanding === 0)) {
         feeFront.style.display = 'none';
         feeSuccess.style.display = 'flex';
       } else {
