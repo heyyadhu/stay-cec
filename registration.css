@@ -461,11 +461,13 @@ button {
 }
 .flex-row-adb {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
+  gap: 16px;
   position: relative;
   width: 446px;
-  height: 75px;
+  height: auto;
+  min-height: 75px;
   z-index: 40;
 }
 .full-name {
@@ -628,11 +630,13 @@ button {
 }
 .flex-row {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
+  gap: 16px;
   position: relative;
   width: 446px;
-  height: 76px;
+  height: auto;
+  min-height: 76px;
   z-index: 54;
 }
 .department {

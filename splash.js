@@ -6,13 +6,13 @@
 import './splash.css';
 
 (function () {
-  const INTERNAL_FLAG = 'staycec_nav_internal';
+  const SPLASH_SHOWN = 'staycec_splash_shown';
   
-  // If we arrived here via an in-app link, skip the splash
-  if (sessionStorage.getItem(INTERNAL_FLAG)) {
-    sessionStorage.removeItem(INTERNAL_FLAG);
+  // If we already saw the splash this session, skip it
+  if (sessionStorage.getItem(SPLASH_SHOWN)) {
     return; // no splash
   }
+  sessionStorage.setItem(SPLASH_SHOWN, '1');
 
   // Build overlay
   const overlay = document.createElement('div');
@@ -53,10 +53,8 @@ import './splash.css';
 })();
 
 /**
- * Call this helper before navigating in-app so the destination page
- * knows it was an internal navigation and skips the splash.
+ * Helper to navigate in-app.
  */
 window.navigateTo = function (url) {
-  sessionStorage.setItem('staycec_nav_internal', '1');
   window.location.href = url;
 };

@@ -52,7 +52,7 @@
               >
             </div>
           </div>
-          <div class="form">
+          <form class="form" id="loginForm">
             <div class="mobile-number-field">
               <div class="label"><span class="text">Email Address</span></div>
               <div class="container-5">
@@ -88,14 +88,14 @@
               </div>
             </div>
             <div id="loginError" style="display:none; color:#e74c3c; font-size:13px; font-family:'Inter',sans-serif; margin-bottom:10px; text-align:center;"></div>
-            <div class="submit-button" id="loginBtn" style="cursor: pointer;">
+            <button type="submit" class="submit-button" id="loginBtn" style="cursor: pointer; border: none; background: transparent; padding: 0; position: relative; width: 100%;">
               <div class="button-shadow"></div>
               <div class="container-16">
                 <span class="text-login" id="loginBtnText">Login</span>
               </div>
               <div class="container-17"><div class="icon-18"></div></div>
-            </div>
-          </div>
+            </button>
+          </form>
           <div class="support-footer">
             <div class="container-19">
               <span class="new-to-staycec">new to staycec?</span>
@@ -137,7 +137,10 @@
       const loginBtnText = document.getElementById('loginBtnText');
       const loginError = document.getElementById('loginError');
 
-      loginBtn.addEventListener('click', async () => {
+      const loginForm = document.getElementById('loginForm');
+
+      loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
         const email = emailInput.value.trim();
         const password = passwordInput.value;
 
@@ -158,8 +161,6 @@
           // Get profile to check role
           const { getStudentProfile } = await import('./auth.js');
           const profile = await getStudentProfile();
-          
-          sessionStorage.setItem('staycec_nav_internal', '1');
           
           if (profile && profile.role === 'warden') {
             window.location.href = 'warden-dashboard.html';
@@ -188,10 +189,7 @@
         }
       });
 
-      // Allow Enter key to submit
-      passwordInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') loginBtn.click();
-      });
+
     </script>
   </body>
 </html>

@@ -81,7 +81,7 @@
             >
           </div>
         </div>
-        <div class="form">
+        <form class="form" id="regForm">
           <div class="container-12">
             <div class="role-selection" style="margin-bottom: 24px;">
               <div class="full-name">
@@ -191,17 +191,17 @@
           </div>
           <div id="regError" style="display:none; color:#e74c3c; font-size:13px; font-family:'Inter',sans-serif; margin-bottom:10px; text-align:center;"></div>
           <div id="regSuccess" style="display:none; color:#27ae60; font-size:13px; font-family:'Inter',sans-serif; margin-bottom:10px; text-align:center;"></div>
-          <div class="submit-button" id="regBtn" style="cursor:pointer;">
+          <button type="submit" class="submit-button" id="regBtn" style="cursor:pointer; border: none; background: transparent; padding: 0; position: relative; width: 100%;">
             <div class="button-shadow"></div>
             <span class="send-request" id="regBtnText">Send request</span>
-          </div>
+          </button>
           <div class="footer-link">
             <div class="text-3c">
               <span class="have-account">Already have an account? </span
               ><span class="login-here" onclick="navigateTo('index.html')" style="cursor:pointer;">Login here</span>
             </div>
           </div>
-        </div>
+        </form>
         <div class="terms-privacy">
           <div class="container-3d">
             <div class="text-3e">
@@ -239,8 +239,10 @@
       const regBtnText = document.getElementById('regBtnText');
       const regError = document.getElementById('regError');
       const regSuccess = document.getElementById('regSuccess');
+      const regForm = document.getElementById('regForm');
 
-      regBtn.addEventListener('click', async () => {
+      regForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
         const fullName = document.getElementById('regFullName').value.trim();
         const registerNumber = document.getElementById('regRegNumber').value.trim();
         const department = document.getElementById('departmentSelect').value;
@@ -303,7 +305,6 @@
           regSuccess.textContent = 'Registration successful! Redirecting to login...';
           regSuccess.style.display = 'block';
           setTimeout(() => {
-            sessionStorage.setItem('staycec_nav_internal', '1');
             window.location.href = 'index.html';
           }, 2000);
         } catch (err) {
