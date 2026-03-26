@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StayCEC – Warden Reports</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" />
+    <link rel="stylesheet" href="warden-reports.css" />
+  </head>
+  <body>
+    <div class="main-container">
+      <div class="rectangle"></div>
+      <div class="staycecdesktop"></div>
+      
+      <div class="nav">
+        <div class="link" onclick="window.location.href='warden-dashboard.html'">
+          <div class="container"><div class="icon"></div></div>
+          <div class="container-1"><span class="dashboard">Dashboard</span></div>
+        </div>
+        <div class="link-2" onclick="window.location.href='warden-residents.html'">
+          <div class="container-3"><div class="icon-4"></div></div>
+          <div class="container-5"><span class="residents">Residents</span></div>
+        </div>
+        <div class="link-6" onclick="window.location.href='warden-complaints.html'">
+          <div class="container-7"><div class="icon-8"></div></div>
+          <div class="container-9"><span class="complaints">Complaints</span></div>
+        </div>
+        <div class="link-a" onclick="window.location.href='warden-notifications.html'">
+          <div class="container-b"><div class="icon-c"></div></div>
+          <div class="container-d"><span class="notifications">Notifications</span></div>
+        </div>
+        <div class="link-e active-nav" onclick="window.location.href='warden-reports.html'">
+          <div class="container-f"><div class="icon-10"></div></div>
+          <div class="container-11"><span class="reports">Reports</span></div>
+        </div>
+      </div>
+
+      <div class="container-12">
+        <div class="link-13">
+          <div class="container-14"><div class="icon-15"></div></div>
+          <div class="container-16"><span class="settings">Settings</span></div>
+        </div>
+        <div class="link-17" id="logoutBtn">
+          <div class="container-18"><div class="icon-19"></div></div>
+          <div class="container-1a"><span class="logout">Logout</span></div>
+        </div>
+      </div>
+
+      <div class="content-area">
+        <div class="page-header">
+          <div class="heading">
+            <span class="reports-analytics">Reports & Analytics</span>
+          </div>
+          <div class="container-1b">
+            <span class="text">Comprehensive overview of hostel performance, financial health, and resident activity metrics.</span>
+          </div>
+        </div>
+
+        <!-- Stat Cards -->
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-label">Total Revenue</div>
+            <div class="stat-value" id="totalRevenue">₹0</div>
+            <div class="stat-subtext">Cumulative collection</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Pending Fees</div>
+            <div class="stat-value" id="pendingFees">0</div>
+            <div class="stat-subtext">Students with dues</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Total Residents</div>
+            <div class="stat-value" id="totalResidents">0</div>
+            <div class="stat-subtext">Occupancy level</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Complaint Rate</div>
+            <div class="stat-value" id="complaintRate">0%</div>
+            <div class="stat-subtext">Resolved requests</div>
+          </div>
+        </div>
+
+        <div class="bento-layout">
+          <!-- Occupancy Chart -->
+          <div class="chart-card">
+            <div class="card-header">
+              <span class="card-title">Occupancy Distribution</span>
+              <div class="export-btn" onclick="alert('Exporting data...')">Export CSV</div>
+            </div>
+            <div class="chart-container">
+              <div class="bar-row">
+                <span class="bar-label">Men's Hostel</span>
+                <div class="bar-outer"><div class="bar-inner men" id="menBar" style="width: 0%"></div></div>
+                <span class="bar-val" id="menVal">0</span>
+              </div>
+              <div class="bar-row">
+                <span class="bar-label">Women's Hostel</span>
+                <div class="bar-outer"><div class="bar-inner women" id="womenBar" style="width: 0%"></div></div>
+                <span class="bar-val" id="womenVal">0</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mess Reductions Table -->
+          <div class="table-card">
+            <div class="card-header">
+              <span class="card-title">Recent Mess Reductions</span>
+              <span class="view-all">View Log</span>
+            </div>
+            <div class="mini-table">
+              <div class="m-header">
+                <div style="flex:2">Student</div>
+                <div style="flex:1">Days</div>
+                <div style="flex:1">Status</div>
+              </div>
+              <div id="messLogBody">
+                <div style="padding:20px; text-align:center; color:#8e8e93;">Loading...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="border"><div class="student-profile-avatar"></div></div>
+    </div>
+
+    <script type="module">
+      import { auth, onAuthStateChanged } from './firebase-config.js';
+      import { logOut, getStudentProfile } from './auth.js';
+      import { getReportData } from './data.js';
+
+      const totalRevenue = document.getElementById('totalRevenue');
+      const pendingFees = document.getElementById('pendingFees');
+      const totalResidents = document.getElementById('totalResidents');
+      const complaintRate = document.getElementById('complaintRate');
+      const menBar = document.getElementById('menBar');
+      const womenBar = document.getElementById('womenBar');
+      const menVal = document.getElementById('menVal');
+      const womenVal = document.getElementById('womenVal');
+      const messLogBody = document.getElementById('messLogBody');
+
+      async function initReports() {
+        const data = await getReportData();
+        if (!data) return;
+
+        // Populate Stats
+        totalRevenue.textContent = `₹${data.revenue.toLocaleString()}`;
+        pendingFees.textContent = data.pendingFees;
+        totalResidents.textContent = data.occupancy.total;
+        
+        const rate = data.complaints.total > 0 
+          ? Math.round((data.complaints.resolved / data.complaints.total) * 100) 
+          : 0;
+        complaintRate.textContent = `${rate}%`;
+
+        // Populate Bars
+        const max = data.occupancy.total || 1;
+        const menPercent = (data.occupancy.men / max) * 100;
+        const womenPercent = (data.occupancy.women / max) * 100;
+        
+        menBar.style.width = `${menPercent}%`;
+        womenBar.style.width = `${womenPercent}%`;
+        menVal.textContent = data.occupancy.men;
+        womenVal.textContent = data.occupancy.women;
+
+        // Populate Table
+        if (data.recentMess.length === 0) {
+          messLogBody.innerHTML = `<div style="padding:20px; text-align:center; color:#8e8e93;">No active reductions.</div>`;
+        } else {
+          messLogBody.innerHTML = data.recentMess.map(m => `
+            <div class="m-row">
+              <div style="flex:2; font-weight:600;">${m.studentName}</div>
+              <div style="flex:1">${m.totalDays}d</div>
+              <div style="flex:1">
+                <span class="status-s ${m.status.toLowerCase()}">${m.status}</span>
+              </div>
+            </div>
+          `).join('');
+        }
+      }
+
+      onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+          window.location.href = 'index.html';
+          return;
+        }
+        const profile = await getStudentProfile(user.uid);
+        if (!profile || profile.role !== 'warden') {
+          window.location.href = 'dashboard.html';
+          return;
+        }
+        initReports();
+      });
+
+      document.getElementById('logoutBtn').addEventListener('click', logOut);
+    </script>
+  </body>
+</html>

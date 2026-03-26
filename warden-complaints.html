@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StayCEC - Complaint Management</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" />
+    <link rel="stylesheet" href="warden-complaints.css" />
+  </head>
+  <body>
+    <div class="main-container">
+      <div class="rectangle">
+        <div class="staycecdesktop"></div>
+        <div class="nav">
+          <div class="link" onclick="window.location.href='warden-dashboard.html'">
+            <div class="container"><div class="icon"></div></div>
+            <div class="container-1">
+              <span class="dashboard">Dashboard</span>
+            </div>
+          </div>
+          <div class="link-2" onclick="window.location.href='warden-residents.html'">
+            <div class="container-3"><div class="icon-4"></div></div>
+            <div class="container-5">
+              <span class="residents">Residents</span>
+            </div>
+          </div>
+          <div class="link-6 active-nav" onclick="window.location.href='warden-complaints.html'">
+            <div class="container-7"><div class="icon-8"></div></div>
+            <div class="container-9">
+              <span class="complaints">Complaints</span>
+            </div>
+          </div>
+          <div class="link-a" onclick="window.location.href='warden-notifications.html'">
+            <div class="container-b"><div class="icon-c"></div></div>
+            <div class="container-d">
+              <span class="notifications">Notifications</span>
+            </div>
+          </div>
+          <div class="link-e" onclick="window.location.href='warden-reports.html'">
+            <div class="container-f"><div class="icon-10"></div></div>
+            <div class="container-11"><span class="reports">Reports</span></div>
+          </div>
+        </div>
+        <div class="container-12">
+          <div class="link-13" onclick="window.location.href='warden-settings.html'">
+            <div class="container-14"><div class="icon-15"></div></div>
+            <div class="container-16">
+              <span class="settings">Settings</span>
+            </div>
+          </div>
+          <div class="link-17" id="logoutBtn">
+            <div class="container-18"><div class="icon-19"></div></div>
+            <div class="container-1a"><span class="logout">Logout</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="border"><div class="student-profile-avatar"></div></div>
+      <div class="button">
+        <div class="container-1b"><div class="icon-1c"></div></div>
+        <div class="background-border"></div>
+      </div>
+      <div class="main-content-canvas">
+        <div class="header-section">
+          <div class="container-1d">
+            <div class="heading">
+              <span class="complaint-management">Complaint Management</span>
+            </div>
+            <div class="container-1e">
+              <span class="resolution-hub">Resolution hub for Serene Warden residents</span>
+            </div>
+          </div>
+          <div class="quick-stats-grid">
+            <div class="stat-card">
+              <span class="stat-label">Open Cases</span>
+              <div class="stat-row">
+                <span class="stat-value" id="openCount">0</span>
+                <span class="stat-sub-red">+0 today</span>
+              </div>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">Avg Time</span>
+              <div class="stat-row">
+                <span class="stat-value" id="avgTime">4.2h</span>
+                <span class="stat-sub-grn">Excellent</span>
+              </div>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">High Priority</span>
+              <div class="stat-row">
+                <span class="stat-value" id="highPriorityCount">0</span>
+                <span class="stat-sub-muted">Critical</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="filters-bar">
+          <div class="export-btn">
+            <div class="container-29"><div class="icon-2a"></div></div>
+            <span>Export PDF</span>
+          </div>
+          <div class="filter-tabs">
+            <div class="filter-tab active" data-filter="All">All</div>
+            <div class="filter-tab" data-filter="Pending">Pending</div>
+            <div class="filter-tab" data-filter="In Progress">In Progress</div>
+            <div class="filter-tab" data-filter="Resolved">Resolved</div>
+          </div>
+        </div>
+        <div class="complaints-table-view">
+          <div class="table">
+            <div class="header-row">
+              <div class="col-resident"><span class="th">Resident</span></div>
+              <div class="col-issue"><span class="th">Issue Summary</span></div>
+              <div class="col-date"><span class="th">Date Logged</span></div>
+              <div class="col-priority"><span class="th">Priority</span></div>
+              <div class="col-status"><span class="th">Status</span></div>
+              <div class="col-actions"><span class="th">Actions</span></div>
+            </div>
+            <div class="table-body" id="complaintsBody">
+              <div class="loading-row">Fetching complaints...</div>
+            </div>
+          </div>
+          <div class="pagination-footer">
+            <div class="pagination-info">
+              Showing <strong id="rangeText">0</strong> of <strong id="totalText">0</strong> complaints
+            </div>
+            <div class="pagination-controls">
+              <button class="page-btn" disabled>&lt;</button>
+              <button class="page-btn active">1</button>
+              <button class="page-btn">2</button>
+              <button class="page-btn">&gt;</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Firebase & Logic -->
+    <script type="module">
+      import { auth, db } from './firebase-config.js';
+      import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
+      import { getComplaints, updateComplaintStatus, getComplaintStats } from './data.js';
+
+      let allComplaints = [];
+      let currentFilter = 'All';
+
+      onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+          window.location.href = 'login.html';
+          return;
+        }
+        
+        // Logged in as warden? (Assuming warden logic)
+        loadStats();
+        loadComplaints();
+      });
+
+      async function loadStats() {
+        const stats = await getComplaintStats();
+        document.getElementById('openCount').textContent = stats.openCount;
+        document.getElementById('highPriorityCount').textContent = stats.highPriority;
+        document.getElementById('avgTime').textContent = stats.avgTime;
+      }
+
+      async function loadComplaints() {
+        const complaintsBody = document.getElementById('complaintsBody');
+        allComplaints = await getComplaints();
+        renderComplaints();
+      }
+
+      function renderComplaints() {
+        const complaintsBody = document.getElementById('complaintsBody');
+        const filtered = currentFilter === 'All' 
+          ? allComplaints 
+          : allComplaints.filter(c => c.status === currentFilter);
+
+        if (filtered.length === 0) {
+          complaintsBody.innerHTML = '<div class="empty-state">No complaints found.</div>';
+          updatePagination(0, 0);
+          return;
+        }
+
+        complaintsBody.innerHTML = filtered.map(c => {
+          const date = c.createdAt?.toDate ? c.createdAt.toDate() : new Date();
+          const dateStr = date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+          const timeStr = date.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+          
+          let priorityClass = 'chip-low';
+          let priority = 'Low';
+          if (c.category === 'Emergency' || c.description.length > 50) {
+            priority = 'High';
+            priorityClass = 'chip-high';
+          } else if (c.description.length > 20) {
+            priority = 'Medium';
+            priorityClass = 'chip-medium';
+          }
+
+          let dotClass = 'dot-pending';
+          if (c.status === 'In Progress') dotClass = 'dot-progress';
+          if (c.status === 'Resolved') dotClass = 'dot-resolved';
+
+          return `
+            <div class="table-row">
+              <div class="resident-cell">
+                <div class="avatar">${c.studentName?.[0] || 'S'}</div>
+                <div>
+                  <div class="resident-name">${c.studentName || 'Student'}</div>
+                  <div class="resident-room">Room ${c.room || '--'} • Roll ${c.registerNumber || '--'}</div>
+                </div>
+              </div>
+              <div class="issue-cell">
+                <div class="issue-title">${c.title}</div>
+                <div class="issue-desc">${c.description}</div>
+              </div>
+              <div class="date-cell">
+                <div class="date-main">${dateStr}</div>
+                <div class="date-time">${timeStr}</div>
+              </div>
+              <div class="priority-cell">
+                <span class="chip ${priorityClass}">${priority}</span>
+              </div>
+              <div class="status-cell">
+                <div class="status-dot ${dotClass}"></div>
+                <span class="status-label">${c.status}</span>
+              </div>
+              <div class="actions-cell">
+                <select class="status-select" onchange="window.handleStatusChange('${c.id}', this.value, '${c.studentId}')">
+                  <option value="Pending" ${c.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                  <option value="In Progress" ${c.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
+                  <option value="Resolved" ${c.status === 'Resolved' ? 'selected' : ''}>Resolved</option>
+                  <option value="Rejected" ${c.status === 'Rejected' ? 'selected' : ''}>Rejected</option>
+                </select>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        updatePagination(1, filtered.length);
+      }
+
+      function updatePagination(start, end) {
+        document.getElementById('rangeText').textContent = `${start}-${end}`;
+        document.getElementById('totalText').textContent = end;
+      }
+
+      // Exposed to window for onclick/onchange
+      window.handleStatusChange = async (id, status, sid) => {
+        try {
+          await updateComplaintStatus(id, status, sid);
+          alert(`Status updated to ${status}`);
+          loadComplaints();
+          loadStats();
+        } catch (err) {
+          alert('Error updating status: ' + err.message);
+        }
+      };
+
+      // Filter tabs
+      document.querySelectorAll('.filter-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          currentFilter = tab.dataset.filter;
+          renderComplaints();
+        });
+      });
+
+      // Logout
+      document.getElementById('logoutBtn')?.addEventListener('click', () => {
+        signOut(auth).then(() => window.location.href = 'login.html');
+      });
+    </script>
+  </body>
+</html>

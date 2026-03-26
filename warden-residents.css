@@ -758,3 +758,26 @@ button {
 
 .icon-prev { width:4.317px; height:7px; background:url(https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-26/c7HqAPFxVq.png) no-repeat center/cover; }
 .icon-next { width:4.317px; height:7px; background:url(https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-26/JLdE8SBtXv.png) no-repeat center/cover; }
+
+/* UI STANDARD: Active Nav & Sidebar */
+.active-nav {
+  background: #ffffff !important;
+  box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.05) !important;
+}
+.active-nav span {
+  color: #12b1a6 !important;
+  font-weight: 600 !important;
+}
+.rectangle {
+  background: #ffffff !important;
+  border-right: 1px solid rgba(0,0,0,0.05);
+}
+.link, .link-2, .link-6, .link-a, .link-e {
+  border-radius: 20px;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.link:hover, .link-2:hover, .link-6:hover, .link-a:hover, .link-e:hover {
+  background: rgba(18, 177, 166, 0.05);
+}

@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StayCEC – Communication Hub</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" />
+    <link rel="stylesheet" href="warden-notifications.css" />
+  </head>
+  <body>
+    <div class="main-container">
+      <div class="rectangle"></div>
+      <div class="staycecdesktop"></div>
+      
+      <div class="nav">
+        <div class="link" onclick="window.location.href='warden-dashboard.html'">
+          <div class="container"><div class="icon"></div></div>
+          <div class="container-1"><span class="dashboard">Dashboard</span></div>
+        </div>
+        <div class="link-2" onclick="window.location.href='warden-residents.html'">
+          <div class="container-3"><div class="icon-4"></div></div>
+          <div class="container-5"><span class="residents">Residents</span></div>
+        </div>
+        <div class="link-6" onclick="window.location.href='warden-complaints.html'">
+          <div class="container-7"><div class="icon-8"></div></div>
+          <div class="container-9"><span class="complaints">Complaints</span></div>
+        </div>
+        <div class="link-a active-nav" onclick="window.location.href='warden-notifications.html'">
+          <div class="container-b"><div class="icon-c"></div></div>
+          <div class="container-d"><span class="notifications">Notifications</span></div>
+        </div>
+        <div class="link-e" onclick="window.location.href='warden-reports.html'">
+          <div class="container-f"><div class="icon-10"></div></div>
+          <div class="container-11"><span class="reports">Reports</span></div>
+        </div>
+      </div>
+
+      <div class="container-12">
+        <div class="link-13">
+          <div class="container-14"><div class="icon-15"></div></div>
+          <div class="container-16"><span class="settings">Settings</span></div>
+        </div>
+        <div class="link-17" id="logoutBtn">
+          <div class="container-18"><div class="icon-19"></div></div>
+          <div class="container-1a"><span class="logout">Logout</span></div>
+        </div>
+      </div>
+
+      <div class="content-area">
+        <div class="page-header">
+          <div class="heading">
+            <span class="communication-hub">Communication Hub</span>
+          </div>
+          <div class="container-1b">
+            <span class="text">Create and broadcast essential announcements to your residents with professional polish and precision targeting.</span>
+          </div>
+        </div>
+
+        <div class="bento-grid-layout">
+          <!-- Recent Notifications List -->
+          <div class="bottom-row-history-table">
+            <div class="horizontal-border">
+              <div class="container-1c">
+                <div class="heading-1d">
+                  <span class="text-1e">Recent Notifications</span>
+                </div>
+                <div class="container-1f">
+                  <span class="text-20">Log of your last 10 broadcast activity</span>
+                </div>
+              </div>
+              <div class="button">
+                <span class="text-21">View All</span>
+              </div>
+            </div>
+            <div class="table">
+              <div class="header-row">
+                <div class="cell" style="flex:2"><span class="text-24">Title</span></div>
+                <div class="cell-25" style="flex:1.5"><span class="text-26">Date & Time</span></div>
+                <div class="cell-27" style="flex:1"><span class="text-28">Priority</span></div>
+                <div class="cell-29" style="flex:1"><span class="text-2a">Status</span></div>
+              </div>
+              <div class="body" id="broadcastHistory">
+                <!-- Rows injected by JS -->
+                <div style="padding:40px; text-align:center; color:#8e8e93;">Loading history...</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex-row-ea">
+            <!-- Writer Column -->
+            <div class="left-column-writer-options">
+              <div class="smart-notification-writer-card">
+                <div class="container-68">
+                  <div class="overlay-69"><div class="icon-6a"></div></div>
+                  <div class="heading-6b">
+                    <span class="text-6c">Announcement Writer</span>
+                  </div>
+                </div>
+                <div class="container-6d">
+                  <div class="container-6e">
+                    <label class="label-text">Message Title</label>
+                    <div style="margin-bottom:12px;">
+                      <input type="text" id="notifTitle" placeholder="e.g. Water Supply Interruption" style="width:100%; padding:12px 16px; background:#f2f4f5; border-radius:12px; font-family:inherit; font-size:14px;"/>
+                    </div>
+                    <label class="label-text">Detailed Content</label>
+                    <div class="textarea">
+                      <textarea id="broadcastMessage" placeholder="Draft your message here..."></textarea>
+                    </div>
+                  </div>
+                  <div class="button-70" id="previewBtn">
+                    <span class="text-73">Update Preview</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="sending-options-card">
+                <div class="container-74">
+                  <div class="overlay-75"><div class="icon-76"></div></div>
+                  <div class="heading-77">
+                    <span class="broadcast-settings">Target & Priority</span>
+                  </div>
+                </div>
+                <div class="container-78" style="display:flex; gap:16px; margin-top:16px;">
+                  <div style="flex:1">
+                    <span class="label-text">Target Audience</span>
+                    <select id="targetAudience" class="custom-select">
+                      <option value="all">All Students</option>
+                      <option value="men">Men's Hostel</option>
+                      <option value="women">Women's Hostel</option>
+                    </select>
+                  </div>
+                  <div style="flex:1">
+                    <span class="label-text">Priority Level</span>
+                    <select id="priorityLevel" class="custom-select">
+                      <option value="Normal">Normal</option>
+                      <option value="Urgent">Urgent</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Preview Column -->
+            <div class="right-column-generated-output">
+              <div class="generated-notification-output-card">
+                <div class="overlay-horizontal-border">
+                  <div class="container-8c">
+                    <div class="container-8d">
+                      <div class="background-border">
+                        <span class="text-ai-generated-draft">PREVIEW</span>
+                      </div>
+                      <div class="container-8e">
+                        <div class="container-8f"><div class="icon-90"></div></div>
+                        <span class="text-just-now">Just now</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="container-98">
+                  <div class="container-99">
+                    <div class="heading-9a">
+                      <span class="preview-title" id="prevTitle">Important Notice</span>
+                    </div>
+                    <div class="container-9b">
+                      <span class="preview-body" id="prevBody">Your message will appear here...</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="background-9c">
+                  <div class="container-9d">
+                    <span id="targetCountText" style="font-size:12px; font-weight:700; color:#3c4947;">Calculating audience...</span>
+                  </div>
+                  <div class="container-a2">
+                    <div class="button-a4" id="sendBtn">
+                      <span class="text-send-notification">Send Notification</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="border"><div class="student-profile-avatar"></div></div>
+    </div>
+
+    <script type="module">
+      import { auth, onAuthStateChanged } from './firebase-config.js';
+      import { logOut, getStudentProfile } from './auth.js';
+      import { sendWardenAnnouncement, getWardenBroadcasts } from './data.js';
+
+      const notifTitle = document.getElementById('notifTitle');
+      const broadcastMessage = document.getElementById('broadcastMessage');
+      const prevTitle = document.getElementById('prevTitle');
+      const prevBody = document.getElementById('prevBody');
+      const sendBtn = document.getElementById('sendBtn');
+      const historyBody = document.getElementById('broadcastHistory');
+
+      // ── Update Preview ──
+      function updateUIPreview() {
+        prevTitle.textContent = notifTitle.value || 'Important Notice';
+        prevBody.textContent = broadcastMessage.value || 'Your message will appear here...';
+      }
+
+      notifTitle.addEventListener('input', updateUIPreview);
+      broadcastMessage.addEventListener('input', updateUIPreview);
+      document.getElementById('previewBtn').addEventListener('click', updateUIPreview);
+
+      // ── Load History ──
+      async function loadHistory() {
+        const broadcasts = await getWardenBroadcasts();
+        if (!broadcasts.length) {
+          historyBody.innerHTML = `<div style="padding:40px; text-align:center; color:#8e8e93;">No recent broadcasts.</div>`;
+          return;
+        }
+        historyBody.innerHTML = broadcasts.map(b => {
+          const date = b.createdAt?.toDate ? b.createdAt.toDate().toLocaleString() : 'Just now';
+          const priorityClass = b.priority === 'Urgent' ? 'urgent' : 'normal';
+          return `
+            <div class="row">
+              <div class="data" style="flex:2; font-weight:600; color:#191c1d;">${b.title}</div>
+              <div class="data-31" style="flex:1.5; color:#3c4947;">${date}</div>
+              <div class="data-33" style="flex:1">
+                <span class="status-pill ${priorityClass}">${b.priority || 'Normal'}</span>
+              </div>
+              <div class="data-36" style="flex:1; color:#006a63; font-weight:700;">SENT</div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // ── Auth & Init ──
+      onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+          window.location.href = 'index.html';
+          return;
+        }
+        const profile = await getStudentProfile(user.uid);
+        if (!profile || profile.role !== 'warden') {
+          window.location.href = 'dashboard.html';
+          return;
+        }
+        
+        loadHistory();
+      });
+
+      // ── Send Logic ──
+      sendBtn.addEventListener('click', async () => {
+        const title = notifTitle.value.trim();
+        const body = broadcastMessage.value.trim();
+        const target = document.getElementById('targetAudience').value;
+        const priority = document.getElementById('priorityLevel').value;
+
+        if (!title || !body) {
+          alert('Please enter both title and message.');
+          return;
+        }
+
+        sendBtn.style.opacity = '0.5';
+        sendBtn.style.pointerEvents = 'none';
+        sendBtn.textContent = 'Sending...';
+
+        try {
+          await sendWardenAnnouncement(title, body, target, priority);
+          alert('Broadcast sent successfully!');
+          notifTitle.value = '';
+          broadcastMessage.value = '';
+          updateUIPreview();
+          loadHistory();
+        } catch (err) {
+          console.error(err);
+          alert('Failed to send broadcast.');
+        } finally {
+          sendBtn.style.opacity = '1';
+          sendBtn.style.pointerEvents = 'auto';
+          sendBtn.textContent = 'Send Notification';
+        }
+      });
+
+      document.getElementById('logoutBtn').addEventListener('click', logOut);
+    </script>
+  </body>
+</html>

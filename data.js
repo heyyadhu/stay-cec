@@ -130,15 +130,21 @@ export async function updateComplaintStatus(complaintId, status) {
 export async function getAllResidents(pageSize = 10, lastVisible = null) {
   try {
     const ref = collection(db, 'students');
+    // Fetch all and filter client-side for now to ensure all students (even those missing 'role' field) are included
+    // In a real large-scale app, we'd ensure data consistency and use index-backed queries.
     let constraints = [
-      where('role', '==', 'student'),
       orderBy('fullName', 'asc'),
       limit(pageSize),
     ];
     if (lastVisible) constraints.push(startAfter(lastVisible));
     const q = query(ref, ...constraints);
     const snap = await getDocs(q);
-    const residents = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    
+    // Filter out wardens client-side
+    const residents = snap.docs
+      .map(d => ({ id: d.id, ...d.data() }))
+      .filter(r => r.role !== 'warden');
+      
     const newLastVisible = snap.docs.length > 0 ? snap.docs[snap.docs.length - 1] : null;
     return { residents, lastVisible: newLastVisible };
   } catch (error) {
@@ -149,28 +155,29 @@ export async function getAllResidents(pageSize = 10, lastVisible = null) {
 
 /**
  * Count all students and compute stats for the Resident Directory stat cards.
- * Fetches all students in a single query and derives stats client-side.
  */
 export async function getResidentStats() {
   try {
     const ref = collection(db, 'students');
-    const snap = await getDocs(query(ref, where('role', '==', 'student')));
+    const snap = await getDocs(ref);
 
-    let maleCount = 0, femaleCount = 0, newAdmissions = 0;
-    const since = Date.now() - 30 * 24 * 60 * 60 * 1000; // last 30 days
+    let maleCount = 0, femaleCount = 0, newAdmissions = 0, studentCount = 0;
+    const since = Date.now() - 30 * 24 * 60 * 60 * 1000;
 
     snap.forEach(d => {
       const data = d.data();
+      if (data.role === 'warden') return;
+      
+      studentCount++;
       const hostel = (data.hostel || '').toLowerCase();
       if (hostel.includes("men") && !hostel.includes("women")) maleCount++;
       else if (hostel.includes("women")) femaleCount++;
 
-      // count new admissions (last 30 days)
       const createdMs = data.createdAt?.toMillis?.() ?? 0;
       if (createdMs >= since) newAdmissions++;
     });
 
-    return { total: snap.size, maleCount, femaleCount, newAdmissions };
+    return { total: studentCount, maleCount, femaleCount, newAdmissions };
   } catch (error) {
     console.error('Error fetching resident stats:', error);
     return { total: 0, maleCount: 0, femaleCount: 0, newAdmissions: 0 };
@@ -312,6 +319,61 @@ export async function updateComplaintStatus(complaintId, status, studentId) {
   }
 }
 
+/**
+ * Fetch complaints. If studentId is provided, returns only their complaints.
+ * Otherwise returns all (for wardens).
+ */
+export async function getComplaints(studentId = null) {
+  try {
+    let q;
+    if (studentId) {
+      q = query(
+        collection(db, 'complaints'),
+        where('studentId', '==', studentId),
+        orderBy('createdAt', 'desc'),
+        limit(20)
+      );
+    } else {
+      q = query(
+        collection(db, 'complaints'),
+        orderBy('createdAt', 'desc'),
+        limit(50)
+      );
+    }
+    const snap = await getDocs(q);
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch (error) {
+    console.error('Error fetching complaints:', error);
+    return [];
+  }
+}
+
+/**
+ * Get overall complaint stats for the warden dashboard.
+ */
+export async function getComplaintStats() {
+  try {
+    const snap = await getDocs(collection(db, 'complaints'));
+    let openCount = 0;
+    let highPriority = 0;
+    
+    snap.docs.forEach(d => {
+      const data = d.data();
+      if (data.status !== 'Resolved' && data.status !== 'Rejected') openCount++;
+      if (data.category === 'Emergency' || (data.description && data.description.length > 100)) highPriority++; // Mock logic for priority if not stored
+    });
+
+    return {
+      openCount,
+      highPriority,
+      avgTime: '4.2h' // Mocked for now
+    };
+  } catch (error) {
+    console.error('Error fetching complaint stats:', error);
+    return { openCount: 0, highPriority: 0, avgTime: '0h' };
+  }
+}
+
 // ─────────────────────────────────────────────────────────────
 // NOTIFICATION FUNCTIONS
 // ─────────────────────────────────────────────────────────────
@@ -359,34 +421,75 @@ export async function markAllNotificationsRead(uid) {
 
 /**
  * Send an announcement from the warden to all (or a subset of) students.
- * @param {string} wardenUid
- * @param {{ title: string, message: string }} notifData
- * @param {'all'|'men'|'women'} targetGroup
+ * Also saves a record in the 'broadcasts' collection for history tracking.
  */
-export async function sendWardenAnnouncement(wardenUid, notifData, targetGroup = 'all') {
-  // Fetch target students
-  let q = query(collection(db, 'students'), where('role', '==', 'student'));
-  const snap = await getDocs(q);
-
-  const batch = writeBatch(db);
-  snap.docs.forEach(d => {
-    const data = d.data();
-    const hostel = (data.hostel || '').toLowerCase();
-    if (targetGroup === 'men'   && !hostel.includes('men'))    return;
-    if (targetGroup === 'women' && !hostel.includes('women'))  return;
-
-    const nRef = doc(collection(db, 'notifications'));
-    batch.set(nRef, {
-      uid: d.id,
-      type: 'announcement',
-      title: notifData.title,
-      message: notifData.message,
-      from: 'Warden',
-      read: false,
+export async function sendWardenAnnouncement(title, message, targetGroup = 'all', priority = 'Normal') {
+  try {
+    // 1. Save the broadcast itself for history
+    const broadcastRef = await addDoc(collection(db, 'broadcasts'), {
+      title,
+      message,
+      targetGroup,
+      priority,
+      status: 'Sent',
       createdAt: serverTimestamp(),
     });
-  });
-  await batch.commit();
+
+    // 2. Fetch target students
+    // We fetch all students and filter client-side to be inclusive of those missing the 'role' field
+    const studentsSnap = await getDocs(collection(db, 'students'));
+    const batch = writeBatch(db);
+    let count = 0;
+
+    studentsSnap.forEach(d => {
+      const data = d.data();
+      if (data.role === 'warden') return;
+
+      const hostel = (data.hostel || '').toLowerCase();
+      if (targetGroup === 'men' && !hostel.includes('men')) return;
+      if (targetGroup === 'women' && !hostel.includes('women')) return;
+
+      const nRef = doc(collection(db, 'notifications'));
+      batch.set(nRef, {
+        uid: d.id,
+        type: 'announcement',
+        title: title,
+        message: message,
+        from: 'Warden',
+        priority: priority,
+        read: false,
+        createdAt: serverTimestamp(),
+      });
+      count++;
+    });
+
+    if (count > 0) {
+      await batch.commit();
+    }
+    
+    return broadcastRef.id;
+  } catch (error) {
+    console.error('Error sending announcement:', error);
+    throw error;
+  }
+}
+
+/**
+ * Fetch recent broadcasts for the warden history table.
+ */
+export async function getWardenBroadcasts(limitCount = 10) {
+  try {
+    const q = query(
+      collection(db, 'broadcasts'),
+      orderBy('createdAt', 'desc'),
+      limit(limitCount)
+    );
+    const snap = await getDocs(q);
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch (error) {
+    console.error('Error fetching broadcasts:', error);
+    return [];
+  }
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -432,6 +535,66 @@ export async function submitMessReduction(uid, data) {
   });
 
   return ref.id;
+}
+
+/**
+ * Aggregate all hostel data for the Reports page.
+ */
+export async function getReportData() {
+  try {
+    const [studentsSnap, complaintsSnap, transactionsSnap, messSnap] = await Promise.all([
+      getDocs(collection(db, 'students')),
+      getDocs(collection(db, 'complaints')),
+      getDocs(collection(db, 'transactions')),
+      getDocs(collection(db, 'messReductions'))
+    ]);
+
+    // 1. Revenue & Fees
+    let totalRevenue = 0;
+    let pendingFeesCount = 0;
+    transactionsSnap.forEach(d => totalRevenue += (d.data().amount || 0));
+    studentsSnap.forEach(d => {
+      const data = d.data();
+      if (data.role !== 'warden' && (data.feeStatus === 'Pending' || data.outstandingAmount > 0)) {
+        pendingFeesCount++;
+      }
+    });
+
+    // 2. Occupancy
+    let menCount = 0, womenCount = 0;
+    studentsSnap.forEach(d => {
+      const data = d.data();
+      if (data.role === 'warden') return;
+      const hostel = (data.hostel || '').toLowerCase();
+      if (hostel.includes('men')) menCount++;
+      else if (hostel.includes('women')) womenCount++;
+    });
+
+    // 3. Complaints
+    let resolved = 0, open = 0;
+    complaintsSnap.forEach(d => {
+      const status = d.data().status;
+      if (status === 'Resolved') resolved++;
+      else if (status !== 'Rejected') open++;
+    });
+
+    // 4. Mess Reductions
+    const activeMessReductions = messSnap.docs
+      .map(d => ({ id: d.id, ...d.data() }))
+      .filter(m => m.status === 'Approved' || m.status === 'Pending')
+      .slice(0, 10);
+
+    return {
+      revenue: totalRevenue,
+      pendingFees: pendingFeesCount,
+      occupancy: { men: menCount, women: womenCount, total: menCount + womenCount },
+      complaints: { resolved, open, total: resolved + open },
+      recentMess: activeMessReductions
+    };
+  } catch (error) {
+    console.error('Error fetching report data:', error);
+    return null;
+  }
 }
 
 /**

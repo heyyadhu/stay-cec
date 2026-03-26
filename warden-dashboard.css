@@ -1546,3 +1546,28 @@ button {
   overflow: hidden;
   border-radius: 9999px;
 }
+
+/* UI STANDARD: Active Nav & Sidebar */
+.active-nav {
+  background: #ffffff !important;
+  box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.05);
+}
+.active-nav span {
+  color: #12b1a6 !important;
+  font-weight: 600 !important;
+}
+.rectangle {
+  background: #ffffff !important;
+  border-right: 1px solid rgba(0,0,0,0.05);
+}
+.link, .link-2, .link-7, .link-c, .link-11 {
+  border-radius: 20px;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: transparent;
+  box-shadow: none;
+}
+.link:hover, .link-2:hover, .link-7:hover, .link-c:hover, .link-11:hover {
+  background: rgba(18, 177, 166, 0.05);
+}
