@@ -6,9 +6,10 @@
     <title>StayCEC - Notifications</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" />
     <link rel="stylesheet" href="notifications.css" />
+    <script type="module" src="./splash.js"></script>
   </head>
   <body>
-    <div class="main-container">
+    <div class="main-container" id="mainContainer" style="opacity:0; transition: opacity 0.3s;">
       <div class="rectangle">
         <div class="staycecdesktop"></div>
         <div class="flex-row-b">
@@ -41,7 +42,7 @@
             <div class="container-14"><div class="icon-15"></div></div>
             <div class="container-16"><span class="text-17">Settings</span></div>
           </div>
-          <div class="link-18" onclick="navigateTo('login.html')" style="cursor:pointer;">
+          <div class="link-18" id="logoutBtn" style="cursor:pointer;">
             <div class="container-19"><div class="icon-1a"></div></div>
             <div class="container-1b"><span class="text-1c">Logout</span></div>
           </div>
@@ -183,10 +184,17 @@
       </div>
     </div>
     <script>
-      function navigateTo(url) {
-        sessionStorage.setItem('staycec_nav_internal', '1');
-        window.location.href = url;
-      }
+
+    </script>
+    <script type="module">
+      import { requireAuth, logOut } from './auth.js';
+
+      (async () => {
+        await requireAuth();
+        document.getElementById('mainContainer').style.opacity = '1';
+      })();
+
+      document.getElementById('logoutBtn').addEventListener('click', () => logOut());
     </script>
   </body>
 </html>

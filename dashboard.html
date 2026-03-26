@@ -6,9 +6,10 @@
     <title>StayCEC - Dashboard</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" />
     <link rel="stylesheet" href="dashboard.css" />
+    <script type="module" src="./splash.js"></script>
   </head>
   <body>
-    <div class="main-container">
+    <div class="main-container" id="mainContainer" style="opacity:0; transition: opacity 0.3s;">
       <div class="rectangle">
         <div class="staycecdesktop"></div>
         <div class="nav">
@@ -48,7 +49,7 @@
               <span class="settings">Settings</span>
             </div>
           </div>
-          <div class="link-15" onclick="navigateTo('login.html')" style="cursor:pointer;">
+          <div class="link-15" id="logoutBtn" style="cursor:pointer;">
             <div class="container-16"><div class="icon-17"></div></div>
             <div class="container-18"><span class="logout">Logout</span></div>
           </div>
@@ -107,7 +108,7 @@
         </div>
         <div class="container-2d">
           <div class="heading-2e">
-            <span class="text">Good Morning, Adhu</span>
+            <span class="text" id="greetingText">Good Morning</span>
           </div>
           <div class="container-2f">
             <span class="text-30">Welcome back to your serene space.</span>
@@ -249,10 +250,30 @@
       </div>
     </div>
   </body>
-  <script>
-    function navigateTo(url) {
-      sessionStorage.setItem('staycec_nav_internal', '1');
-      window.location.href = url;
-    }
+
+  <script type="module">
+    import { requireAuth, getStudentProfile, logOut } from './auth.js';
+
+    (async () => {
+      const user = await requireAuth();
+      
+      // Load student profile for greeting
+      const profile = await getStudentProfile();
+      const greetEl = document.getElementById('greetingText');
+      if (profile && profile.fullName) {
+        const hour = new Date().getHours();
+        let greet = 'Good Evening';
+        if (hour < 12) greet = 'Good Morning';
+        else if (hour < 17) greet = 'Good Afternoon';
+        const firstName = profile.fullName.split(' ')[0];
+        greetEl.textContent = `${greet}, ${firstName}`;
+      }
+
+      // Show the page
+      document.getElementById('mainContainer').style.opacity = '1';
+    })();
+
+    // Logout
+    document.getElementById('logoutBtn').addEventListener('click', () => logOut());
   </script>
 </html>

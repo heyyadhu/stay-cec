@@ -6,10 +6,10 @@
     <title>StayCEC - Services</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" />
     <link rel="stylesheet" href="service.css" />
+    <script type="module" src="./splash.js"></script>
   </head>
   <body>
-    <div class="main-container">
-      <!-- Sidebar -->
+    <div class="main-container" id="mainContainer" style="opacity:0; transition: opacity 0.3s;">
       <div class="rectangle">
         <div class="staycecdesktop"></div>
         <div class="link" onclick="navigateTo('mess.html')" style="cursor:pointer;">
@@ -29,7 +29,7 @@
             <div class="container-b"><div class="icon-c"></div></div>
             <div class="container-d"><span class="settings">Settings</span></div>
           </div>
-          <div class="link-e" onclick="navigateTo('login.html')" style="cursor:pointer;">
+          <div class="link-e" id="logoutBtn" style="cursor:pointer;">
             <div class="container-f"><div class="icon-10"></div></div>
             <div class="container-11"><span class="logout">Logout</span></div>
           </div>
@@ -327,9 +327,7 @@
           <div class="subject-input">
             <div class="label"><span class="subject">Subject</span></div>
             <div class="input">
-              <div class="container-7c">
-                <span class="text-e-g-room-shift">e.g., Room shift, Leave extension</span>
-              </div>
+              <input type="text" id="meetingSubject" class="form-input" placeholder="e.g., Room shift, Leave extension" required />
             </div>
           </div>
           <div class="date-time-row">
@@ -339,16 +337,7 @@
               </div>
               <div class="container-7f">
                 <div class="input-80">
-                  <div class="container-81">
-                    <div class="container-82">
-                      <div class="paragraph">
-                        <span class="spinbutton-month">mm</span><span class="text-83">/</span><span class="spinbutton-day">dd</span><span class="text-84">/</span><span class="spinbutton-year">yyyy</span>
-                      </div>
-                    </div>
-                    <div class="button-menu">
-                      <div class="image-fill"><div class="svg"></div></div>
-                    </div>
-                  </div>
+                  <input type="date" id="meetingDate" class="form-input" required />
                 </div>
                 <div class="container-85"><div class="icon-86"></div></div>
               </div>
@@ -358,12 +347,13 @@
                 <span class="preferred-time-slot">Preferred Time Slot</span>
               </div>
               <div class="container-89">
-                <div class="options">
-                  <div class="container-8a">
-                    <span class="text-8b">Select Slot</span>
-                  </div>
-                  <div class="image-fill-8c"><div class="svg-8d"></div></div>
-                </div>
+                <select id="meetingTime" class="form-input" style="appearance:auto; background:transparent;">
+                  <option value="" disabled selected>Select Slot</option>
+                  <option value="10:00 AM">10:00 AM</option>
+                  <option value="11:30 AM">11:30 AM</option>
+                  <option value="02:00 PM">02:00 PM</option>
+                  <option value="04:00 PM">04:00 PM</option>
+                </select>
                 <div class="container-8e"><div class="icon-8f"></div></div>
               </div>
             </div>
@@ -373,15 +363,14 @@
               <span class="text-91">Additional Notes</span>
             </div>
             <div class="textarea">
-              <div class="container-92">
-                <span class="purpose-meeting">Briefly describe the purpose of the meeting...</span>
-              </div>
+              <textarea id="meetingNotes" class="form-input" rows="3" placeholder="Briefly describe the purpose of the meeting..." style="resize:none; padding-top:10px;"></textarea>
             </div>
           </div>
         </div>
         <div class="modal-actions">
-          <div class="button-93" onclick="closeRequestMeetingModal()" style="cursor: pointer;">
-            <span class="text-94">Request Slot</span>
+          <div id="meetingError" style="display:none; color:#e74c3c; font-size:13px; font-family:'Inter',sans-serif; text-align:center; margin-bottom:10px; width:100%;"></div>
+          <div class="button-93" id="submitMeetingBtn" style="cursor: pointer;">
+            <span class="text-94" id="submitMeetingBtnText">Request Slot</span>
             <div class="container-95"><div class="icon-96"></div></div>
           </div>
           <div class="button-97" onclick="closeRequestMeetingModal()" style="cursor: pointer;"><span class="text-98">Cancel</span></div>
@@ -413,40 +402,29 @@
                 <span class="priority-level">Priority Level</span>
               </div>
               <div class="container-7d">
-                <div class="label-7e" style="cursor: pointer;">
-                  <div class="background-border-7f">
-                    <div class="container-80"><div class="icon-81"></div></div>
-                    <div class="container-82">
-                      <span class="text-low">Low</span>
-                    </div>
-                  </div>
-                </div>
-                <div class="label-83" style="cursor: pointer;">
-                  <div class="background-border-shadow-84">
-                    <div class="container-85"><div class="icon-86"></div></div>
-                    <div class="container-87">
-                      <span class="text-medium">Medium</span>
-                    </div>
-                  </div>
-                </div>
-                <div class="label-88" style="cursor: pointer;">
-                  <div class="background-border-89">
-                    <div class="container-8a"><div class="icon-8b"></div></div>
-                    <div class="container-8c">
-                      <span class="text-high">High</span>
-                    </div>
-                  </div>
-                </div>
+                <select id="complaintPriority" class="form-input" style="appearance:auto; border:1px solid #ddd; background:#fff; padding:10px; border-radius:8px;">
+                  <option value="" disabled selected>Select Priority</option>
+                  <option value="low">Low Priority</option>
+                  <option value="medium">Medium Priority</option>
+                  <option value="high">High Priority</option>
+                </select>
               </div>
             </div>
             <div class="description-textarea">
               <div class="label-8d">
-                <span class="description">Description</span>
+                <span class="description">Category &amp; Description</span>
+              </div>
+              <div class="container-7d" style="margin-bottom:10px;">
+                <select id="complaintCategory" class="form-input" style="appearance:auto; border:1px solid #ddd; background:#fff; padding:10px; border-radius:8px; width:100%;">
+                  <option value="" disabled selected>Select Category</option>
+                  <option value="Maintenance">Maintenance (Electrical/Plumbing/AC)</option>
+                  <option value="Housekeeping">Housekeeping</option>
+                  <option value="Internet">Internet/Wi-Fi</option>
+                  <option value="Other">Other</option>
+                </select>
               </div>
               <div class="textarea">
-                <div class="container-8e">
-                  <span class="detail-description">Please describe the issue in detail...</span>
-                </div>
+                <textarea id="complaintDesc" class="form-input" rows="4" placeholder="Please describe the issue in detail..." style="resize:none; padding-top:10px;"></textarea>
               </div>
             </div>
             <div class="attachment-upload">
@@ -472,20 +450,33 @@
           </div>
         </div>
         <div class="modal-footer">
+          <div id="complaintError" style="display:none; color:#e74c3c; font-size:13px; font-family:'Inter',sans-serif; text-align:center; margin-bottom:10px; width:100%;"></div>
           <div class="button-98" onclick="closeComplaintModal()" style="cursor: pointer;"><span class="cancel">Cancel</span></div>
-          <div class="submit-ticket" onclick="closeComplaintModal()" style="cursor: pointer;">
+          <div class="submit-ticket" id="submitComplaintBtn" style="cursor: pointer;">
             <div class="box-23"></div>
-            <span class="text-39">Submit Ticket</span>
+            <span class="text-39" id="submitComplaintBtnText">Submit Ticket</span>
           </div>
         </div>
       </div>
     </div>
     
-    <script>
-      function navigateTo(url) {
-        sessionStorage.setItem('staycec_nav_internal', '1');
-        window.location.href = url;
+    <style>
+      .form-input {
+        width: 100%;
+        border: none;
+        outline: none;
+        background: transparent;
+        font-family: 'Inter', sans-serif;
+        font-size: 14px;
+        color: #1a1a2e;
+        padding: 0;
       }
+      .form-input::placeholder {
+        color: #9ca3af;
+        opacity: 1;
+      }
+    </style>
+    <script>
       function openComplaintModal() {
         document.getElementById('complaintModal').style.display = 'flex';
       }
@@ -504,6 +495,119 @@
       function closeHelpDeskModal() {
         document.getElementById('helpDeskModal').style.display = 'none';
       }
+    </script>
+    <script type="module">
+      import { requireAuth, logOut } from './auth.js';
+      import { db } from './firebase-config.js';
+      import { collection, addDoc, serverTimestamp, query, where, getDocs, orderBy, limit } from "firebase/firestore";
+
+      let currentUser = null;
+
+      (async () => {
+        currentUser = await requireAuth();
+        document.getElementById('mainContainer').style.opacity = '1';
+
+        // Optional: you could load recent complaints from Firestore here and populate the table
+      })();
+
+      document.getElementById('logoutBtn').addEventListener('click', () => logOut());
+
+      // Handle Meeting Request
+      const submitMeetingBtn = document.getElementById('submitMeetingBtn');
+      submitMeetingBtn.addEventListener('click', async () => {
+        const subject = document.getElementById('meetingSubject').value.trim();
+        const date = document.getElementById('meetingDate').value;
+        const time = document.getElementById('meetingTime').value;
+        const notes = document.getElementById('meetingNotes').value.trim();
+        const errorEl = document.getElementById('meetingError');
+
+        if (!subject || !date || !time) {
+          errorEl.textContent = 'Please fill out all required fields (Subject, Date, Time).';
+          errorEl.style.display = 'block';
+          return;
+        }
+
+        const btnText = document.getElementById('submitMeetingBtnText');
+        errorEl.style.display = 'none';
+        btnText.textContent = 'Requesting...';
+        submitMeetingBtn.style.pointerEvents = 'none';
+        submitMeetingBtn.style.opacity = '0.7';
+
+        try {
+          await addDoc(collection(db, "meetings"), {
+            userId: currentUser.uid,
+            subject,
+            preferredDate: date,
+            preferredTime: time,
+            notes,
+            status: 'pending',
+            createdAt: serverTimestamp()
+          });
+
+          alert('Meeting requested successfully!');
+          closeRequestMeetingModal();
+          
+          // Reset form
+          document.getElementById('meetingSubject').value = '';
+          document.getElementById('meetingDate').value = '';
+          document.getElementById('meetingTime').value = '';
+          document.getElementById('meetingNotes').value = '';
+        } catch (err) {
+          errorEl.textContent = 'Failed to submit request: ' + err.message;
+          errorEl.style.display = 'block';
+        } finally {
+          btnText.textContent = 'Request Slot';
+          submitMeetingBtn.style.pointerEvents = 'auto';
+          submitMeetingBtn.style.opacity = '1';
+        }
+      });
+
+      // Handle Complaint Registration
+      const submitComplaintBtn = document.getElementById('submitComplaintBtn');
+      submitComplaintBtn.addEventListener('click', async () => {
+        const priority = document.getElementById('complaintPriority').value;
+        const category = document.getElementById('complaintCategory').value;
+        const desc = document.getElementById('complaintDesc').value.trim();
+        const errorEl = document.getElementById('complaintError');
+
+        if (!priority || !category || !desc) {
+          errorEl.textContent = 'Please select Priority, Category, and provide a Description.';
+          errorEl.style.display = 'block';
+          return;
+        }
+
+        const btnText = document.getElementById('submitComplaintBtnText');
+        errorEl.style.display = 'none';
+        btnText.textContent = 'Submitting...';
+        submitComplaintBtn.style.pointerEvents = 'none';
+        submitComplaintBtn.style.opacity = '0.7';
+
+        try {
+          await addDoc(collection(db, "complaints"), {
+            userId: currentUser.uid,
+            priority,
+            category,
+            description: desc,
+            status: 'pending',
+            createdAt: serverTimestamp()
+          });
+
+          alert('Ticket submitted successfully!');
+          closeComplaintModal();
+          
+          // Reset form
+          document.getElementById('complaintPriority').value = '';
+          document.getElementById('complaintCategory').value = '';
+          document.getElementById('complaintDesc').value = '';
+        } catch (err) {
+          errorEl.textContent = 'Failed to submit ticket: ' + err.message;
+          errorEl.style.display = 'block';
+        } finally {
+          btnText.textContent = 'Submit Ticket';
+          submitComplaintBtn.style.pointerEvents = 'auto';
+          submitComplaintBtn.style.opacity = '1';
+        }
+      });
     </script>
   </body>
 </html>

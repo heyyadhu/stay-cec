@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="mess.css" />
   </head>
   <body>
-    <div class="main-container">
+    <div class="main-container" id="mainContainer" style="opacity:0; transition: opacity 0.3s;">
       <div class="rectangle">
         <div class="staycecdesktop"></div>
         <div class="flex-row-ec">
@@ -43,7 +43,7 @@
               <span class="text-19">Settings</span>
             </div>
           </div>
-          <div class="link-1a" onclick="navigateTo('login.html')" style="cursor:pointer;">
+          <div class="link-1a" id="logoutBtn" style="cursor:pointer;">
             <div class="container-1b"><div class="icon-1c"></div></div>
             <div class="container-1d"><span class="text-1e">Logout</span></div>
           </div>
@@ -258,12 +258,19 @@
         </div>
       </div>
     </div>
-    <script src="splash.js"></script>
+    <script type="module" src="./splash.js"></script>
     <script>
-      function navigateTo(url) {
-        sessionStorage.setItem('staycec_nav_internal', '1');
-        window.location.href = url;
-      }
+
+    </script>
+    <script type="module">
+      import { requireAuth, logOut } from './auth.js';
+
+      (async () => {
+        await requireAuth();
+        document.getElementById('mainContainer').style.opacity = '1';
+      })();
+
+      document.getElementById('logoutBtn').addEventListener('click', () => logOut());
     </script>
   </body>
 </html>

@@ -6,7 +6,7 @@
     <title>StayCEC - Registration</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" />
     <link rel="stylesheet" href="registration.css" />
-    <script src="splash.js"></script>
+    <script type="module" src="./splash.js"></script>
   </head>
   <body>
     <div class="main-container">
@@ -89,9 +89,7 @@
                   <span class="full-name-13">Full Name</span>
                 </div>
                 <div class="input">
-                  <div class="container-14">
-                    <span class="john-doe">John Doe</span>
-                  </div>
+                  <input type="text" id="regFullName" class="form-input" placeholder="John Doe" required />
                 </div>
               </div>
               <div class="register-number">
@@ -99,9 +97,7 @@
                   <span class="register-number-16">Register Number</span>
                 </div>
                 <div class="input-17">
-                  <div class="container-18">
-                    <span class="cs">2024CS101</span>
-                  </div>
+                  <input type="text" id="regRegNumber" class="form-input" placeholder="2024CS101" required />
                 </div>
               </div>
             </div>
@@ -110,21 +106,23 @@
                 <div class="label-19">
                   <span class="span-department">Department</span>
                 </div>
-                <div class="options">
-                  <div class="container-1a">
-                    <span class="span-text">Select Department</span>
-                  </div>
-                  <div class="image-fill"><div class="svg"></div></div>
-                </div>
+                <select class="options" id="departmentSelect" style="width:100%;padding:12px 16px;border-radius:10px;border:1px solid rgba(0,0,0,0.08);background:#f8f8fa;font-family:'Inter',sans-serif;font-size:14px;color:#1a1a2e;appearance:auto;cursor:pointer;outline:none;">
+                  <option value="" disabled selected>Select Department</option>
+                  <option value="cs">Computer Science</option>
+                  <option value="ai">Artificial Intelligence</option>
+                  <option value="ece">Electronics &amp; Communication</option>
+                  <option value="ee">Electrical</option>
+                </select>
               </div>
               <div class="year">
                 <div class="label-1b"><span class="span-year">Year</span></div>
-                <div class="options-1c">
-                  <div class="container-1d">
-                    <span class="span-text-1e">Current Year</span>
-                  </div>
-                  <div class="image-fill-1f"><div class="svg-20"></div></div>
-                </div>
+                <select class="options-1c" id="yearSelect" style="width:100%;padding:12px 16px;border-radius:10px;border:1px solid rgba(0,0,0,0.08);background:#f8f8fa;font-family:'Inter',sans-serif;font-size:14px;color:#1a1a2e;appearance:auto;cursor:pointer;outline:none;">
+                  <option value="" disabled selected>Select Year</option>
+                  <option value="1">1st Year</option>
+                  <option value="2">2nd Year</option>
+                  <option value="3">3rd Year</option>
+                  <option value="4">4th Year</option>
+                </select>
               </div>
             </div>
             <div class="flex-row-b">
@@ -134,9 +132,7 @@
                 </div>
                 <div class="container-22">
                   <div class="input-23">
-                    <div class="container-24">
-                      <span class="span-phone-number">+1 (555) 000-0000</span>
-                    </div>
+                    <input type="tel" id="regPhone" class="form-input" placeholder="+91 98765 43210" required />
                   </div>
                   <div class="container-25"><div class="icon"></div></div>
                 </div>
@@ -148,9 +144,7 @@
                 </div>
                 <div class="container-29">
                   <div class="input-2a">
-                    <div class="container-2b">
-                      <span class="phone-number">+1 (555) 000-0000</span>
-                    </div>
+                    <input type="tel" id="regParentPhone" class="form-input" placeholder="+91 98765 43210" required />
                   </div>
                   <div class="container-2c"><div class="icon-2d"></div></div>
                 </div>
@@ -163,9 +157,7 @@
             </div>
             <div class="container-2f">
               <div class="input-30">
-                <div class="container-31">
-                  <span class="email">student@university.edu</span>
-                </div>
+                <input type="email" id="regEmail" class="form-input" placeholder="student@university.edu" required />
               </div>
               <div class="container-32"><div class="icon-33"></div></div>
             </div>
@@ -176,9 +168,7 @@
             </div>
             <div class="container-35">
               <div class="input-36">
-                <div class="container-37">
-                  <span class="dot-line">••••••••••••</span>
-                </div>
+                <input type="password" id="regPassword" class="form-input" placeholder="Min. 6 characters" required />
               </div>
               <div class="container-38"><div class="icon-39"></div></div>
               <div class="button">
@@ -186,14 +176,16 @@
               </div>
             </div>
           </div>
-          <div class="submit-button" onclick="alert('Registration request submitted successfully! Please wait for admin approval.'); navigateTo('login.html');" style="cursor:pointer;">
+          <div id="regError" style="display:none; color:#e74c3c; font-size:13px; font-family:'Inter',sans-serif; margin-bottom:10px; text-align:center;"></div>
+          <div id="regSuccess" style="display:none; color:#27ae60; font-size:13px; font-family:'Inter',sans-serif; margin-bottom:10px; text-align:center;"></div>
+          <div class="submit-button" id="regBtn" style="cursor:pointer;">
             <div class="button-shadow"></div>
-            <span class="send-request">Send request</span>
+            <span class="send-request" id="regBtnText">Send request</span>
           </div>
           <div class="footer-link">
             <div class="text-3c">
               <span class="have-account">Already have an account? </span
-              ><span class="login-here" onclick="navigateTo('login.html')" style="cursor:pointer;">Login here</span>
+              ><span class="login-here" onclick="navigateTo('index.html')" style="cursor:pointer;">Login here</span>
             </div>
           </div>
         </div>
@@ -211,5 +203,101 @@
         </div>
       </div>
     </div>
+    <style>
+      .form-input {
+        width: 100%;
+        border: none;
+        outline: none;
+        background: transparent;
+        font-family: 'Inter', sans-serif;
+        font-size: 14px;
+        color: #1a1a2e;
+        padding: 0;
+      }
+      .form-input::placeholder {
+        color: #9ca3af;
+        opacity: 1;
+      }
+    </style>
+    <script type="module">
+      import { signUp } from './auth.js';
+
+      const regBtn = document.getElementById('regBtn');
+      const regBtnText = document.getElementById('regBtnText');
+      const regError = document.getElementById('regError');
+      const regSuccess = document.getElementById('regSuccess');
+
+      regBtn.addEventListener('click', async () => {
+        const fullName = document.getElementById('regFullName').value.trim();
+        const registerNumber = document.getElementById('regRegNumber').value.trim();
+        const department = document.getElementById('departmentSelect').value;
+        const year = document.getElementById('yearSelect').value;
+        const phone = document.getElementById('regPhone').value.trim();
+        const parentPhone = document.getElementById('regParentPhone').value.trim();
+        const email = document.getElementById('regEmail').value.trim();
+        const password = document.getElementById('regPassword').value;
+
+        // Validation
+        if (!fullName || !registerNumber || !department || !year || !phone || !email || !password) {
+          regError.textContent = 'Please fill in all required fields.';
+          regError.style.display = 'block';
+          regSuccess.style.display = 'none';
+          return;
+        }
+        if (password.length < 6) {
+          regError.textContent = 'Password must be at least 6 characters.';
+          regError.style.display = 'block';
+          regSuccess.style.display = 'none';
+          return;
+        }
+
+        regBtnText.textContent = 'Creating account...';
+        regBtn.style.pointerEvents = 'none';
+        regBtn.style.opacity = '0.7';
+        regError.style.display = 'none';
+        regSuccess.style.display = 'none';
+
+        try {
+          await signUp(email, password, {
+            fullName,
+            registerNumber,
+            department,
+            year,
+            phone,
+            parentPhone,
+            hostel: 'CEC Premium Men\'s Hostel',
+            room: 'Pending Assignment',
+          });
+
+          regSuccess.textContent = 'Registration successful! Redirecting to login...';
+          regSuccess.style.display = 'block';
+          setTimeout(() => {
+            sessionStorage.setItem('staycec_nav_internal', '1');
+            window.location.href = 'index.html';
+          }, 2000);
+        } catch (err) {
+          console.error('Registration error:', err);
+          let msg = `Registration failed: ${err.message || 'Please try again.'}`;
+          
+          if (err.code === 'auth/email-already-in-use') {
+            msg = 'This email is already registered. Try logging in.';
+          } else if (err.code === 'auth/weak-password') {
+            msg = 'Password is too weak. Use at least 6 characters.';
+          } else if (err.code === 'auth/invalid-email') {
+            msg = 'Invalid email address.';
+          } else if (err.code === 'auth/operation-not-allowed') {
+            msg = 'Email/Password sign-in is not enabled in Firebase Console. Please enable it in Auth > Sign-in method.';
+          } else if (err.code === 'permission-denied') {
+            msg = 'Firestore permission denied. Check your security rules.';
+          }
+
+          regError.textContent = msg;
+          regError.style.display = 'block';
+          regBtnText.textContent = 'Send request';
+          regBtn.style.pointerEvents = 'auto';
+          regBtn.style.opacity = '1';
+        }
+      });
+    </script>
   </body>
 </html>

@@ -6,9 +6,10 @@
     <title>StayCEC - Profile</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" />
     <link rel="stylesheet" href="profile.css" />
+    <script type="module" src="./splash.js"></script>
   </head>
   <body>
-    <div class="main-container">
+    <div class="main-container" id="mainContainer" style="opacity:0; transition: opacity 0.3s;">
       <div class="rectangle">
         <div class="staycecdesktop"></div>
         <div class="nav">
@@ -46,7 +47,7 @@
             <div class="container-12"><div class="icon-13"></div></div>
             <div class="container-14"><span class="text">Settings</span></div>
           </div>
-          <div class="link-15" onclick="navigateTo('login.html')" style="cursor: pointer;">
+          <div class="link-15" id="logoutBtn" style="cursor: pointer;">
             <div class="container-16"><div class="icon-17"></div></div>
             <div class="container-18"><span class="text-19">Logout</span></div>
           </div>
@@ -70,7 +71,7 @@
           </div>
         </div>
         <div class="container-23">
-          <div class="heading"><span class="anandhu">Anandhu</span></div>
+          <div class="heading"><span class="anandhu" id="profileName">Loading...</span></div>
           <div class="background">
             <div class="container-24"><div class="icon-25"></div></div>
             <span class="text-verified-student">Verified Student</span>
@@ -89,7 +90,7 @@
               <div class="container-2b">
                 <div class="input">
                   <div class="container-2c">
-                    <span class="text-9876543210">9876543210</span>
+                    <span class="text-9876543210" id="profilePhone">—</span>
                   </div>
                 </div>
                 <div class="container-2d">
@@ -102,7 +103,7 @@
                 <span class="label-full-name">Full Name</span>
                 <div class="input-2f">
                   <div class="container-30">
-                    <span class="text-adhu-s-nair">Adhu S. Nair</span>
+                    <span class="text-adhu-s-nair" id="profileFullName">—</span>
                   </div>
                 </div>
               </div>
@@ -110,7 +111,7 @@
                 <span class="label-register-number">Register Number</span>
                 <div class="input-32">
                   <div class="container-33">
-                    <span class="xxx">2021XXX</span>
+                    <span class="xxx" id="profileRegNumber">—</span>
                   </div>
                 </div>
               </div>
@@ -120,7 +121,7 @@
                 <span class="label-department">Department</span>
                 <div class="input-35">
                   <div class="container-36">
-                    <span class="computer-science">Computer Science</span>
+                    <span class="computer-science" id="profileDepartment">—</span>
                   </div>
                 </div>
               </div>
@@ -128,7 +129,7 @@
                 <span class="label-year">Year</span>
                 <div class="options" style="cursor: pointer;">
                   <div class="container-38">
-                    <span class="text-39">3rd Year</span>
+                    <span class="text-39" id="profileYear">—</span>
                   </div>
                   <div class="image-fill"><div class="svg"></div></div>
                 </div>
@@ -148,9 +149,9 @@
                 <span class="hostel-name">Hostel Name</span>
               </div>
               <div class="container-3e">
-                <span class="cec-premium-mens-hostel"
-                  >CEC Premium Men's<br />Hostel</span
-                >
+                  <span class="cec-premium-mens-hostel" id="profileHostel"
+                    >—</span
+                  >
               </div>
             </div>
             <div class="background-shadow">
@@ -163,7 +164,7 @@
                 </div>
                 <div class="container-44">
                   <div class="container-45">
-                    <span class="text-block-a">Block A • 402</span>
+                    <span class="text-block-a" id="profileRoom">—</span>
                   </div>
                   <div class="container-46">
                     <span class="text-single-occupancy">Single Occupancy</span>
@@ -192,7 +193,7 @@
         </div>
       </div>
       <div class="action-button">
-        <div class="button-4e" onclick="alert('Changes saved successfully!')" style="cursor: pointer;">
+        <div class="button-4e" id="saveBtn" style="cursor: pointer;">
           <div class="button-shadow"></div>
           <div class="container-4f"><div class="icon-50"></div></div>
           <span class="text-save-changes">Save Changes</span>
@@ -200,10 +201,40 @@
       </div>
     </div>
     <script>
-      function navigateTo(url) {
-        sessionStorage.setItem('staycec_nav_internal', '1');
-        window.location.href = url;
-      }
+    </script>
+    <script type="module">
+      import { requireAuth, getStudentProfile, updateStudentProfile, logOut } from './auth.js';
+
+      (async () => {
+        const user = await requireAuth();
+        const profile = await getStudentProfile();
+
+        if (profile) {
+          document.getElementById('profileName').textContent = profile.fullName || '—';
+          document.getElementById('profileFullName').textContent = profile.fullName || '—';
+          document.getElementById('profilePhone').textContent = profile.phone || '—';
+          document.getElementById('profileRegNumber').textContent = profile.registerNumber || '—';
+          document.getElementById('profileDepartment').textContent = profile.department || '—';
+          document.getElementById('profileYear').textContent = profile.year ? profile.year + ' Year' : '—';
+          document.getElementById('profileHostel').textContent = profile.hostel || '—';
+          document.getElementById('profileRoom').textContent = profile.room || '—';
+        }
+
+        document.getElementById('mainContainer').style.opacity = '1';
+      })();
+
+      // Save changes
+      document.getElementById('saveBtn').addEventListener('click', async () => {
+        try {
+          // For now we just confirm since fields are display-only
+          alert('Profile saved successfully!');
+        } catch (err) {
+          alert('Failed to save profile: ' + err.message);
+        }
+      });
+
+      // Logout
+      document.getElementById('logoutBtn').addEventListener('click', () => logOut());
     </script>
   </body>
 </html>

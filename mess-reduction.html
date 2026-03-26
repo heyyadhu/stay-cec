@@ -6,6 +6,7 @@
     <title>StayCEC - Request Mess Reduction</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" />
     <link rel="stylesheet" href="mess-reduction.css" />
+    <script type="module" src="./splash.js"></script>
   </head>
   <body>
     <div class="main-container">
@@ -40,7 +41,7 @@
             <div class="container-13"><div class="icon-14"></div></div>
             <div class="container-15"><span class="text-16">Settings</span></div>
           </div>
-          <div class="link-17" onclick="navigateTo('login.html')" style="cursor:pointer;">
+          <div class="link-17" onclick="navigateTo('index.html')" style="cursor:pointer;">
             <div class="container-18"><div class="icon-19"></div></div>
             <div class="container-1a"><span class="text-1b">Logout</span></div>
           </div>
@@ -185,10 +186,7 @@
     </div>
 
     <script>
-      function navigateTo(url) {
-        sessionStorage.setItem('staycec_nav_internal', '1');
-        window.location.href = url;
-      }
+
 
       // Auto-calculate days across both date ranges
       function calcRangeDays(fromId, toId) {
