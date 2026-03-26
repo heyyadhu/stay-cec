@@ -59,7 +59,7 @@
             <div class="total-students-shadow"></div>
             <div class="container-24">
               <div class="container-25"><span class="total-students-26">Total Students</span></div>
-              <div class="heading-27"><span class="text-v">420</span></div>
+              <div class="heading-27"><span class="text-v" id="wsTotalStudents">...</span></div>
               <div class="background">
                 <div class="container-28"><div class="icon-29"></div></div>
                 <span class="full-occupancy">Full Occupancy</span>
@@ -71,7 +71,7 @@
             <div class="pending-requests-shadow"></div>
             <div class="container-2c">
               <div class="container-2d"><span class="pending-requests-2e">Pending Requests</span></div>
-              <div class="heading-2f"><span class="text-v">24</span></div>
+              <div class="heading-2f"><span class="text-v" id="wsPendingRequests">...</span></div>
               <div class="container-30">
                 <div class="background-31"><span class="text-f">12 Mess</span></div>
                 <div class="background-32"><span class="text-10">8 Leave</span></div>
@@ -84,7 +84,7 @@
             <div class="fee-pending-shadow"></div>
             <div class="container-36">
               <div class="container-37"><span class="fee-pending-38">Fee Pending</span></div>
-              <div class="heading-39"><span class="text-v" style="color: #ff3b30">12</span></div>
+              <div class="heading-39"><span class="text-v" style="color: #ff3b30" id="wsFeePending">...</span></div>
               <div class="container-3a"><span class="due-by-end-of-month">Due by end of month</span></div>
             </div>
             <div class="background-3b"><div class="icon-3c"></div></div>
@@ -99,60 +99,8 @@
                 <div class="container-40"><div class="icon-41"></div></div>
               </div>
             </div>
-            <div class="background-border-shadow">
-              <div class="activity-item">
-                <div class="container-42">
-                  <div class="student" style="background-image: url('https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-26/ahhZBmgOnu.png'); background-size: cover"></div>
-                  <div class="container-43">
-                    <div class="heading-44"><span class="text-45">Rahul Varma </span><span class="text-46">Room 204B</span></div>
-                    <div class="container-47">
-                      <span class="text-48">Leave Request: Oct 26 - Oct 28 (Family Event)</span>
-                    </div>
-                  </div>
-                </div>
-                <div class="container-49">
-                  <div class="container-4a">
-                    <div class="button-4b"><span class="approve">Approve</span></div>
-                  </div>
-                  <div class="background-4c"><span class="text-4d">2m ago</span></div>
-                </div>
-              </div>
-              <div class="activity-item">
-                <div class="container-42">
-                  <div class="student" style="display: flex; align-items: center; justify-content: center; background: #f2f2f7">
-                    <img src="https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-26/COtGqcwdEV.png" style="width: 14px" />
-                  </div>
-                  <div class="container-43">
-                    <div class="heading-44"><span class="text-45">Sneha Kapoor </span><span class="text-46">Room 112A</span></div>
-                    <div class="container-47">
-                      <span class="text-48">Complaint: Water leakage in washroom</span>
-                    </div>
-                  </div>
-                </div>
-                <div class="container-49">
-                  <div class="container-4a">
-                    <div class="button-4b"><span class="approve">Assign</span></div>
-                  </div>
-                  <div class="background-4c"><span class="text-4d">15m ago</span></div>
-                </div>
-              </div>
-              <div class="activity-item" style="border-bottom: none">
-                <div class="container-42">
-                  <div class="student" style="background-image: url('https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-26/qXtKrLjKg2.png'); background-size: cover"></div>
-                  <div class="container-43">
-                    <div class="heading-44"><span class="text-45">Arjun Nair </span><span class="text-46">Room 305C</span></div>
-                    <div class="container-47">
-                      <span class="text-48">Mess Reduction: Medical grounds (3 days)</span>
-                    </div>
-                  </div>
-                </div>
-                <div class="container-49">
-                  <div class="container-4a">
-                    <div class="button-4b"><span class="approve">Approve</span></div>
-                  </div>
-                  <div class="background-4c"><span class="text-4d">1h ago</span></div>
-                </div>
-              </div>
+            <div class="background-border-shadow" id="recentActivityList">
+              <!-- Dynamically populated complaints -->
             </div>
           </div>
           <div class="sidebar-content">
@@ -196,20 +144,8 @@
                 <div class="heading-8d"><span class="text-8e">Live Feed</span></div>
                 <div class="container-8f"><div class="icon-90"></div></div>
               </div>
-              <div class="container-91">
-                <div class="container-92">
-                  <div class="container-94">
-                    <div class="container-95">
-                      <div style="display: flex; align-items: center; gap: 8px">
-                        <div style="width: 8px; height: 8px; background: #12b1a6; border-radius: 50%"></div>
-                        <span class="hostel-deep-cleaning">Hostel Deep Cleaning</span>
-                      </div>
-                    </div>
-                    <div class="container-96" style="margin-left: 16px">
-                      <span class="text-97">Scheduled for this Sunday, 10 AM onwards. All residents are requested to keep rooms accessible for the maintenance team.</span>
-                    </div>
-                  </div>
-                </div>
+              <div class="container-91" id="liveFeedList">
+                <!-- Dynamically populated announcements/meetings -->
               </div>
             </div>
           </div>
@@ -220,18 +156,95 @@
 
     <script type="module">
       import { requireAuth, logOut, getStudentProfile } from './auth.js';
+      import { getWardenStats, getAllComplaints, getUpcomingMeetings, updateComplaintStatus } from './data.js';
 
       async function init() {
         try {
           const user = await requireAuth();
-          const profile = await getStudentProfile();
+          const profile = await getStudentProfile(user.uid);
 
           if (!profile || profile.role !== 'warden') {
             window.location.href = 'dashboard.html';
             return;
           }
 
-          document.getElementById('wardenGreeting').textContent = `Good Morning, Warden ${profile.fullName.split(' ')[0]}`;
+          document.getElementById('wardenGreeting').textContent = `Good Morning, Warden ${profile.fullName ? profile.fullName.split(' ')[0] : ''}`;
+
+          // Load stats
+          const stats = await getWardenStats();
+          document.getElementById('wsTotalStudents').textContent = stats.totalStudents;
+          document.getElementById('wsPendingRequests').textContent = stats.pendingRequests;
+          document.getElementById('wsFeePending').textContent = stats.feePendingCount;
+
+          // Load activity feed (complaints)
+          const complaints = await getAllComplaints();
+          const recentActivityList = document.getElementById('recentActivityList');
+          if (complaints.length > 0) {
+            recentActivityList.innerHTML = complaints.map(c => `
+              <div class="activity-item" style="margin-bottom: 8px; padding-bottom: 12px;">
+                <div class="container-42">
+                  <div class="student" style="display: flex; align-items: center; justify-content: center; background: #f2f2f7">
+                    <img src="https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-26/COtGqcwdEV.png" style="width: 14px" />
+                  </div>
+                  <div class="container-43">
+                    <div class="heading-44"><span class="text-45">Student ID: ${c.studentId.slice(0, 6)}</span></div>
+                    <div class="container-47">
+                      <span class="text-48">${c.title || 'Complaint'}: ${c.description}</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="container-49">
+                  <div class="container-4a">
+                    <div class="button-4b" data-id="${c.id}" style="cursor: pointer; background: ${c.status === 'Resolved' ? 'transparent' : ''}; color: ${c.status === 'Resolved' ? '#12b1a6' : ''}">
+                      <span class="approve">${c.status === 'Resolved' ? 'Resolved' : 'Mark Done'}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            `).join('');
+
+            // Add action listeners
+            const actionBtns = recentActivityList.querySelectorAll('.button-4b');
+            actionBtns.forEach(btn => {
+              btn.addEventListener('click', async (e) => {
+                const id = e.currentTarget.getAttribute('data-id');
+                if (e.currentTarget.textContent.trim() !== 'Resolved') {
+                  e.currentTarget.textContent = 'Resolving...';
+                  await updateComplaintStatus(id, 'Resolved');
+                  e.currentTarget.innerHTML = '<span class="approve">Resolved</span>';
+                  e.currentTarget.style.background = 'transparent';
+                  e.currentTarget.style.color = '#12b1a6';
+                }
+              });
+            });
+
+          } else {
+            recentActivityList.innerHTML = '<div style="padding: 24px; text-align: center; color: #8e8e93; font-size: 14px;">No recent activity found.</div>';
+          }
+
+          // Load meetings
+          const meetings = await getUpcomingMeetings();
+          const liveFeedList = document.getElementById('liveFeedList');
+          if (meetings.length > 0) {
+            liveFeedList.innerHTML = meetings.map(m => `
+                <div class="container-92" style="margin-bottom: 16px;">
+                  <div class="container-94">
+                    <div class="container-95">
+                      <div style="display: flex; align-items: center; gap: 8px">
+                        <div style="width: 8px; height: 8px; background: #12b1a6; border-radius: 50%"></div>
+                        <span class="hostel-deep-cleaning">${m.title}</span>
+                      </div>
+                    </div>
+                    <div class="container-96" style="margin-left: 16px">
+                      <span class="text-97">${m.description} - ${new Date(m.date.seconds * 1000).toLocaleDateString()}</span>
+                    </div>
+                  </div>
+                </div>
+            `).join('');
+          } else {
+            liveFeedList.innerHTML = '<div style="padding: 16px; color: #8e8e93; font-size: 14px;">No upcoming announcements.</div>';
+          }
+
         } catch (err) {
           console.error('Dashboard init error:', err);
         }

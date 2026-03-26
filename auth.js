@@ -66,10 +66,14 @@ export async function logOut() {
  * Get the current user's Firestore student profile.
  * Returns null if no user or no doc.
  */
-export async function getStudentProfile() {
-  const user = auth.currentUser;
-  if (!user) return null;
-  const snap = await getDoc(doc(db, "students", user.uid));
+export async function getStudentProfile(uid) {
+  if (!uid) {
+    const user = auth.currentUser;
+    if (!user) return null;
+    uid = user.uid;
+  }
+  if (!uid) return null;
+  const snap = await getDoc(doc(db, "students", uid));
   return snap.exists() ? { id: snap.id, ...snap.data() } : null;
 }
 

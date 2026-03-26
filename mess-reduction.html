@@ -193,7 +193,7 @@
       async function init() {
         try {
           currentUser = await requireAuth();
-          const profile = await getStudentProfile();
+          const profile = await getStudentProfile(currentUser.uid);
 
           if (profile && profile.role === 'warden') {
             window.location.href = 'warden-dashboard.html';

@@ -9,7 +9,7 @@
     <script type="module" src="./splash.js"></script>
   </head>
   <body>
-    <div class="main-container" id="mainContainer" style="opacity:0; transition: opacity 0.3s;">
+    <div class="main-container" id="mainContainer">
       <div class="rectangle">
         <div class="staycecdesktop"></div>
         <div class="nav">
@@ -296,7 +296,7 @@
           const user = await requireAuth();
           
           // 2. Fetch the Firestore profile
-          const profile = await getStudentProfile();
+          const profile = await getStudentProfile(user.uid);
           
           if (profile && profile.role === 'warden') {
             window.location.href = 'warden-dashboard.html';

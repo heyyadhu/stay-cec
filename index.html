@@ -88,7 +88,7 @@
               </div>
             </div>
             <div id="loginError" style="display:none; color:#e74c3c; font-size:13px; font-family:'Inter',sans-serif; margin-bottom:10px; text-align:center;"></div>
-            <button type="submit" class="submit-button" id="loginBtn" style="cursor: pointer; border: none; background: transparent; padding: 0; position: relative; width: 100%;">
+            <button type="submit" class="submit-button" id="loginBtn" style="cursor: pointer; border: none; position: relative; width: 100%;">
               <div class="button-shadow"></div>
               <div class="container-16">
                 <span class="text-login" id="loginBtnText">Login</span>
@@ -156,11 +156,11 @@
         loginError.style.display = 'none';
 
         try {
-          await signIn(email, password);
+          const user = await signIn(email, password);
           
           // Get profile to check role
           const { getStudentProfile } = await import('./auth.js');
-          const profile = await getStudentProfile();
+          const profile = await getStudentProfile(user.uid);
           
           if (profile && profile.role === 'warden') {
             window.location.href = 'warden-dashboard.html';

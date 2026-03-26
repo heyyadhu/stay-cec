@@ -1,5 +1,6 @@
 {
   "hosting": {
+    "site": "stay-cec",
     "public": "dist",
     "cleanUrls": true,
     "ignore": [
