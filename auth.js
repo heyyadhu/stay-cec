@@ -13,8 +13,21 @@ import {
   doc,
   setDoc,
   getDoc,
+  updateDoc,
   serverTimestamp,
 } from "firebase/firestore";
+
+/**
+ * Update student fees status after mock payment
+ */
+export async function updateStudentFees(uid) {
+  const studentRef = doc(db, "students", uid);
+  await updateDoc(studentRef, {
+    outstandingAmount: 0,
+    feeStatus: 'Paid',
+    lastPaymentDate: serverTimestamp()
+  });
+}
 
 /**
  * Sign up a new student.

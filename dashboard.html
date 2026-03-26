@@ -74,29 +74,53 @@
               </div>
             </div>
           </div>
-          <div class="container-1f">
-            <div class="container-20">
-              <div class="margin-21">
-                <div class="container-22">
-                  <span class="total-outstanding">Total Outstanding</span>
-                </div>
-              </div>
-              <div class="paragraph">
-                <span class="rupees">₹1,200</span
-                ><span class="rupees-23">rupees</span>
-              </div>
-              <div class="margin-24">
-                <div class="overlay-25">
-                  <div class="container-26"><div class="icon-27"></div></div>
-                  <div class="container-28">
-                    <span class="due-october-15-2024"
-                      >Due October 15, 2024</span
-                    >
+          <div id="feeCardInner" style="position: relative; width: 100%; height: 100%;">
+            <!-- Front Face -->
+            <div id="feeFront" style="display: flex; flex-direction: column; height: 100%; justify-content: space-between;">
+              <div class="container-1f">
+                <div class="container-20">
+                  <div class="margin-21">
+                    <div class="container-22">
+                      <span class="total-outstanding">Total Outstanding</span>
+                    </div>
+                  </div>
+                  <div class="paragraph">
+                    <span class="rupees" id="outstandingDisplay">₹1,200</span><span class="rupees-23">rupees</span>
+                  </div>
+                  <div class="margin-24">
+                    <div class="overlay-25">
+                      <div class="container-26"><div class="icon-27"></div></div>
+                      <div class="container-28">
+                        <span class="due-october-15-2024" id="dueStatusDisplay">Due October 15, 2024</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
+                <div class="button" id="payNowBtn" style="cursor:pointer;"><span class="pay-now">Pay Now</span></div>
               </div>
             </div>
-            <div class="button" onclick="navigateTo('payments.html')" style="cursor:pointer;"><span class="pay-now">Pay Now</span></div>
+
+            <!-- Back Face (Payment/QR) -->
+            <div id="feeBack" style="display: none; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; gap: 15px;">
+              <div id="qrContainer" style="background: white; padding: 10px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                <img id="qrCodeImg" src="" alt="UPI QR Code" style="width: 150px; height: 150px; display: block;" />
+              </div>
+              <div style="width: 100%; max-width: 300px;">
+                <input type="text" id="utrInput" placeholder="Enter 12-digit UTR No." 
+                  style="width: 100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: white; font-family: 'Inter', sans-serif; margin-bottom: 10px; outline: none;" />
+                <div class="button" id="verifyBtn" style="width: 100%; height: auto; padding: 12px; background: white; cursor: pointer;">
+                  <span style="color: #006a63; font-weight: 700;">Verify Payment</span>
+                </div>
+              </div>
+              <div id="paymentError" style="color: #ba1a1a; font-size: 12px; display: none; font-weight: 700;"></div>
+              <div id="cancelPay" style="color: white; font-size: 12px; cursor: pointer; text-decoration: underline; opacity: 0.8;">Cancel</div>
+            </div>
+
+            <!-- Success Message -->
+            <div id="feeSuccess" style="display: none; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center;">
+              <span style="font-size: 32px; font-weight: 900; color: white; letter-spacing: -1px;">🎉 All Dues Cleared!</span>
+              <span style="color: rgba(255,255,255,0.8); margin-top: 10px; font-weight: 500;">Your hostel fees are fully paid.</span>
+            </div>
           </div>
         </div>
         <div class="container-29" onclick="navigateTo('profile.html')" style="cursor: pointer;">
@@ -252,13 +276,15 @@
   </body>
 
   <script type="module">
-    import { requireAuth, getStudentProfile, logOut } from './auth.js';
+    import { requireAuth, getStudentProfile, logOut, updateStudentFees } from './auth.js';
 
     (async () => {
       const user = await requireAuth();
       
-      // Load student profile for greeting
+      // Load student profile
       const profile = await getStudentProfile();
+      
+      // 1. Greeting logic
       const greetEl = document.getElementById('greetingText');
       if (profile && profile.fullName) {
         const hour = new Date().getHours();
@@ -268,6 +294,66 @@
         const firstName = profile.fullName.split(' ')[0];
         greetEl.textContent = `${greet}, ${firstName}`;
       }
+
+      // 2. Fee Display Logic
+      const outstanding = profile.outstandingAmount !== undefined ? profile.outstandingAmount : 1200;
+      const outstandingDisplay = document.getElementById('outstandingDisplay');
+      const dueStatusDisplay = document.getElementById('dueStatusDisplay');
+      const feeFront = document.getElementById('feeFront');
+      const feeSuccess = document.getElementById('feeSuccess');
+
+      if (profile.feeStatus === 'Paid' || outstanding === 0) {
+        feeFront.style.display = 'none';
+        feeSuccess.style.display = 'flex';
+      } else {
+        outstandingDisplay.textContent = `₹${outstanding.toLocaleString()}`;
+      }
+
+      // 3. Payment Flow Logic
+      const payNowBtn = document.getElementById('payNowBtn');
+      const feeBack = document.getElementById('feeBack');
+      const cancelPay = document.getElementById('cancelPay');
+      const qrCodeImg = document.getElementById('qrCodeImg');
+      const verifyBtn = document.getElementById('verifyBtn');
+      const utrInput = document.getElementById('utrInput');
+      const paymentError = document.getElementById('paymentError');
+
+      payNowBtn.addEventListener('click', () => {
+        const upiString = `upi://pay?pa=fxadhu-2@okaxis&pn=StayCEC&am=${outstanding}&cu=INR`;
+        qrCodeImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(upiString)}`;
+        feeFront.style.display = 'none';
+        feeBack.style.display = 'flex';
+      });
+
+      cancelPay.addEventListener('click', () => {
+        feeBack.style.display = 'none';
+        feeFront.style.display = 'flex';
+      });
+
+      verifyBtn.addEventListener('click', async () => {
+        const utr = utrInput.id ? utrInput.value.trim() : '';
+        if (utr.length !== 12 || !/^\d+$/.test(utr)) {
+          paymentError.textContent = 'Please enter a valid 12-digit UTR Number.';
+          paymentError.style.display = 'block';
+          return;
+        }
+
+        paymentError.style.display = 'none';
+        verifyBtn.style.opacity = '0.7';
+        verifyBtn.style.pointerEvents = 'none';
+
+        try {
+          await updateStudentFees(user.uid);
+          feeBack.style.display = 'none';
+          feeSuccess.style.display = 'flex';
+        } catch (err) {
+          console.error(err);
+          paymentError.textContent = 'Verification failed. Please try again.';
+          paymentError.style.display = 'block';
+          verifyBtn.style.opacity = '1';
+          verifyBtn.style.pointerEvents = 'auto';
+        }
+      });
 
       // Show the page
       document.getElementById('mainContainer').style.opacity = '1';
