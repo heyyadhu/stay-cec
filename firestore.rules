@@ -3,26 +3,50 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper: check if the signed-in user is a warden
     function isWarden() {
       return request.auth != null &&
         get(/databases/$(database)/documents/students/$(request.auth.uid)).data.role == 'warden';
     }
 
+    // ── Students ─────────────────────────────────────────────
     match /students/{uid} {
-      // Students can read/write their own profile
-      // Wardens can read ALL student profiles
       allow read:  if request.auth != null && (request.auth.uid == uid || isWarden());
       allow write: if request.auth != null && request.auth.uid == uid;
     }
 
+    // ── Complaints ────────────────────────────────────────────
     match /complaints/{complaintId} {
-      // Wardens can read and update all complaints
-      allow read:   if request.auth != null && (resource.data.studentId == request.auth.uid || isWarden());
+      allow read:   if request.auth != null &&
+                       (resource.data.studentId == request.auth.uid || isWarden());
+      allow create: if request.auth != null;
+      allow update: if request.auth != null &&
+                       (resource.data.studentId == request.auth.uid || isWarden());
+    }
+
+    // ── Notifications ─────────────────────────────────────────
+    match /notifications/{notifId} {
+      // Students: read/update their own. Wardens: write (send) to any.
+      allow read:   if request.auth != null && resource.data.uid == request.auth.uid;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null && resource.data.uid == request.auth.uid;
+    }
+
+    // ── Transactions ──────────────────────────────────────────
+    match /transactions/{txId} {
+      allow read:   if request.auth != null && resource.data.uid == request.auth.uid;
+      allow create: if request.auth != null;
+      // No updates/deletes — transactions are immutable
+    }
+
+    // ── Mess Reductions ───────────────────────────────────────
+    match /messReductions/{reqId} {
+      allow read:   if request.auth != null &&
+                       (resource.data.uid == request.auth.uid || isWarden());
       allow create: if request.auth != null;
       allow update: if request.auth != null && isWarden();
     }
 
+    // ── Meetings ──────────────────────────────────────────────
     match /meetings/{meetingId} {
       allow read:   if request.auth != null;
       allow create: if request.auth != null && isWarden();

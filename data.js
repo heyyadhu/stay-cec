@@ -11,10 +11,16 @@ import {
   orderBy, 
   limit, 
   getDocs,
+  getDoc,
+  addDoc,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  writeBatch,
   startAfter,
   Timestamp,
+  serverTimestamp,
   doc,
-  updateDoc
 } from "firebase/firestore";
 
 /**
@@ -168,5 +174,290 @@ export async function getResidentStats() {
   } catch (error) {
     console.error('Error fetching resident stats:', error);
     return { total: 0, maleCount: 0, femaleCount: 0, newAdmissions: 0 };
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// PAYMENT FUNCTIONS
+// ─────────────────────────────────────────────────────────────
+
+/**
+ * Verify a UPI payment with a UTR number.
+ * Saves a transaction record and clears the student's outstanding fee.
+ * @param {string} uid - Student's Firebase Auth UID
+ * @param {string} utr - 12-digit UTR number from UPI
+ * @param {number} amount - Amount paid
+ */
+export async function verifyPayment(uid, utr, amount) {
+  // Validate UTR
+  if (!/^\d{12}$/.test(utr)) throw new Error('Invalid UTR: must be exactly 12 digits.');
+
+  // Check if UTR already used
+  const txRef = doc(db, 'transactions', `${uid}_${utr}`);
+  const existing = await getDoc(txRef);
+  if (existing.exists()) throw new Error('This UTR number has already been used.');
+
+  // Generate transaction ID
+  const txId = `CEC-${Math.floor(Math.random() * 90000) + 10000}`;
+
+  // Write transaction record
+  await setDoc(txRef, {
+    uid,
+    utr,
+    amount,
+    txId,
+    status: 'Success',
+    createdAt: serverTimestamp(),
+  });
+
+  // Update student fee status
+  const studentRef = doc(db, 'students', uid);
+  await updateDoc(studentRef, {
+    feeStatus: 'Paid',
+    outstandingAmount: 0,
+    lastPaymentDate: serverTimestamp(),
+  });
+
+  // Send payment confirmation notification
+  await addDoc(collection(db, 'notifications'), {
+    uid,
+    type: 'payment',
+    title: 'Payment Successful',
+    message: `Your payment of ₹${amount.toLocaleString()} has been verified. Transaction ID: ${txId}.`,
+    read: false,
+    createdAt: serverTimestamp(),
+  });
+
+  return { txId };
+}
+
+/**
+ * Fetch all transactions for a student, ordered newest first.
+ */
+export async function getTransactionHistory(uid) {
+  try {
+    const q = query(
+      collection(db, 'transactions'),
+      where('uid', '==', uid),
+      orderBy('createdAt', 'desc'),
+      limit(20)
+    );
+    const snap = await getDocs(q);
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch (error) {
+    console.error('Error fetching transactions:', error);
+    return [];
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// COMPLAINT FUNCTIONS
+// ─────────────────────────────────────────────────────────────
+
+/**
+ * Create a new complaint for a student.
+ * Pulls studentName from their Firestore profile so it can't be spoofed.
+ * @param {string} uid
+ * @param {{ title: string, description: string, category: string }} data
+ */
+export async function createComplaint(uid, data) {
+  const studentSnap = await getDoc(doc(db, 'students', uid));
+  if (!studentSnap.exists()) throw new Error('Student profile not found.');
+  const profile = studentSnap.data();
+
+  const ref = await addDoc(collection(db, 'complaints'), {
+    studentId: uid,
+    studentName: profile.fullName || 'Unknown',
+    registerNumber: profile.registerNumber || '',
+    room: profile.room || '',
+    title: data.title,
+    description: data.description,
+    category: data.category || 'General',
+    status: 'Pending',
+    createdAt: serverTimestamp(),
+  });
+
+  // Notify the student
+  await addDoc(collection(db, 'notifications'), {
+    uid,
+    type: 'complaint',
+    title: 'Complaint Received',
+    message: `Your complaint "${data.title}" has been received and is pending review.`,
+    read: false,
+    createdAt: serverTimestamp(),
+  });
+
+  return ref.id;
+}
+
+/**
+ * Update a complaint's status (warden action) and notify the student.
+ * @param {string} complaintId
+ * @param {'In Progress'|'Resolved'|'Rejected'} status
+ * @param {string} studentId - UID of the student who filed the complaint
+ */
+export async function updateComplaintStatus(complaintId, status, studentId) {
+  const complaintRef = doc(db, 'complaints', complaintId);
+  await updateDoc(complaintRef, { status, updatedAt: serverTimestamp() });
+
+  if (studentId) {
+    await addDoc(collection(db, 'notifications'), {
+      uid: studentId,
+      type: 'complaint',
+      title: 'Complaint Status Updated',
+      message: `Your complaint has been marked as "${status}".`,
+      read: false,
+      createdAt: serverTimestamp(),
+    });
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// NOTIFICATION FUNCTIONS
+// ─────────────────────────────────────────────────────────────
+
+/**
+ * Fetch notifications for a student, ordered newest first.
+ */
+export async function getNotifications(uid) {
+  try {
+    const q = query(
+      collection(db, 'notifications'),
+      where('uid', '==', uid),
+      orderBy('createdAt', 'desc'),
+      limit(20)
+    );
+    const snap = await getDocs(q);
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch (error) {
+    console.error('Error fetching notifications:', error);
+    return [];
+  }
+}
+
+/**
+ * Mark a single notification as read.
+ */
+export async function markNotificationRead(notifId) {
+  await updateDoc(doc(db, 'notifications', notifId), { read: true });
+}
+
+/**
+ * Mark ALL unread notifications for a student as read (Clear All).
+ */
+export async function markAllNotificationsRead(uid) {
+  const q = query(
+    collection(db, 'notifications'),
+    where('uid', '==', uid),
+    where('read', '==', false)
+  );
+  const snap = await getDocs(q);
+  const batch = writeBatch(db);
+  snap.docs.forEach(d => batch.update(d.ref, { read: true }));
+  await batch.commit();
+}
+
+/**
+ * Send an announcement from the warden to all (or a subset of) students.
+ * @param {string} wardenUid
+ * @param {{ title: string, message: string }} notifData
+ * @param {'all'|'men'|'women'} targetGroup
+ */
+export async function sendWardenAnnouncement(wardenUid, notifData, targetGroup = 'all') {
+  // Fetch target students
+  let q = query(collection(db, 'students'), where('role', '==', 'student'));
+  const snap = await getDocs(q);
+
+  const batch = writeBatch(db);
+  snap.docs.forEach(d => {
+    const data = d.data();
+    const hostel = (data.hostel || '').toLowerCase();
+    if (targetGroup === 'men'   && !hostel.includes('men'))    return;
+    if (targetGroup === 'women' && !hostel.includes('women'))  return;
+
+    const nRef = doc(collection(db, 'notifications'));
+    batch.set(nRef, {
+      uid: d.id,
+      type: 'announcement',
+      title: notifData.title,
+      message: notifData.message,
+      from: 'Warden',
+      read: false,
+      createdAt: serverTimestamp(),
+    });
+  });
+  await batch.commit();
+}
+
+// ─────────────────────────────────────────────────────────────
+// MESS REDUCTION FUNCTIONS
+// ─────────────────────────────────────────────────────────────
+
+/**
+ * Submit a mess reduction request for a student.
+ * @param {string} uid
+ * @param {{ periods: Array<{from: string, to: string}>, reason: string, totalDays: number }} data
+ */
+export async function submitMessReduction(uid, data) {
+  const studentSnap = await getDoc(doc(db, 'students', uid));
+  if (!studentSnap.exists()) throw new Error('Student profile not found.');
+  const profile = studentSnap.data();
+
+  // Validate: at least one period must have dates
+  const validPeriods = data.periods.filter(p => p.from && p.to && p.to >= p.from);
+  if (!validPeriods.length) throw new Error('Please provide at least one valid date range.');
+  if (!data.reason?.trim()) throw new Error('Please provide a reason.');
+
+  const ref = await addDoc(collection(db, 'messReductions'), {
+    uid,
+    studentName: profile.fullName || 'Unknown',
+    registerNumber: profile.registerNumber || '',
+    room: profile.room || '',
+    hostel: profile.hostel || '',
+    periods: validPeriods,
+    totalDays: data.totalDays,
+    reason: data.reason.trim(),
+    status: 'Pending',
+    createdAt: serverTimestamp(),
+  });
+
+  // Notify the student
+  await addDoc(collection(db, 'notifications'), {
+    uid,
+    type: 'mess',
+    title: 'Mess Reduction Pending',
+    message: `Your mess reduction request for ${data.totalDays} days is under review.`,
+    read: false,
+    createdAt: serverTimestamp(),
+  });
+
+  return ref.id;
+}
+
+/**
+ * Get all mess reduction requests (warden: all students, student: own only).
+ */
+export async function getMessReductions(uid = null) {
+  try {
+    let q;
+    if (uid) {
+      q = query(
+        collection(db, 'messReductions'),
+        where('uid', '==', uid),
+        orderBy('createdAt', 'desc'),
+        limit(10)
+      );
+    } else {
+      q = query(
+        collection(db, 'messReductions'),
+        orderBy('createdAt', 'desc'),
+        limit(30)
+      );
+    }
+    const snap = await getDocs(q);
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch (error) {
+    console.error('Error fetching mess reductions:', error);
+    return [];
   }
 }

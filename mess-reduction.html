@@ -187,6 +187,7 @@
 
     <script type="module">
       import { requireAuth, logOut, getStudentProfile } from './auth.js';
+      import { submitMessReduction } from './data.js';
 
       let currentUser = null;
 
@@ -200,26 +201,22 @@
             return;
           }
 
-          // Populate student info if available
           if (profile) {
             const nameEl = document.querySelector('.text-25');
             const rollEl = document.querySelector('.text-2b');
             const roomEl = document.querySelector('.text-block-a');
-            if (nameEl) nameEl.textContent = profile.fullName;
-            if (rollEl) rollEl.textContent = profile.registerNumber;
-            if (roomEl && profile.block && profile.roomNumber) {
-                roomEl.textContent = `${profile.block} - ${profile.roomNumber}`;
-            }
+            if (nameEl) nameEl.textContent = profile.fullName || '—';
+            if (rollEl) rollEl.textContent = profile.registerNumber || '—';
+            if (roomEl) roomEl.textContent = profile.room || '—';
           }
-
         } catch (err) {
-          console.error("Init failed:", err);
+          console.error('Init failed:', err);
         }
       }
 
       init();
 
-      // Auto-calculate days across both date ranges
+      // Auto-calculate days
       window.calcRangeDays = function(fromId, toId) {
         const f = new Date(document.getElementById(fromId).value);
         const t = new Date(document.getElementById(toId).value);
@@ -238,28 +235,32 @@
         document.getElementById(id).addEventListener('change', window.updateDays);
       });
 
-      window.submitRequest = function() {
-        const reason = document.getElementById('reasonText').value.trim();
-        const days   = document.getElementById('calcDays').textContent;
-        const hasRange1 = document.getElementById('fromDate1').value && document.getElementById('toDate1').value;
-        const hasRange2 = document.getElementById('fromDate2').value && document.getElementById('toDate2').value;
-        if (!hasRange1 && !hasRange2) {
-          alert('Please fill in at least one absence period.');
-          return;
+      window.submitRequest = async function() {
+        const reason   = document.getElementById('reasonText').value.trim();
+        const totalDays = parseInt(document.getElementById('calcDays').textContent, 10);
+        const periods = [
+          { from: document.getElementById('fromDate1').value, to: document.getElementById('toDate1').value },
+          { from: document.getElementById('fromDate2').value, to: document.getElementById('toDate2').value },
+        ];
+
+        const submitBtn = document.querySelector('.button-7c');
+        try {
+          submitBtn.style.opacity = '0.6';
+          submitBtn.style.pointerEvents = 'none';
+
+          await submitMessReduction(currentUser.uid, { periods, reason, totalDays });
+
+          alert(`✅ Request submitted!\n\nTotal Days: ${totalDays}\nReason: ${reason}\n\nYour mess reduction request has been submitted for approval.`);
+          window.location.href = 'mess.html';
+        } catch (err) {
+          alert(`❌ Error: ${err.message}`);
+          submitBtn.style.opacity = '1';
+          submitBtn.style.pointerEvents = '';
         }
-        if (!reason) {
-          alert('Please enter a reason for the reduction request.');
-          return;
-        }
-        alert(`Request submitted!\n\nTotal Days: ${days}\nReason: ${reason}\n\nYour mess reduction request has been submitted for approval.`);
-        window.location.href = 'mess.html';
       };
 
       const logoutBtn = document.querySelector('.link-17');
-      if (logoutBtn) logoutBtn.addEventListener('click', (e) => {
-          e.preventDefault();
-          logOut();
-      });
+      if (logoutBtn) logoutBtn.addEventListener('click', (e) => { e.preventDefault(); logOut(); });
     </script>
   </body>
 </html>
