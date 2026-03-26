@@ -11,6 +11,8 @@ import {
   orderBy, 
   limit, 
   getDocs,
+  getCountFromServer,
+  startAfter,
   Timestamp,
   doc,
   updateDoc
@@ -111,5 +113,62 @@ export async function updateComplaintStatus(complaintId, status) {
   } catch (error) {
     console.error("Error updating complaint:", error);
     throw error;
+  }
+}
+
+/**
+ * Fetch a page of students (role === 'student') for the Resident Directory.
+ * @param {number} pageSize  - rows per page
+ * @param {DocumentSnapshot|null} lastVisible - cursor from previous page (null for first page)
+ * @returns {{ residents: Array, lastVisible: DocumentSnapshot|null }}
+ */
+export async function getAllResidents(pageSize = 10, lastVisible = null) {
+  try {
+    const ref = collection(db, 'students');
+    let constraints = [
+      where('role', '==', 'student'),
+      orderBy('fullName', 'asc'),
+      limit(pageSize),
+    ];
+    if (lastVisible) constraints.push(startAfter(lastVisible));
+    const q = query(ref, ...constraints);
+    const snap = await getDocs(q);
+    const residents = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const newLastVisible = snap.docs.length > 0 ? snap.docs[snap.docs.length - 1] : null;
+    return { residents, lastVisible: newLastVisible };
+  } catch (error) {
+    console.error('Error fetching residents:', error);
+    return { residents: [], lastVisible: null };
+  }
+}
+
+/**
+ * Count all students and compute stats for the Resident Directory stat cards.
+ */
+export async function getResidentStats() {
+  try {
+    const ref = collection(db, 'students');
+    const studentQuery = query(ref, where('role', '==', 'student'));
+    const countSnap = await getCountFromServer(studentQuery);
+    const total = countSnap.data().count;
+
+    // Approximate splits from hostel name (men/women)
+    const menQuery  = query(ref, where('role', '==', 'student'), where('hostel', '>=', "CEC Premium Men"),  where('hostel', '<=', "CEC Premium Men\uf8ff"));
+    const womenQuery = query(ref, where('role', '==', 'student'), where('hostel', '>=', "CEC Premium Women"), where('hostel', '<=', "CEC Premium Women\uf8ff"));
+    const [menSnap, womenSnap] = await Promise.all([getDocs(menQuery), getDocs(womenQuery)]);
+    const maleCount   = menSnap.size;
+    const femaleCount = womenSnap.size;
+
+    // New admissions this academic cycle (no date field → just use last 30 days)
+    const since = new Date();
+    since.setDate(since.getDate() - 30);
+    const newQuery = query(ref, where('role', '==', 'student'), where('createdAt', '>=', Timestamp.fromDate(since)));
+    const newSnap = await getDocs(newQuery);
+    const newAdmissions = newSnap.size;
+
+    return { total, maleCount, femaleCount, newAdmissions };
+  } catch (error) {
+    console.error('Error fetching resident stats:', error);
+    return { total: 0, maleCount: 0, femaleCount: 0, newAdmissions: 0 };
   }
 }

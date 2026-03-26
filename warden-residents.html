@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StayCEC – Resident Directory</title>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    />
+    <link rel="stylesheet" href="warden-residents.css" />
+  </head>
+  <body>
+    <div class="main-container">
+
+      <!-- ── Sidebar ───────────────────────────────────────── -->
+      <div class="rectangle"></div>
+
+      <!-- Logo -->
+      <div class="staycecdesktop"></div>
+
+      <!-- Nav -->
+      <div class="nav">
+        <!-- Dashboard -->
+        <div class="link" onclick="window.location.href='warden-dashboard.html'">
+          <div class="container"><div class="icon"></div></div>
+          <div class="container-1"><span class="dashboard">Dashboard</span></div>
+        </div>
+
+        <!-- Residents (active) -->
+        <div class="link-2 active-nav" onclick="window.location.href='warden-residents.html'">
+          <div class="container-3"><div class="icon-4"></div></div>
+          <div class="container-5"><span class="residents">Residents</span></div>
+        </div>
+
+        <!-- Complaints -->
+        <div class="link-6" onclick="">
+          <div class="container-7"><div class="icon-8"></div></div>
+          <div class="container-9"><span class="complaints">Complaints</span></div>
+        </div>
+
+        <!-- Notifications -->
+        <div class="link-a" onclick="">
+          <div class="container-b"><div class="icon-c"></div></div>
+          <div class="container-d"><span class="notifications">Notifications</span></div>
+        </div>
+
+        <!-- Reports -->
+        <div class="link-e" onclick="">
+          <div class="container-f"><div class="icon-10"></div></div>
+          <div class="container-11"><span class="reports">Reports</span></div>
+        </div>
+      </div>
+
+      <!-- Bottom nav: Settings + Logout -->
+      <div class="container-12">
+        <div class="link-13">
+          <div class="container-14"><div class="icon-15"></div></div>
+          <div class="container-16"><span class="settings">Settings</span></div>
+        </div>
+        <div class="link-17" id="logoutBtn">
+          <div class="container-18"><div class="icon-19"></div></div>
+          <div class="container-1a"><span class="logout">Logout</span></div>
+        </div>
+      </div>
+
+      <!-- Profile avatar -->
+      <div class="border"><div class="student-profile-avatar"></div></div>
+
+      <!-- ── Page title ──────────────────────────────────────── -->
+      <span class="resident-directory">Resident Directory</span>
+
+      <!-- ── Main content ────────────────────────────────────── -->
+      <div class="main-content-canvas">
+
+        <!-- Stats row -->
+        <div class="stats-row">
+
+          <!-- Total Residents -->
+          <div class="stat-card">
+            <div class="stat-top-row">
+              <div class="stat-icon-box green"><div class="sicon-residents"></div></div>
+              <div class="stat-badge teal-light"><span id="statTotalChange">+12%</span></div>
+            </div>
+            <div class="stat-label">Total Residents</div>
+            <div class="stat-value" id="statTotal">420</div>
+          </div>
+
+          <!-- Male / Female Split -->
+          <div class="stat-card">
+            <div class="stat-top-row">
+              <div class="stat-icon-box blue"><div class="sicon-gender"></div></div>
+              <div class="stat-badge neutral">
+                <span id="statMale">240 M</span>
+                <span id="statFemale">180 F</span>
+              </div>
+            </div>
+            <div class="stat-label xs-margin">Male/Female Split</div>
+            <div class="stat-value" id="statSplit">57:43</div>
+          </div>
+
+          <!-- New Admissions -->
+          <div class="stat-card">
+            <div class="stat-top-row">
+              <div class="stat-icon-box teal"><div class="sicon-admission"></div></div>
+              <div class="stat-badge teal-faint"><span>New Cycle</span></div>
+            </div>
+            <div class="stat-label small-margin">New Admissions</div>
+            <div class="stat-value" id="statAdmissions">28</div>
+          </div>
+
+          <!-- Occupancy Rate -->
+          <div class="stat-card">
+            <div class="stat-top-row">
+              <div class="stat-icon-box dark"><div class="sicon-occupancy"></div></div>
+              <div class="occupancy-bar-wrap"><div class="occupancy-bar"></div></div>
+            </div>
+            <div class="stat-label xxs-margin">Occupancy Rate</div>
+            <div class="stat-value" id="statOccupancy">94%</div>
+          </div>
+        </div>
+
+        <!-- Directory Table Card -->
+        <div class="directory-section">
+
+          <!-- Controls -->
+          <div class="table-controls">
+            <div class="tc-left">
+              <span class="tc-title">Resident Directory</span>
+              <div class="tc-badge" id="entryCountBadge">ALL ENTRIES</div>
+            </div>
+            <div class="tc-right">
+              <div class="filter-btn">
+                <div class="fi-block"></div>
+                <span>All Blocks</span>
+              </div>
+              <div class="filter-btn">
+                <div class="fi-batch"></div>
+                <span>Batch 2023</span>
+              </div>
+              <div class="filter-btn">
+                <div class="fi-status"></div>
+                <span>Active Status</span>
+              </div>
+              <button class="search-btn">
+                <div class="icon-search"></div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Table -->
+          <div class="directory-table">
+            <div class="header-row">
+              <div class="th w-name">Student Name</div>
+              <div class="th w-roll">Roll Number</div>
+              <div class="th w-room">Room</div>
+              <div class="th w-block">Block</div>
+              <div class="th w-status">Status</div>
+              <div class="th w-action">Action</div>
+            </div>
+
+            <div class="tbody" id="residentTableBody">
+              <!-- Rows injected by JS -->
+            </div>
+          </div>
+
+          <!-- Pagination -->
+          <div class="pagination">
+            <div class="pag-info">
+              Showing <strong id="pagFrom">1</strong>–<strong id="pagTo">5</strong>
+              of <strong id="pagTotal">5</strong> residents
+            </div>
+            <div class="pag-buttons">
+              <button class="pag-btn arrow" id="prevBtn" disabled>
+                <div class="icon-prev"></div>
+              </button>
+              <button class="pag-btn active" id="page1Btn" onclick="goToPage(1)">1</button>
+              <button class="pag-btn ellipsis">...</button>
+              <button class="pag-btn" id="pagLastBtn" onclick="goToPage(lastPage)">42</button>
+              <button class="pag-btn arrow" id="nextBtn" onclick="goToPage(currentPage + 1)">
+                <div class="icon-next"></div>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      import { requireAuth, logOut, getStudentProfile } from './auth.js';
+      import { getAllResidents, getResidentStats } from './data.js';
+
+      // ── Pagination state ──────────────────────────────────
+      const PER_PAGE   = 10;
+      let currentPage  = 1;
+      let totalCount   = 0;
+      let lastPage     = 1;
+
+      // Cursor stack: index 0 = null (first page), index N = cursor for page N+1
+      const cursors    = [null];
+
+      // ── Avatar pool (cycles through for visual variety) ───
+      const AV_POOL = ['av1','av2','av3','av4','av5'];
+
+      // ── Helpers ───────────────────────────────────────────
+      function deptLabel(r) {
+        const dept = (r.department || '').toUpperCase();
+        const yr   = r.year ? `Year ${r.year}` : '';
+        return [dept, yr].filter(Boolean).join(' - ') || 'Student';
+      }
+
+      function statusFromDoc(r) {
+        if (r.feeStatus === 'On Leave') return 'On Leave';
+        return 'Active';
+      }
+
+      function initials(name = '') {
+        return name.split(' ').slice(0,2).map(w => w[0]).join('').toUpperCase();
+      }
+
+      function renderRows(residents) {
+        const tbody = document.getElementById('residentTableBody');
+        if (!residents.length) {
+          tbody.innerHTML = `<div style="padding:40px;text-align:center;color:#8e8e93;font-size:14px;">No residents found.</div>`;
+          return;
+        }
+        tbody.innerHTML = residents.map((r, i) => {
+          const status    = statusFromDoc(r);
+          const isActive  = status === 'Active';
+          const pillClass = isActive ? 'active' : 'leave';
+          const dotClass  = isActive ? 'teal'   : 'amber';
+          const textClass = isActive ? 'teal'   : 'amber';
+          const avClass   = AV_POOL[i % AV_POOL.length];
+          const room      = r.room || '—';
+          const hostel    = r.hostel || '—';
+          const roll      = r.registerNumber || '—';
+          return `
+            <div class="table-row">
+              <div class="td-name">
+                <div class="avatar-wrap">
+                  <div class="avatar ${avClass}"></div>
+                  <div class="status-dot ${isActive ? 'online' : 'offline'}"></div>
+                </div>
+                <div class="name-info">
+                  <span class="name-text">${r.fullName || 'Unknown'}</span>
+                  <span class="dept-text">${deptLabel(r)}</span>
+                </div>
+              </div>
+              <div class="td w-roll"><span class="roll-text">${roll}</span></div>
+              <div class="td w-room"><span class="room-text">${room}</span></div>
+              <div class="td w-block"><span class="block-text">${hostel}</span></div>
+              <div class="td w-status">
+                <div class="status-pill ${pillClass}">
+                  <div class="pill-dot ${dotClass}"></div>
+                  <span class="pill-text ${textClass}">${status}</span>
+                </div>
+              </div>
+              <div class="td w-action">
+                <span class="view-profile-btn">View Profile</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      function setLoading(on) {
+        const tbody = document.getElementById('residentTableBody');
+        if (on) tbody.innerHTML = `<div style="padding:40px;text-align:center;color:#8e8e93;font-size:14px;">Loading…</div>`;
+      }
+
+      function updatePagination() {
+        const from = Math.min((currentPage - 1) * PER_PAGE + 1, totalCount);
+        const to   = Math.min(currentPage * PER_PAGE, totalCount);
+        document.getElementById('pagFrom').textContent  = totalCount ? from : 0;
+        document.getElementById('pagTo').textContent    = to;
+        document.getElementById('pagTotal').textContent = totalCount;
+        document.getElementById('prevBtn').disabled     = currentPage === 1;
+        document.getElementById('nextBtn').disabled     = currentPage >= lastPage;
+        document.getElementById('page1Btn').classList.toggle('active', currentPage === 1);
+        document.getElementById('pagLastBtn').textContent = lastPage;
+      }
+
+      async function loadPage(page) {
+        setLoading(true);
+        currentPage = page;
+        const cursor = cursors[page - 1] ?? null;
+        const { residents, lastVisible } = await getAllResidents(PER_PAGE, cursor);
+
+        // Store cursor for the NEXT page if not already known
+        if (!cursors[page]) cursors[page] = lastVisible;
+
+        renderRows(residents);
+        updatePagination();
+      }
+
+      // ── Auth guard + init ──────────────────────────────────
+      async function init() {
+        try {
+          const user    = await requireAuth();
+          const profile = await getStudentProfile(user.uid);
+
+          if (!profile || profile.role !== 'warden') {
+            window.location.href = 'dashboard.html';
+            return;
+          }
+
+          // Load stats
+          const stats = await getResidentStats();
+          totalCount  = stats.total;
+          lastPage    = Math.max(1, Math.ceil(totalCount / PER_PAGE));
+
+          document.getElementById('statTotal').textContent      = stats.total;
+          document.getElementById('statMale').textContent       = `${stats.maleCount} M`;
+          document.getElementById('statFemale').textContent     = `${stats.femaleCount} F`;
+          document.getElementById('statAdmissions').textContent = stats.newAdmissions;
+
+          // Gender split ratio
+          if (stats.total > 0) {
+            const mp = Math.round((stats.maleCount / stats.total) * 100);
+            const fp = 100 - mp;
+            document.getElementById('statSplit').textContent = `${mp}:${fp}`;
+          }
+
+          // Occupancy (static label — update if you add a capacity field)
+          document.getElementById('statOccupancy').textContent = totalCount > 0 ? '—' : '0%';
+
+          // Entry count badge
+          document.getElementById('entryCountBadge').textContent = `${totalCount} ENTRIES`;
+
+          // Load first page
+          await loadPage(1);
+
+        } catch (err) {
+          console.error('Residents page init error:', err);
+        }
+      }
+
+      // ── Event listeners ───────────────────────────────────
+      document.getElementById('logoutBtn').addEventListener('click', logOut);
+
+      document.getElementById('nextBtn').addEventListener('click', async () => {
+        if (currentPage < lastPage) await loadPage(currentPage + 1);
+      });
+      document.getElementById('prevBtn').addEventListener('click', async () => {
+        if (currentPage > 1) await loadPage(currentPage - 1);
+      });
+      document.getElementById('page1Btn').addEventListener('click', () => loadPage(1));
+
+      init();
+    </script>
+  </body>
+</html>
