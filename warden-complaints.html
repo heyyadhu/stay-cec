@@ -136,8 +136,8 @@
 
     <!-- Firebase & Logic -->
     <script type="module">
-      import { auth, db } from './firebase-config.js';
-      import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
+      import { auth, onAuthStateChanged } from './firebase-config.js';
+      import { logOut } from './auth.js';
       import { getComplaints, updateComplaintStatus, getComplaintStats } from './data.js';
 
       let allComplaints = [];
@@ -265,9 +265,7 @@
       });
 
       // Logout
-      document.getElementById('logoutBtn')?.addEventListener('click', () => {
-        signOut(auth).then(() => window.location.href = 'login.html');
-      });
+      document.getElementById('logoutBtn')?.addEventListener('click', logOut);
     </script>
   </body>
 </html>

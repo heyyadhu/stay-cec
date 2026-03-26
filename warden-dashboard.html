@@ -116,7 +116,7 @@
                 <span class="text-span-73">Manage critical hostel administrative tasks<br />with one tap.</span>
               </div>
               <div class="container-74">
-                <div class="button-75">
+                <div class="button-75" onclick="window.location.href='warden-notifications.html'" style="cursor: pointer;">
                   <div class="container-76">
                     <div class="container-77"><div class="icon-78"></div></div>
                     <div class="container-79"><span class="text-span-7a">Post Announcement</span></div>
@@ -195,7 +195,7 @@
                 </div>
                 <div class="container-49">
                   <div class="container-4a">
-                    <div class="button-4b" data-id="${c.id}" style="cursor: pointer; background: ${c.status === 'Resolved' ? 'transparent' : ''}; color: ${c.status === 'Resolved' ? '#12b1a6' : ''}">
+                    <div class="button-4b" data-id="${c.id}" data-sid="${c.studentId}" style="cursor: pointer; background: ${c.status === 'Resolved' ? 'transparent' : ''}; color: ${c.status === 'Resolved' ? '#12b1a6' : ''}">
                       <span class="approve">${c.status === 'Resolved' ? 'Resolved' : 'Mark Done'}</span>
                     </div>
                   </div>
@@ -207,10 +207,11 @@
             const actionBtns = recentActivityList.querySelectorAll('.button-4b');
             actionBtns.forEach(btn => {
               btn.addEventListener('click', async (e) => {
-                const id = e.currentTarget.getAttribute('data-id');
+                const id  = e.currentTarget.getAttribute('data-id');
+                const sid = e.currentTarget.getAttribute('data-sid');
                 if (e.currentTarget.textContent.trim() !== 'Resolved') {
                   e.currentTarget.textContent = 'Resolving...';
-                  await updateComplaintStatus(id, 'Resolved');
+                  await updateComplaintStatus(id, 'Resolved', sid);
                   e.currentTarget.innerHTML = '<span class="approve">Resolved</span>';
                   e.currentTarget.style.background = 'transparent';
                   e.currentTarget.style.color = '#12b1a6';

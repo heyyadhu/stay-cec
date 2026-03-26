@@ -108,18 +108,6 @@ export async function getAllComplaints() {
   }
 }
 
-/**
- * Update complaint status by warden.
- */
-export async function updateComplaintStatus(complaintId, status) {
-  try {
-    const docRef = doc(db, "complaints", complaintId);
-    await updateDoc(docRef, { status });
-  } catch (error) {
-    console.error("Error updating complaint:", error);
-    throw error;
-  }
-}
 
 /**
  * Fetch a page of students (role === 'student') for the Resident Directory.
@@ -471,6 +459,28 @@ export async function sendWardenAnnouncement(title, message, targetGroup = 'all'
   } catch (error) {
     console.error('Error sending announcement:', error);
     throw error;
+  }
+}
+
+/**
+ * Get count of students in a target group.
+ */
+export async function getTargetAudienceCount(targetGroup = 'all') {
+  try {
+    const snap = await getDocs(collection(db, 'students'));
+    let count = 0;
+    snap.forEach(d => {
+      const data = d.data();
+      if (data.role === 'warden') return;
+      const hostel = (data.hostel || '').toLowerCase();
+      if (targetGroup === 'men' && !hostel.includes('men')) return;
+      if (targetGroup === 'women' && !hostel.includes('women')) return;
+      count++;
+    });
+    return count;
+  } catch (error) {
+    console.error('Error counting audience:', error);
+    return 0;
   }
 }
 

@@ -188,7 +188,7 @@
     <script type="module">
       import { auth, onAuthStateChanged } from './firebase-config.js';
       import { logOut, getStudentProfile } from './auth.js';
-      import { sendWardenAnnouncement, getWardenBroadcasts } from './data.js';
+      import { sendWardenAnnouncement, getWardenBroadcasts, getTargetAudienceCount } from './data.js';
 
       const notifTitle = document.getElementById('notifTitle');
       const broadcastMessage = document.getElementById('broadcastMessage');
@@ -205,6 +205,13 @@
 
       notifTitle.addEventListener('input', updateUIPreview);
       broadcastMessage.addEventListener('input', updateUIPreview);
+      async function updateAudienceCount() {
+        const target = document.getElementById('targetAudience').value;
+        const count = await getTargetAudienceCount(target);
+        document.getElementById('targetCountText').textContent = `Targeting approx. ${count} students`;
+      }
+
+      document.getElementById('targetAudience').addEventListener('change', updateAudienceCount);
       document.getElementById('previewBtn').addEventListener('click', updateUIPreview);
 
       // ── Load History ──
@@ -243,6 +250,7 @@
         }
         
         loadHistory();
+        updateAudienceCount();
       });
 
       // ── Send Logic ──
@@ -278,7 +286,7 @@
         }
       });
 
-      document.getElementById('logoutBtn').addEventListener('click', logOut);
+      document.getElementById('logoutBtn')?.addEventListener('click', logOut);
     </script>
   </body>
 </html>
