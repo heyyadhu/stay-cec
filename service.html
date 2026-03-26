@@ -113,48 +113,10 @@
                   <div class="cell-38"><span class="text-logged-date">Logged<br/>Date</span></div>
                   <div class="cell-39"><span class="text-status">Status</span></div>
                 </div>
-                <div class="body">
+                <div class="body" id="complaintsTableBody">
+                  <!-- Dynamic complaints will be injected here -->
                   <div class="row">
-                    <div class="data"><span class="text-com-9042">COM-<br/>9042</span></div>
-                    <div class="data-3a">
-                      <div class="container-3b"><div class="icon-3c"></div></div>
-                      <div class="container-3d"><span class="text-plumbing-leak">Plumbing<br/>Leak</span></div>
-                    </div>
-                    <div class="data-3e"><span class="text-oct-24">Oct 24,<br/>2023</span></div>
-                    <div class="data-3f">
-                      <div class="background">
-                        <div class="background-40"></div>
-                        <span class="text-in-progress">In Progress</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="row-41">
-                    <div class="data-42"><span class="text-com-8921">COM-<br/>8921</span></div>
-                    <div class="data-43">
-                      <div class="container-44"><div class="icon-45"></div></div>
-                      <div class="container-46"><span class="text-socket-failure">Socket<br/>Failure</span></div>
-                    </div>
-                    <div class="data-47"><span class="text-oct-20-2023">Oct 20,<br/>2023</span></div>
-                    <div class="data-48">
-                      <div class="background-49">
-                        <div class="overlay-4a"></div>
-                        <span class="text-resolved">Resolved</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="row-4b">
-                    <div class="data-4c"><span class="text-com-8845">COM-<br/>8845</span></div>
-                    <div class="data-4d">
-                      <div class="container-4e"><div class="icon-4f"></div></div>
-                      <div class="container-50"><span class="text-ac-service">AC Service</span></div>
-                    </div>
-                    <div class="data-51"><span class="text-oct-15-2023">Oct 15,<br/>2023</span></div>
-                    <div class="data-52">
-                      <div class="background-53">
-                        <div class="background-54"></div>
-                        <span class="text-pending">Pending</span>
-                      </div>
-                    </div>
+                    <div class="data" colspan="4" style="text-align:center; padding: 20px;">Loading complaints...</div>
                   </div>
                 </div>
               </div>
@@ -166,30 +128,12 @@
             <div class="heading-upcoming-meetings">
               <span class="container-55">Upcoming Meetings</span>
             </div>
-            <div class="box-19">
+            <div class="box-19" id="meetingsList">
+              <!-- Dynamic meetings will be injected here -->
               <div class="background-border-shadow-56">
-                <div class="container-57">
-                  <div class="container-58">
-                    <div class="container-59"><span class="text-5a">Room Allocation</span></div>
-                    <div class="heading-5b"><span class="text-5c">Meeting with Warden</span></div>
-                  </div>
-                  <div class="overlay-5d"><span class="text-5e">CONFIRMED</span></div>
+                <div class="container-57" style="justify-content:center; padding: 20px;">
+                  <span>Loading upcoming meetings...</span>
                 </div>
-                <div class="container-5f">
-                  <div class="container-60">
-                    <div class="container-61"><div class="icon-62"></div></div>
-                    <span class="text-63">Oct 28, 2023</span>
-                  </div>
-                  <div class="container-64">
-                    <div class="container-65"><div class="icon-66"></div></div>
-                    <span class="text-67">11:30 AM</span>
-                  </div>
-                </div>
-                <div class="container-68">
-                  <div class="warden-avatar"></div>
-                  <div class="container-69"><span class="text-6a">Mr. Robert Chen (Admin Office)</span></div>
-                </div>
-                <div class="background-6b"></div>
               </div>
             </div>
           </div>
@@ -497,17 +441,85 @@
       }
     </script>
     <script type="module">
-      import { requireAuth, logOut } from './auth.js';
+      import { requireAuth, logOut, getStudentProfile } from './auth.js';
+      import { getRecentComplaints, getUpcomingMeetings } from './data.js';
       import { db } from './firebase-config.js';
-      import { collection, addDoc, serverTimestamp, query, where, getDocs, orderBy, limit } from "firebase/firestore";
+      import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
       let currentUser = null;
 
       (async () => {
         currentUser = await requireAuth();
+        const profile = await getStudentProfile();
         document.getElementById('mainContainer').style.opacity = '1';
 
-        // Optional: you could load recent complaints from Firestore here and populate the table
+        // 1. Load complaints
+        const tableBody = document.getElementById('complaintsTableBody');
+        if (tableBody) {
+          const complaints = await getRecentComplaints(currentUser.uid);
+          if (complaints.length > 0) {
+            tableBody.innerHTML = complaints.map(c => {
+              const date = c.createdAt ? new Date(c.createdAt.seconds * 1000).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Pending';
+              const ref = c.id.substring(0, 5).toUpperCase();
+              return `
+                <div class="row">
+                  <div class="data"><span class="text-com-9042">COM-<br/>${ref}</span></div>
+                  <div class="data-3a">
+                    <div class="container-3b"><div class="icon-3c"></div></div>
+                    <div class="container-3d"><span class="text-plumbing-leak">${c.category || 'General'}<br/>Issue</span></div>
+                  </div>
+                  <div class="data-3e"><span class="text-oct-24">${date}</span></div>
+                  <div class="data-3f">
+                    <div class="background">
+                      <div class="background-40" style="background: ${c.status === 'Resolved' ? '#12b1a6' : '#FFB74D'}"></div>
+                      <span class="text-in-progress">${c.status || 'Pending'}</span>
+                    </div>
+                  </div>
+                </div>
+              `;
+            }).join('');
+          } else {
+            tableBody.innerHTML = '<div class="row"><div class="data" colspan="4" style="text-align:center; padding: 20px; opacity:0.6;">No recent complaints.</div></div>';
+          }
+        }
+
+        // 2. Load meetings
+        const meetingsList = document.getElementById('meetingsList');
+        if (meetingsList) {
+          const meetings = await getUpcomingMeetings();
+          if (meetings.length > 0) {
+            meetingsList.innerHTML = meetings.map(m => {
+              const date = m.date ? new Date(m.date.seconds * 1000).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : 'TBD';
+              return `
+                <div class="background-border-shadow-56" style="margin-bottom: 16px;">
+                  <div class="container-57">
+                    <div class="container-58">
+                      <div class="container-59"><span class="text-5a">${m.subject || 'Meeting'}</span></div>
+                      <div class="heading-5b"><span class="text-5c">Warden Meeting</span></div>
+                    </div>
+                    <div class="overlay-5d"><span class="text-5e">${m.status ? m.status.toUpperCase() : 'PENDING'}</span></div>
+                  </div>
+                  <div class="container-5f">
+                    <div class="container-60">
+                      <div class="container-61"><div class="icon-62"></div></div>
+                      <span class="text-63">${date}</span>
+                    </div>
+                    <div class="container-64">
+                      <div class="container-65"><div class="icon-66"></div></div>
+                      <span class="text-67">${m.preferredTime || 'TBD'}</span>
+                    </div>
+                  </div>
+                  <div class="container-68">
+                    <div class="warden-avatar"></div>
+                    <div class="container-69"><span class="text-6a">Admin Office</span></div>
+                  </div>
+                </div>
+              `;
+            }).join('');
+          } else {
+            meetingsList.innerHTML = '<div class="background-border-shadow-56"><div class="container-57" style="justify-content:center; padding: 20px; border-radius: 24px; background: white;"><span style="opacity:0.6;">No upcoming meetings.</span></div></div>';
+          }
+        }
       })();
 
       document.getElementById('logoutBtn').addEventListener('click', () => logOut());
@@ -535,7 +547,7 @@
 
         try {
           await addDoc(collection(db, "meetings"), {
-            userId: currentUser.uid,
+            studentId: currentUser.uid,
             subject,
             preferredDate: date,
             preferredTime: time,
@@ -584,7 +596,7 @@
 
         try {
           await addDoc(collection(db, "complaints"), {
-            userId: currentUser.uid,
+            studentId: currentUser.uid,
             priority,
             category,
             description: desc,

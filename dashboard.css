@@ -2300,15 +2300,25 @@ button {
   min-height: 16px;
 }
 
-/* --- Codia Design Payment Flow --- */
+/* --- Premium Payment Flow (Cohesive Extended Card) --- */
 .payment-card-back.codia-style {
   position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
+  top: 0; left: 0;
+  width: 655px;
+  min-height: 480px; /* Extended to fit UTR/Upload */
   display: flex;
   flex-direction: column;
   padding: 40px;
   background: linear-gradient(180deg, #12b1a6, #54ff9c);
   border-radius: 24px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+  z-index: 500;
+  animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .codia-main-row {
@@ -2316,23 +2326,21 @@ button {
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  height: 100%;
+  margin-bottom: 40px;
 }
 
 .codia-qr-side {
-  flex: 0 0 200px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+  flex: 0 0 180px;
 }
 
 .codia-qr-label {
+  display: block;
   color: #006a63;
-  font-family: 'Inter', sans-serif;
-  font-size: 12px;
-  font-weight: 700;
+  font-size: 11px;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 1.8px;
+  letter-spacing: 1.5px;
+  margin-bottom: 12px;
 }
 
 .codia-qr-container {
@@ -2344,7 +2352,6 @@ button {
   display: flex;
   justify-content: center;
   align-items: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 .codia-qr-container img {
@@ -2357,34 +2364,32 @@ button {
   padding-left: 40px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  text-align: left;
+  gap: 8px;
 }
 
 .codia-label-small {
   color: #3c4947;
-  font-family: 'Inter', sans-serif;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
+  opacity: 0.8;
 }
 
 .codia-amount-row {
   display: flex;
   align-items: baseline;
   gap: 8px;
+  margin-bottom: 12px;
 }
 
 .codia-amount-big {
   color: #191c1d;
-  font-family: 'Inter', sans-serif;
-  font-size: 60px;
+  font-size: 56px;
   font-weight: 900;
-  letter-spacing: -3px;
+  letter-spacing: -2px;
 }
 
 .codia-amount-unit {
-  color: rgba(60, 73, 71, 0.4);
-  font-family: 'Inter', sans-serif;
+  color: rgba(60, 73, 71, 0.5);
   font-size: 16px;
   font-weight: 700;
 }
@@ -2393,100 +2398,91 @@ button {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: rgba(255, 218, 214, 0.3);
+  background: rgba(255, 255, 255, 0.2);
   padding: 8px 16px;
   border-radius: 9999px;
   color: #ba1a1a;
-  font-family: 'Inter', sans-serif;
-  font-size: 12px;
-  font-weight: 700;
+  font-size: 11px;
+  font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 1.2px;
+  letter-spacing: 1px;
   width: fit-content;
 }
 
-/* UTR & Action Section */
+/* Action Area (Integrated) */
 .codia-action-area {
-  position: absolute;
-  top: 110%; /* Place below the card */
-  left: 0;
-  width: 100%;
+  border-top: 1px solid rgba(0, 106, 99, 0.1);
+  padding-top: 30px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding-top: 10px;
+  gap: 16px;
 }
 
 .codia-utr-label {
-  color: #141c1b;
-  font-family: 'Inter', sans-serif;
+  color: #004d48;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 700;
 }
 
 .codia-input-row {
   display: flex;
   gap: 12px;
-  align-items: center;
 }
 
 #utrInput.codia-input {
   flex: 1;
-  height: 48px;
+  height: 52px;
   background: white !important;
   color: #191c1d !important;
-  border: 1px solid #d1d5db;
-  border-radius: 16px;
-  padding: 0 20px;
-  font-size: 15px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 12px;
+  padding: 0 16px;
+  font-size: 16px;
+  font-weight: 500;
 }
 
 .codia-upload-btn {
-  background: #f1f5f9;
-  border: 1px dashed #94a3b8;
-  border-radius: 16px;
-  height: 48px;
+  background: rgba(255, 255, 255, 0.3);
+  border: 1.5px dashed rgba(0, 106, 99, 0.3);
+  border-radius: 12px;
+  height: 52px;
   padding: 0 16px;
   display: flex;
   align-items: center;
   gap: 8px;
   cursor: pointer;
-  color: #475569;
+  color: #006a63;
+  font-weight: 700;
   font-size: 13px;
-  font-weight: 600;
-  transition: all 0.2s;
-}
-
-.codia-upload-btn:hover {
-  background: #e2e8f0;
 }
 
 .codia-submit-btn {
-  background: linear-gradient(180deg, #12b1a6, #54ff9c);
-  color: white;
+  background: #191c1d;
+  color: #54ff9c;
   border: none;
-  border-radius: 16px;
-  height: 48px;
-  padding: 0 32px;
-  font-family: 'Inter', sans-serif;
+  border-radius: 12px;
+  height: 52px;
+  padding: 0 24px;
+  font-weight: 800;
   font-size: 14px;
-  font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(18, 177, 166, 0.2);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
   transition: all 0.2s;
 }
 
 .codia-submit-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(18, 177, 166, 0.3);
+  background: #000;
 }
 
 .codia-cancel {
   align-self: center;
-  color: #64748b;
+  color: #006a63;
   font-size: 12px;
+  font-weight: 700;
   text-decoration: underline;
   cursor: pointer;
-  margin-top: 4px;
+  margin-top: 8px;
+  opacity: 0.8;
 }
+
