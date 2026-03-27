@@ -18,7 +18,8 @@ export default defineConfig({
         wardenResidents:   resolve(__dirname, 'warden-residents.html'),
         wardenComplaints:  resolve(__dirname, 'warden-complaints.html'),
         wardenNotifications: resolve(__dirname, 'warden-notifications.html'),
-        wardenReports:     resolve(__dirname, 'warden-reports.html')
+        wardenReports:     resolve(__dirname, 'warden-reports.html'),
+        headWardenDashboard: resolve(__dirname, 'head-warden-dashboard.html')
       }
     }
   }
