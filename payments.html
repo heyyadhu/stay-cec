@@ -6,6 +6,17 @@
     <title>StayCEC - Payments</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" />
     <link rel="stylesheet" href="payments.css" />
+    <style>
+      @media print {
+        body { margin: 0; padding: 0; background: #fff; }
+        .rectangle, .container-9a, .button-3f, .horizontal-border, .section-transaction-history, .button, .codia-action-area, .last-activity-card {
+          display: none !important;
+        }
+        .main-container { overflow: visible !important; height: auto !important; }
+        .page-content { margin-left: 0 !important; padding: 20px !important; }
+        .hero-balance-card, .hostel-fee-card, .mess-fee-card { border: 1px solid #e2e8f0 !important; box-shadow: none !important; break-inside: avoid; }
+      }
+    </style>
     <script type="module" src="./splash.js"></script>
   </head>
   <body>
@@ -167,8 +178,8 @@
               <div class="overlay-38"><div class="icon-39"></div></div>
             </div>
             <div class="horizontal-border">
-              <div class="link-3a" onclick="alert('Downloading receipt...')" style="cursor:pointer;">
-                <span class="text-download-receipt">Download Receipt</span>
+              <div class="link-3a" onclick="window.print()" style="cursor:pointer;">
+                <span class="text-download-receipt">Download Statement</span>
                 <div class="container-3b"><div class="icon-3c"></div></div>
               </div>
             </div>
@@ -239,89 +250,9 @@
               </div>
             </div>
           </div>
-          <div class="background-border-shadow">
-            <!-- September -->
-            <div class="group-september">
-              <div class="overlay-66">
-                <div class="container-67"><span class="text-september-2023">February 2026</span></div>
-              </div>
-              <div class="table-body-row">
-                <div class="data">
-                  <div class="container-68"><span class="sep">10 Feb 2026</span></div>
-                  <div class="container-69"><span class="transaction-cec">Transaction #CEC-9281</span></div>
-                </div>
-                <div class="data-6a">
-                  <div class="container-6b"><span class="monthly-fee-bundle">Monthly Fee Bundle</span></div>
-                  <div class="container-6c"><span class="rent-mess-utilities">Rent + Mess + Utilities</span></div>
-                </div>
-                <div class="data-6d"><span class="text-8200-6e">&#8377;8,200.00</span></div>
-                <div class="data-6f">
-                  <div class="overlay-70">
-                    <div class="background-71"></div>
-                    <span class="text-success">Success</span>
-                  </div>
-                </div>
-                <div class="data-72">
-                  <div class="button-73">
-                    <div class="container-74"><div class="icon-75"></div></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <!-- August -->
-            <div class="group-august">
-              <div class="overlay-76">
-                <div class="container-77"><span class="text-august-2023">January 2026</span></div>
-              </div>
-              <div class="table-body">
-                <div class="row">
-                  <div class="data-78">
-                    <div class="container-79"><span class="aug">10 Jan 2026</span></div>
-                    <div class="container-7a"><span class="transaction-cec-8102">Transaction #CEC-8102</span></div>
-                  </div>
-                  <div class="data-7b">
-                    <div class="container-7c"><span class="mess-fee-aug">Mess Fee - Jan 2026</span></div>
-                    <div class="container-7d"><span class="unlimited-meal-plan">Unlimited Meal Plan</span></div>
-                  </div>
-                  <div class="data-7e"><span class="text-7f">&#8377;3,500.00</span></div>
-                  <div class="data-80">
-                    <div class="overlay-81">
-                      <div class="background-82"></div>
-                      <span class="success">Success</span>
-                    </div>
-                  </div>
-                  <div class="data-83">
-                    <div class="button-84">
-                      <div class="container-85"><div class="icon-86"></div></div>
-                    </div>
-                  </div>
-                </div>
-                <div class="row-87">
-                  <div class="data-88">
-                    <div class="container-89"><span class="aug-8a">05 Jan 2026</span></div>
-                    <div class="container-8b"><span class="transaction-cec-8091">Transaction #CEC-8091</span></div>
-                  </div>
-                  <div class="data-8c">
-                    <div class="container-8d"><span class="electricity-bill-jul">Hostel Fee - Dec 2025</span></div>
-                    <div class="container-8e"><span class="unit-consumption-overage">Unit consumption overage</span></div>
-                  </div>
-                  <div class="data-8f"><span class="text-90">&#8377;1,120.00</span></div>
-                  <div class="data-91">
-                    <div class="overlay-92">
-                      <div class="background-93"></div>
-                      <span class="success-94">Success</span>
-                    </div>
-                  </div>
-                  <div class="data-95">
-                    <div class="button-96">
-                      <div class="container-97"><div class="icon-98"></div></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="overlay-horizontal-border">
-              <div class="button-99" onclick="alert('No more transactions to display.')" style="cursor:pointer;"><span class="show-more-transactions">Show More Transactions</span></div>
+          <div class="background-border-shadow" id="txHistoryContainer">
+            <div style="padding: 40px; text-align: center; color: #64748b; font-weight: 500;">
+              Loading transactions...
             </div>
           </div>
         </div>
@@ -338,7 +269,7 @@
     </div>
     <script type="module">
       import { requireAuth, logOut, getStudentProfile } from './auth.js';
-      import { verifyPayment, calculateAndSetMonthlyFee, checkAndNotifyLateFee } from './data.js';
+      import { verifyPayment, calculateAndSetMonthlyFee, checkAndNotifyLateFee, getTransactionHistory } from './data.js';
 
       (async () => {
         const user = await requireAuth();
@@ -415,6 +346,44 @@
           if (outstanding === 0 || profile.feeStatus === 'Paid') {
             feeFront.style.display = 'none';
             feeSuccess.style.display = 'flex';
+          }
+        }
+
+        // ── Load Transaction History ──
+        const txHistoryContainer = document.getElementById('txHistoryContainer');
+        if (txHistoryContainer) {
+          try {
+            const txs = await getTransactionHistory(user.uid);
+            if (txs.length === 0) {
+              txHistoryContainer.innerHTML = '<div style="padding: 40px; text-align: center; color: #64748b; font-weight: 500;">No recent transactions.</div>';
+            } else {
+              txHistoryContainer.innerHTML = txs.map(tx => {
+                const date = tx.createdAt?.toDate ? tx.createdAt.toDate().toLocaleDateString('en-GB', {day:'numeric', month:'short', year:'numeric'}) : 'Just now';
+                return `
+                  <div class="group-september" style="margin-bottom: 12px;">
+                    <div class="table-body-row" style="background:var(--white); border-radius:12px; padding:16px; display:flex; gap:16px; border:1px solid #e2e8f0; align-items:center;">
+                      <div class="data" style="flex:1;">
+                        <div class="container-68"><span class="sep" style="font-weight:600; color:#0f172a;">${date}</span></div>
+                        <div class="container-69"><span class="transaction-cec" style="font-size:12px; color:#64748b;">Txn ID: ${tx.txId || 'N/A'}</span></div>
+                      </div>
+                      <div class="data-6a" style="flex:2;">
+                        <div class="container-6b"><span class="monthly-fee-bundle" style="font-weight:600; color:#0f172a;">Fee Payment</span></div>
+                        <div class="container-6c"><span class="rent-mess-utilities" style="font-size:12px; color:#64748b;">UTR: ${tx.utr || 'N/A'}</span></div>
+                      </div>
+                      <div class="data-6d" style="flex:1;"><span class="text-8200-6e" style="font-weight:800; color:#0f172a;">&#8377;${(tx.amount || 0).toLocaleString()}</span></div>
+                      <div class="data-6f" style="flex:1;">
+                        <div class="overlay-70" style="background:#dcfce7; padding:4px 12px; border-radius:99px; display:inline-flex; align-items:center; justify-content:center;">
+                          <span class="text-success" style="color:#166534; font-size:12px; font-weight:600;">Success</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                `;
+              }).join('');
+            }
+          } catch(err) {
+            console.error("Failed to load tx", err);
+            txHistoryContainer.innerHTML = '<div style="padding: 40px; text-align: center; color: #ef4444;">Failed to load history.</div>';
           }
         }
 

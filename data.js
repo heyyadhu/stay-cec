@@ -619,6 +619,7 @@ export async function sendWardenAnnouncement(title, message, targetGroup = 'all'
       const hostel = (data.hostel || '').toLowerCase();
       if (targetGroup === 'men' && !hostel.includes('men')) return;
       if (targetGroup === 'women' && !hostel.includes('women')) return;
+      if (targetGroup === 'overdue' && data.feeStatus !== 'Overdue') return;
 
       const nRef = doc(collection(db, 'notifications'));
       batch.set(nRef, {
@@ -658,6 +659,7 @@ export async function getTargetAudienceCount(targetGroup = 'all') {
       const hostel = (data.hostel || '').toLowerCase();
       if (targetGroup === 'men' && !hostel.includes('men')) return;
       if (targetGroup === 'women' && !hostel.includes('women')) return;
+      if (targetGroup === 'overdue' && data.feeStatus !== 'Overdue') return;
       count++;
     });
     return count;
