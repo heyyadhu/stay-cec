@@ -244,26 +244,98 @@
       document.getElementById('targetAudience').addEventListener('change', updateAudienceCount);
       
       // ── AI Generation Logic ──
-      const previewBtn = document.getElementById('previewBtn');
-      
-      const aiTemplates = [
-        { keywords: ['water', 'plumbing', 'maintenance'], template: "Dear Residents,\n\nPlease be advised that there will be a scheduled interruption in the water supply for essential maintenance. We apologize for the inconvenience and request you to store sufficient water in advance.\n\nThank you for your cooperation." },
-        { keywords: ['fee', 'dues', 'payment', 'fine', 'overdue'], template: "Dear Students,\n\nThis is a gentle reminder regarding the pending hostel and mess fees. Kindly ensure that all outstanding dues are cleared immediately to avoid late fee accumulation. Payments can be made securely via the portal.\n\nIgnore this message if already paid." },
-        { keywords: ['meeting', 'assembly', 'gather'], template: "Attention Residents,\n\nA mandatory meeting has been scheduled for all students. Please ensure your punctual attendance as important matters regarding hostel regulations and upcoming events will be discussed.\n\nAttendance is strictly required." },
-        { keywords: ['clean', 'waste', 'hygiene'], template: "Dear Residents,\n\nMaintaining hygiene within the hostel premises is everyone's responsibility. Please ensure your rooms and common areas are kept clean, and dispose of waste in the designated bins. Strict action will be taken against violations.\n\nThank you for maintaining decorum." },
-        { keywords: ['holiday', 'festival', 'vacation', 'leave'], template: "Dear Students,\n\nAs the upcoming holidays approach, we request all students planning to vacate the hostel to properly fill out the leave register. Ensure all appliances are switched off and rooms are locked securely before departure.\n\nWishing you a safe and pleasant break!" }
-      ];
+      // ── Advanced AI Simulation Engine ──
 
-      function getSmartTemplate(prompt) {
-        const lowerPrompt = prompt.toLowerCase();
-        for (const t of aiTemplates) {
-          if (t.keywords.some(k => lowerPrompt.includes(k))) {
-            return t.template;
-          }
+      function extractEntities(text) {
+        const lower = text.toLowerCase();
+        
+        // Very robust heuristic parsing for dates
+        const dateRegex = /\b(today|tomorrow|monday|tuesday|wednesday|thursday|friday|saturday|sunday|\d{1,2}(st|nd|rd|th)?\s+(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*)\b/gi;
+        
+        // Time parsing (e.g. 10am, 2:30 PM, 14:00)
+        const timeRegex = /\b((?:1[0-2]|0?[1-9])(?::[0-5][0-9])?\s*(?:am|pm)|(?:[01][0-9]|2[0-3]):[0-5][0-9])\b/gi;
+        
+        // Locations (Block A, Mess, Library, Gate)
+        const locRegex = /\b(block [a-z]|mess|canteen|library|main gate|reception|gym|laundry|hostel [a-z]?[0-9]?)\b/gi;
+
+        const dates = [...text.matchAll(dateRegex)].map(m => m[0]);
+        const times = [...text.matchAll(timeRegex)].map(m => m[0]);
+        const locs = [...text.matchAll(locRegex)].map(m => m[0]);
+
+        // Intents
+        let intent = 'general';
+        if (/water|electricity|power|plumbing|internet|wifi|maintenance|cleaning|repair/i.test(lower)) intent = 'maintenance';
+        else if (/fee|due|payment|fine|late|pay/i.test(lower)) intent = 'payment';
+        else if (/meeting|gather|assembly|urgent|mandatory/i.test(lower)) intent = 'urgent_meeting';
+        else if (/holiday|vacation|leave|closure|festival/i.test(lower)) intent = 'holiday';
+        else if (/discipline|hygiene|clean|waste|noise|rule/i.test(lower)) intent = 'disciplinary';
+
+        return {
+          dates: [...new Set(dates)],
+          times: [...new Set(times)],
+          locations: [...new Set(locs)],
+          intent
+        };
+      }
+
+      function getAdvancedTemplate(prompt) {
+        if (prompt.length < 5) {
+          return "Dear Residents,\n\nThis is a generic notification from the Warden's desk. Please ensure compliance with hostel rules and check the notice board for comprehensive updates.\n\nWarm regards,\nHostel Administration";
         }
-        // Fallback generic formal enhancement
-        if (prompt.length < 5) return "Dear Residents,\n\nThis is an important update from the Warden's office. Please check the notice board for more detailed information regarding recent changes in the hostel administration.\n\nThank you.";
-        return `Dear Residents,\n\nThis is an official notice regarding the following matter:\n\n${prompt}\n\nPlease take note of this and ensure strict compliance. Reach out to the hostel office for any clarifications.\n\nThank you.`;
+
+        const entities = extractEntities(prompt);
+        
+        const dateStr = entities.dates.length ? ` on ${entities.dates[0]}` : "";
+        const timeStr = entities.times.length ? ` at ${entities.times[0]}` : "";
+        
+        let locStr = "";
+        if (entities.locations.length) {
+           locStr = ` specifically affecting ${entities.locations.join(' and ')}`;
+        }
+
+        const intros = [
+          "Attention Residents,",
+          "Dear Students,",
+          "To all Hostel Residents,",
+          "Greetings,"
+        ];
+        
+        const signoffs = [
+          "Thank you for your cooperation.\n\nSincerely,\nHostel Administration",
+          "We appreciate your prompt attention to this matter.\n\nBest regards,\nWarden's Office",
+          "Please reach out if you have any urgent concerns.\n\nRegards,\nManagement",
+          "Ensure strict compliance with this directive.\n\nBy Order,\nChief Warden"
+        ];
+
+        // Randomly pick intro/signoff to make it feel AI generated (unique each time)
+        const intro = intros[Math.floor(Math.random() * intros.length)];
+        const signoff = signoffs[Math.floor(Math.random() * signoffs.length)];
+
+        let body = "";
+
+        switch (entities.intent) {
+          case 'maintenance':
+            body = `Please be advised that scheduled maintenance work will be carried out${dateStr}${timeStr}. This may cause temporary disruptions${locStr}. We apologize for any inconvenience and request you to plan accordingly.`;
+            break;
+          case 'payment':
+            body = `This is a gentle reminder regarding the settlement of outstanding dues. Kindly ensure that all payments are cleared${dateStr ? " by " + entities.dates[0] : " at your earliest convenience"} to avoid the accumulation of late fees or fines.`;
+            break;
+          case 'urgent_meeting':
+            body = `A mandatory assembly has been scheduled${dateStr}${timeStr}${locStr ? " at the " + entities.locations[0] : ""}. All residents are strictly required to be present as important matters concerning hostel discipline will be discussed.`;
+            break;
+          case 'holiday':
+            body = `As the holidays approach${dateStr}, residents planning to vacate the premises must update the leave register. Ensure your rooms are securely locked and all electrical appliances are switched off prior to departure.`;
+            break;
+          case 'disciplinary':
+            body = `It has come to our attention that certain disciplinary and hygiene protocols are not being followed${locStr}. Maintaining the decorum of the hostel is everyone's responsibility. Strict actions will be taken against repeated violations.`;
+            break;
+          default:
+            // Dynamic fallback attempting to re-use the user's words elegantly
+            body = `This is an official communication regarding the following matter:\n\n"${prompt.replace(/^.*title.*?body/i,'').trim()}"\n\nPlease ensure you read and understand the implications of this update. Disseminate this information among your peers if necessary.`;
+            break;
+        }
+
+        return `${intro}\n\n${body}\n\n${signoff}`;
       }
 
       previewBtn.addEventListener('click', async () => {
@@ -278,24 +350,30 @@
         previewBtn.style.opacity = '0.7';
         previewBtn.style.pointerEvents = 'none';
 
-        const finalTemplate = getSmartTemplate(prompt.trim());
+        const finalTemplate = getAdvancedTemplate(prompt.trim());
         
-        // Simulating AI processing delay
-        await new Promise(r => setTimeout(r, 800));
+        // Simulating AI processing delay based on prompt length
+        await new Promise(r => setTimeout(r, 600 + Math.random() * 800));
         
         broadcastMessage.value = '';
         updateUIPreview();
         
-        // Typewriter effect
+        // Streaming AI typewriter effect with variable speed
         let i = 0;
-        const speed = 15; // ms per char
         
         function typeWriter() {
           if (i < finalTemplate.length) {
             broadcastMessage.value += finalTemplate.charAt(i);
             updateUIPreview();
+            
+            // Variable delay: pause longer on punctuation
+            const char = finalTemplate.charAt(i);
+            let delay = 10 + Math.random() * 30; // 10-40ms base typing speed
+            if (char === '.' || char === '\n') delay = 250 + Math.random() * 200; // longer pause at end of sentence
+            else if (char === ',') delay = 100 + Math.random() * 80;
+            
             i++;
-            setTimeout(typeWriter, speed);
+            setTimeout(typeWriter, delay);
           } else {
             btnText.textContent = '✨ Generate AI Draft';
             previewBtn.style.opacity = '1';
