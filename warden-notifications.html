@@ -9,40 +9,39 @@
   </head>
   <body>
     <div class="main-container">
-      <div class="rectangle"></div>
-      <div class="staycecdesktop"></div>
-      
-      <div class="nav">
-        <div class="link" onclick="window.location.href='warden-dashboard.html'">
-          <div class="container"><div class="icon"></div></div>
-          <div class="container-1"><span class="dashboard">Dashboard</span></div>
+      <div class="rectangle">
+        <div class="staycecdesktop"></div>
+        <div class="nav">
+          <div class="link" onclick="window.location.href='warden-dashboard.html'">
+            <div class="container"><div class="icon"></div></div>
+            <div class="container-1"><span class="dashboard">Dashboard</span></div>
+          </div>
+          <div class="link-2" onclick="window.location.href='warden-residents.html'">
+            <div class="container-3"><div class="icon-4"></div></div>
+            <div class="container-5"><span class="residents">Residents</span></div>
+          </div>
+          <div class="link-6" onclick="window.location.href='warden-complaints.html'">
+            <div class="container-7"><div class="icon-8"></div></div>
+            <div class="container-9"><span class="complaints">Complaints</span></div>
+          </div>
+          <div class="link-a active-nav" onclick="window.location.href='warden-notifications.html'">
+            <div class="container-b"><div class="icon-c"></div></div>
+            <div class="container-d"><span class="notifications">Notifications</span></div>
+          </div>
+          <div class="link-e" onclick="window.location.href='warden-reports.html'">
+            <div class="container-f"><div class="icon-10"></div></div>
+            <div class="container-11"><span class="reports">Reports</span></div>
+          </div>
         </div>
-        <div class="link-2" onclick="window.location.href='warden-residents.html'">
-          <div class="container-3"><div class="icon-4"></div></div>
-          <div class="container-5"><span class="residents">Residents</span></div>
-        </div>
-        <div class="link-6" onclick="window.location.href='warden-complaints.html'">
-          <div class="container-7"><div class="icon-8"></div></div>
-          <div class="container-9"><span class="complaints">Complaints</span></div>
-        </div>
-        <div class="link-a active-nav" onclick="window.location.href='warden-notifications.html'">
-          <div class="container-b"><div class="icon-c"></div></div>
-          <div class="container-d"><span class="notifications">Notifications</span></div>
-        </div>
-        <div class="link-e" onclick="window.location.href='warden-reports.html'">
-          <div class="container-f"><div class="icon-10"></div></div>
-          <div class="container-11"><span class="reports">Reports</span></div>
-        </div>
-      </div>
-
-      <div class="container-12">
-        <div class="link-13">
-          <div class="container-14"><div class="icon-15"></div></div>
-          <div class="container-16"><span class="settings">Settings</span></div>
-        </div>
-        <div class="link-17" id="logoutBtn">
-          <div class="container-18"><div class="icon-19"></div></div>
-          <div class="container-1a"><span class="logout">Logout</span></div>
+        <div class="container-12">
+          <div class="link-13">
+            <div class="container-14"><div class="icon-15"></div></div>
+            <div class="container-16"><span class="settings">Settings</span></div>
+          </div>
+          <div class="link-17" id="logoutBtn">
+            <div class="container-18"><div class="icon-19"></div></div>
+            <div class="container-1a"><span class="logout">Logout</span></div>
+          </div>
         </div>
       </div>
 
@@ -57,7 +56,7 @@
         </div>
 
         <div class="bento-grid-layout">
-          <!-- Recent Notifications List -->
+          <!-- Recent Notifications History Table -->
           <div class="bottom-row-history-table">
             <div class="horizontal-border">
               <div class="container-1c">
@@ -65,50 +64,55 @@
                   <span class="text-1e">Recent Notifications</span>
                 </div>
                 <div class="container-1f">
-                  <span class="text-20">Log of your last 10 broadcast activity</span>
+                  <span class="text-20">Log of your last 30 days broadcast activity</span>
                 </div>
               </div>
               <div class="button">
-                <span class="text-21">View All</span>
+                <span class="text-21">View Full History</span>
+                <div class="container-22"><div class="icon-23"></div></div>
               </div>
             </div>
             <div class="table">
               <div class="header-row">
                 <div class="cell" style="flex:2"><span class="text-24">Title</span></div>
-                <div class="cell-25" style="flex:1.5"><span class="text-26">Date & Time</span></div>
+                <div class="cell-25" style="flex:1.5"><span class="text-26">Date &amp; Time</span></div>
                 <div class="cell-27" style="flex:1"><span class="text-28">Priority</span></div>
                 <div class="cell-29" style="flex:1"><span class="text-2a">Status</span></div>
+                <div class="cell-2b" style="flex:0.5"><span class="text-2c">Actions</span></div>
               </div>
               <div class="body" id="broadcastHistory">
-                <!-- Rows injected by JS -->
                 <div style="padding:40px; text-align:center; color:#8e8e93;">Loading history...</div>
               </div>
             </div>
           </div>
 
+          <!-- Writer + Preview Row -->
           <div class="flex-row-ea">
-            <!-- Writer Column -->
+            <!-- Left: Writer -->
             <div class="left-column-writer-options">
               <div class="smart-notification-writer-card">
                 <div class="container-68">
                   <div class="overlay-69"><div class="icon-6a"></div></div>
                   <div class="heading-6b">
-                    <span class="text-6c">Announcement Writer</span>
+                    <span class="text-6c">Smart Notification Writer</span>
                   </div>
                 </div>
                 <div class="container-6d">
                   <div class="container-6e">
-                    <label class="label-text">Message Title</label>
-                    <div style="margin-bottom:12px;">
-                      <input type="text" id="notifTitle" placeholder="e.g. Water Supply Interruption" style="width:100%; padding:12px 16px; background:#f2f4f5; border-radius:12px; font-family:inherit; font-size:14px;"/>
+                    <div class="label">
+                      <span class="draft-message">Message Title</span>
                     </div>
-                    <label class="label-text">Detailed Content</label>
+                    <input type="text" id="notifTitle" placeholder="e.g. Water Supply Interruption" />
+                    <div class="label" style="margin-top:4px;">
+                      <span class="draft-message">Draft Message</span>
+                    </div>
                     <div class="textarea">
-                      <textarea id="broadcastMessage" placeholder="Draft your message here..."></textarea>
+                      <textarea id="broadcastMessage" placeholder="Tomorrow water will be off from 10am to 2pm..."></textarea>
                     </div>
                   </div>
                   <div class="button-70" id="previewBtn">
-                    <span class="text-73">Update Preview</span>
+                    <div class="button-shadow"></div>
+                    <span class="text-73">Generate Notification</span>
                   </div>
                 </div>
               </div>
@@ -117,10 +121,10 @@
                 <div class="container-74">
                   <div class="overlay-75"><div class="icon-76"></div></div>
                   <div class="heading-77">
-                    <span class="broadcast-settings">Target & Priority</span>
+                    <span class="broadcast-settings">Broadcast Settings</span>
                   </div>
                 </div>
-                <div class="container-78" style="display:flex; gap:16px; margin-top:16px;">
+                <div class="container-78">
                   <div style="flex:1">
                     <span class="label-text">Target Audience</span>
                     <select id="targetAudience" class="custom-select">
@@ -140,18 +144,26 @@
               </div>
             </div>
 
-            <!-- Preview Column -->
+            <!-- Right: Preview -->
             <div class="right-column-generated-output">
               <div class="generated-notification-output-card">
                 <div class="overlay-horizontal-border">
                   <div class="container-8c">
                     <div class="container-8d">
                       <div class="background-border">
-                        <span class="text-ai-generated-draft">PREVIEW</span>
+                        <span class="text-ai-generated-draft">AI Generated Draft</span>
                       </div>
                       <div class="container-8e">
                         <div class="container-8f"><div class="icon-90"></div></div>
                         <span class="text-just-now">Just now</span>
+                      </div>
+                    </div>
+                    <div class="container-91">
+                      <div class="button-92">
+                        <div class="container-93"><div class="icon-94"></div></div>
+                      </div>
+                      <div class="button-95">
+                        <div class="container-96"><div class="icon-97"></div></div>
                       </div>
                     </div>
                   </div>
@@ -159,19 +171,31 @@
                 <div class="container-98">
                   <div class="container-99">
                     <div class="heading-9a">
-                      <span class="preview-title" id="prevTitle">Important Notice</span>
+                      <span class="preview-title" id="prevTitle">Important Notice: Water Supply Interruption</span>
                     </div>
                     <div class="container-9b">
-                      <span class="preview-body" id="prevBody">Your message will appear here...</span>
+                      <span class="preview-body" id="prevBody">Please be advised that water supply to Block A will be suspended for essential maintenance tomorrow, between 10:00 AM and 02:00 PM. We regret any inconvenience caused.</span>
                     </div>
                   </div>
                 </div>
                 <div class="background-9c">
                   <div class="container-9d">
-                    <span id="targetCountText" style="font-size:12px; font-weight:700; color:#3c4947;">Calculating audience...</span>
+                    <div class="target-audience-preview"></div>
+                    <div class="img-target-audience-preview-margin">
+                      <div class="target-audience-preview-9e"></div>
+                    </div>
+                    <div class="img-target-audience-preview-margin-9f">
+                      <div class="target-audience-preview-a0"></div>
+                    </div>
+                    <div class="margin">
+                      <div class="background-border-a1">
+                        <span class="text-142" id="targetCountText">+142</span>
+                      </div>
+                    </div>
                   </div>
                   <div class="container-a2">
                     <div class="button-a4" id="sendBtn">
+                      <div class="button-shadow-a5"></div>
                       <span class="text-send-notification">Send Notification</span>
                     </div>
                   </div>
@@ -183,6 +207,10 @@
       </div>
 
       <div class="border"><div class="student-profile-avatar"></div></div>
+      <div class="button-a6">
+        <div class="container-a7"><div class="icon-a8"></div></div>
+        <div class="background-border-a9"></div>
+      </div>
     </div>
 
     <script type="module">
@@ -205,10 +233,11 @@
 
       notifTitle.addEventListener('input', updateUIPreview);
       broadcastMessage.addEventListener('input', updateUIPreview);
+
       async function updateAudienceCount() {
         const target = document.getElementById('targetAudience').value;
         const count = await getTargetAudienceCount(target);
-        document.getElementById('targetCountText').textContent = `Targeting approx. ${count} students`;
+        document.getElementById('targetCountText').textContent = `+${count}`;
       }
 
       document.getElementById('targetAudience').addEventListener('change', updateAudienceCount);
@@ -223,15 +252,22 @@
         }
         historyBody.innerHTML = broadcasts.map(b => {
           const date = b.createdAt?.toDate ? b.createdAt.toDate().toLocaleString() : 'Just now';
-          const priorityClass = b.priority === 'Urgent' ? 'urgent' : 'normal';
+          const isUrgent = b.priority === 'Urgent';
+          const priorityPill = isUrgent
+            ? `<div class="overlay-34"><span class="text-35">Urgent</span></div>`
+            : `<div class="background"><span class="text-49">Normal</span></div>`;
           return `
             <div class="row">
-              <div class="data" style="flex:2; font-weight:600; color:#191c1d;">${b.title}</div>
-              <div class="data-31" style="flex:1.5; color:#3c4947;">${date}</div>
-              <div class="data-33" style="flex:1">
-                <span class="status-pill ${priorityClass}">${b.priority || 'Normal'}</span>
+              <div class="data" style="flex:2">
+                <div class="overlay"><div class="container-2d"><div class="icon-2e"></div></div></div>
+                <div class="container-2f"><span class="text-30">${b.title}</span></div>
               </div>
-              <div class="data-36" style="flex:1; color:#006a63; font-weight:700;">SENT</div>
+              <div class="data-31" style="flex:1.5">${date}</div>
+              <div class="data-33" style="flex:1">${priorityPill}</div>
+              <div class="data-36" style="flex:1">
+                <div class="container-37"><div class="icon-38"></div></div>
+                <div class="container-39"><span class="text-3a">Sent</span></div>
+              </div>
             </div>
           `;
         }).join('');
@@ -239,16 +275,11 @@
 
       // ── Auth & Init ──
       onAuthStateChanged(auth, async (user) => {
-        if (!user) {
-          window.location.href = 'index.html';
-          return;
-        }
+        if (!user) { window.location.href = 'index.html'; return; }
         const profile = await getStudentProfile(user.uid);
         if (!profile || profile.role !== 'warden') {
-          window.location.href = 'dashboard.html';
-          return;
+          window.location.href = 'dashboard.html'; return;
         }
-        
         loadHistory();
         updateAudienceCount();
       });
@@ -267,7 +298,7 @@
 
         sendBtn.style.opacity = '0.5';
         sendBtn.style.pointerEvents = 'none';
-        sendBtn.textContent = 'Sending...';
+        document.querySelector('.text-send-notification').textContent = 'Sending...';
 
         try {
           await sendWardenAnnouncement(title, body, target, priority);
@@ -282,7 +313,7 @@
         } finally {
           sendBtn.style.opacity = '1';
           sendBtn.style.pointerEvents = 'auto';
-          sendBtn.textContent = 'Send Notification';
+          document.querySelector('.text-send-notification').textContent = 'Send Notification';
         }
       });
 
