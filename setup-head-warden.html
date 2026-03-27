@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head><title>Setup Head Warden</title></head>
+<body>
+  <h2>Head Warden Account Setup</h2>
+  <p id="status">Creating account...</p>
+  <script type="module">
+    import { signUp } from './auth.js';
+
+    const statusEl = document.getElementById('status');
+
+    try {
+      const user = await signUp('thelegendanandhu@gmail.com', '123456', {
+        fullName: 'Head Warden',
+        registerNumber: 'HW-001',
+        department: 'Administration',
+        phone: '9999999999',
+        role: 'head-warden',
+        hostel: 'Administration',
+      });
+      statusEl.textContent = `✅ Account created! UID: ${user.uid}. You can now delete this file.`;
+    } catch (err) {
+      statusEl.textContent = `❌ Error: ${err.message}`;
+      console.error(err);
+    }
+  </script>
+</body>
+</html>

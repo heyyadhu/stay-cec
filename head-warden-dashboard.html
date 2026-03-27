@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StayCEC — Head Warden Dashboard</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" />
+  <link rel="stylesheet" href="head-warden-dashboard.css" />
+</head>
+<body>
+
+  <!-- ── Sidebar ─────────────────────────────── -->
+  <aside class="sidebar">
+    <img src="https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-27/QhbhFPhMvM.png"
+         alt="StayCEC" class="sidebar-logo" />
+
+    <nav class="sidebar-nav">
+      <a class="nav-item active" data-page="registrations">
+        <span class="nav-icon">
+          <svg viewBox="0 0 20 20" fill="currentColor"><path d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/></svg>
+        </span>
+        <span class="nav-label">Registrations</span>
+      </a>
+      <a class="nav-item" data-page="residents">
+        <span class="nav-icon">
+          <svg viewBox="0 0 20 20" fill="currentColor"><path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.97 5.97 0 00-.75-2.91A3.98 3.98 0 0119 15v3h-3zM4.75 12.09A5.97 5.97 0 004 15v3H1v-3a3.98 3.98 0 013.75-2.91z"/></svg>
+        </span>
+        <span class="nav-label">All Residents</span>
+      </a>
+      <a class="nav-item" data-page="complaints">
+        <span class="nav-icon">
+          <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+        </span>
+        <span class="nav-label">Complaints</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a class="nav-item" href="warden-dashboard.html">
+        <span class="nav-icon">
+          <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.53 1.53 0 01-2.29.95c-1.37-.84-2.94.73-2.1 2.1.46.75.09 1.74-.79 2.03-1.56.51-1.56 2.34 0 2.85.88.29 1.25 1.28.79 2.03-.84 1.37.73 2.94 2.1 2.1a1.53 1.53 0 012.29.95c.38 1.56 2.6 1.56 2.98 0a1.53 1.53 0 012.29-.95c1.37.84 2.94-.73 2.1-2.1a1.53 1.53 0 01.79-2.03c1.56-.51 1.56-2.34 0-2.85a1.53 1.53 0 01-.79-2.03c.84-1.37-.73-2.94-2.1-2.1a1.53 1.53 0 01-2.29-.95zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/></svg>
+        </span>
+        <span class="nav-label">Warden Panel</span>
+      </a>
+      <a class="nav-item logout" id="logoutBtn">
+        <span class="nav-icon">
+          <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 001 1h5a1 1 0 100-2H4V5h4a1 1 0 100-2H3zm11.707 4.293a1 1 0 10-1.414 1.414L14.586 10H8a1 1 0 100 2h6.586l-1.293 1.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3z" clip-rule="evenodd"/></svg>
+        </span>
+        <span class="nav-label">Log out</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- ── Main Content ────────────────────────── -->
+  <main class="main-content">
+    <!-- Top bar -->
+    <div class="topbar">
+      <button class="topbar-bell">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-2.83-2h5.66A3 3 0 0110 18z"/></svg>
+        <span class="notif-dot"></span>
+      </button>
+      <div class="topbar-avatar">
+        <img src="https://ui-avatars.com/api/?name=Head+Warden&background=006a63&color=fff&bold=true" alt="avatar" />
+      </div>
+    </div>
+
+    <!-- Page Grid -->
+    <div class="page-grid">
+
+      <!-- ── LEFT COLUMN ─────────────────────── -->
+      <div class="left-column">
+
+        <!-- Section Header -->
+        <div class="section-header">
+          <h1 class="section-title">Queue Management</h1>
+          <div class="header-actions">
+            <button class="btn-sm" id="refreshBtn">
+              <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"/></svg>
+              Refresh
+            </button>
+            <button class="btn-sm" id="filterBtn">
+              <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clip-rule="evenodd"/></svg>
+              Filter
+            </button>
+          </div>
+        </div>
+
+        <!-- Registration Table -->
+        <div class="table-card">
+          <table class="reg-table">
+            <thead>
+              <tr>
+                <th>Student</th>
+                <th>Department</th>
+                <th>Applied</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="regTableBody">
+              <tr>
+                <td colspan="4">
+                  <div class="empty-state">
+                    <div class="spinner"></div>
+                    <p style="margin-top:12px">Loading registrations...</p>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Stats Bento -->
+        <div class="stats-bento">
+          <div class="stat-card gradient">
+            <div class="stat-icon">
+              <svg viewBox="0 0 20 20" fill="currentColor"><path d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/></svg>
+            </div>
+            <div>
+              <div class="stat-value" id="statPending">—</div>
+              <div class="stat-label">Pending Requests</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">
+              <svg viewBox="0 0 20 20" fill="currentColor"><path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.05a.5.5 0 01.278.47v3.23a.5.5 0 01-.236.425l-2.18 1.363a.5.5 0 00-.236.424V17a.5.5 0 00.723.447L10 14.89l6.401 2.557A.5.5 0 0017 17v-3.038a.5.5 0 00-.236-.424l-2.18-1.363a.5.5 0 01-.236-.425V8.52a.5.5 0 01.278-.47l2.644-1.132a1 1 0 000-1.838l-7-3z"/></svg>
+            </div>
+            <div>
+              <div class="stat-value" id="statApproved">—</div>
+              <div class="stat-label">Approved Today</div>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">
+              <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg>
+            </div>
+            <div>
+              <div class="stat-value" id="statTotal">—</div>
+              <div class="stat-label">Total Residents</div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /left-column -->
+
+      <!-- ── RIGHT COLUMN ────────────────────── -->
+      <div class="right-column">
+
+        <!-- Student Detail Card -->
+        <div class="detail-card" id="detailCard">
+          <div class="empty-state" id="detailEmpty">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/></svg>
+            <p>Select a student from the queue to view their details</p>
+          </div>
+
+          <div id="detailContent" style="display:none">
+            <div class="student-identity">
+              <div class="portrait-wrap">
+                <img id="detailAvatar" src="" alt="portrait" />
+                <div class="verified-badge">
+                  <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                </div>
+              </div>
+              <div class="identity-name" id="detailName">—</div>
+              <div class="identity-dept" id="detailDept">—</div>
+            </div>
+
+            <div class="details-grid">
+              <div class="detail-row">
+                <span class="detail-label">Register No.</span>
+                <span class="detail-value" id="detailRegNo">—</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Year</span>
+                <span class="detail-value" id="detailYear">—</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Phone</span>
+                <span class="detail-value" id="detailPhone">—</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Parent Phone</span>
+                <span class="detail-value" id="detailParentPhone">—</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Email</span>
+                <span class="detail-value" id="detailEmail">—</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Applied On</span>
+                <span class="detail-value" id="detailApplied">—</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Decision Section -->
+        <div class="decision-section" id="decisionSection" style="display:none">
+          <div class="decision-header">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+            <span>Decision</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Hostel Block</label>
+            <select class="form-select" id="hostelSelect">
+              <option>CEC Premium Men's Hostel</option>
+              <option>CEC Premium Women's Hostel</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Room Assignment</label>
+            <select class="form-select" id="roomSelect">
+              <option>Room 101 — Block A</option>
+              <option>Room 102 — Block A</option>
+              <option>Room 201 — Block B</option>
+              <option>Room 202 — Block B</option>
+              <option>Room 301 — Block C</option>
+              <option>Room 302 — Block C</option>
+            </select>
+          </div>
+
+          <button class="btn-approve" id="approveBtn">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+            <span>Approve &amp; Assign</span>
+          </button>
+
+          <div class="btn-row">
+            <button class="btn-hold" id="holdBtn">Put On Hold</button>
+            <button class="btn-reject" id="rejectBtn">Reject Request</button>
+          </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="activity-card">
+          <div class="activity-header">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg>
+            <span>Recent Activity</span>
+          </div>
+          <div class="activity-list" id="activityList">
+            <div class="empty-state" style="padding:16px">
+              <p>No recent activity</p>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /right-column -->
+    </div><!-- /page-grid -->
+  </main>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <!-- ── Script ────────────────────────────── -->
+  <script type="module">
+    import { requireAuth, getStudentProfile, logOut } from './auth.js';
+    import { getPendingRegistrations, updateRegistrationStatus, getHeadWardenStats, getRecentActivity } from './data.js';
+
+    // ── Auth guard ──
+    const user = await requireAuth();
+    const profile = await getStudentProfile(user.uid);
+    if (!profile || (profile.role !== 'warden' && profile.role !== 'head-warden')) {
+      window.location.href = 'index.html';
+    }
+
+    // ── State ──
+    let registrations = [];
+    let selectedStudent = null;
+
+    // ── DOM References ──
+    const regTableBody = document.getElementById('regTableBody');
+    const detailEmpty = document.getElementById('detailEmpty');
+    const detailContent = document.getElementById('detailContent');
+    const decisionSection = document.getElementById('decisionSection');
+    const toast = document.getElementById('toast');
+
+    // ── Toast helper ──
+    function showToast(msg, isError = false) {
+      toast.textContent = msg;
+      toast.className = 'toast' + (isError ? ' error' : '');
+      setTimeout(() => toast.classList.add('show'), 10);
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    // ── Format date ──
+    function formatDate(ts) {
+      if (!ts) return '—';
+      const d = ts.toDate ? ts.toDate() : new Date(ts);
+      return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+    }
+
+    // ── Avatar colors cycle ──
+    const avatarColors = ['teal', 'blue', 'purple', 'orange'];
+
+    // ── Render table ──
+    function renderTable() {
+      if (registrations.length === 0) {
+        regTableBody.innerHTML = `
+          <tr><td colspan="4">
+            <div class="empty-state">
+              <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/></svg>
+              <p>No pending registrations</p>
+            </div>
+          </td></tr>`;
+        return;
+      }
+
+      regTableBody.innerHTML = registrations.map((s, i) => {
+        const initials = (s.fullName || 'U').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+        const color = avatarColors[i % avatarColors.length];
+        const status = s.registrationStatus || 'Pending';
+        const statusClass = status.toLowerCase().replace(' ', '-');
+        const selected = selectedStudent && selectedStudent.id === s.id ? ' selected' : '';
+
+        return `
+          <tr class="${selected}" data-id="${s.id}">
+            <td>
+              <div class="student-cell">
+                <div class="avatar-circle ${color}">${initials}</div>
+                <div class="student-info">
+                  <div class="name">${s.fullName || 'Unknown'}</div>
+                  <div class="reg-id">${s.registerNumber || '—'}</div>
+                </div>
+              </div>
+            </td>
+            <td>${s.department || '—'}</td>
+            <td>${formatDate(s.createdAt)}</td>
+            <td><span class="status-badge ${statusClass}"><span class="dot"></span>${status}</span></td>
+          </tr>`;
+      }).join('');
+
+      // Row click handlers
+      regTableBody.querySelectorAll('tr[data-id]').forEach(row => {
+        row.addEventListener('click', () => {
+          const id = row.dataset.id;
+          selectedStudent = registrations.find(r => r.id === id);
+          renderTable();
+          showDetail(selectedStudent);
+        });
+      });
+    }
+
+    // ── Show student detail ──
+    function showDetail(s) {
+      if (!s) {
+        detailEmpty.style.display = '';
+        detailContent.style.display = 'none';
+        decisionSection.style.display = 'none';
+        return;
+      }
+
+      detailEmpty.style.display = 'none';
+      detailContent.style.display = '';
+
+      const status = s.registrationStatus || 'Pending';
+      decisionSection.style.display = (status === 'Pending' || status === 'On Hold') ? '' : 'none';
+
+      document.getElementById('detailAvatar').src =
+        `https://ui-avatars.com/api/?name=${encodeURIComponent(s.fullName || 'U')}&background=006a63&color=fff&bold=true&size=96`;
+      document.getElementById('detailName').textContent = s.fullName || 'Unknown';
+      document.getElementById('detailDept').textContent = s.department || '—';
+      document.getElementById('detailRegNo').textContent = s.registerNumber || '—';
+      document.getElementById('detailYear').textContent = s.year || '—';
+      document.getElementById('detailPhone').textContent = s.phone || '—';
+      document.getElementById('detailParentPhone').textContent = s.parentPhone || '—';
+      document.getElementById('detailEmail').textContent = s.email || '—';
+      document.getElementById('detailApplied').textContent = formatDate(s.createdAt);
+    }
+
+    // ── Load data ──
+    async function loadData() {
+      try {
+        regTableBody.innerHTML = `<tr><td colspan="4"><div class="empty-state"><div class="spinner"></div><p style="margin-top:12px">Loading...</p></div></td></tr>`;
+
+        registrations = await getPendingRegistrations();
+        renderTable();
+
+        const stats = await getHeadWardenStats();
+        document.getElementById('statPending').textContent = stats.pending;
+        document.getElementById('statApproved').textContent = stats.approvedToday;
+        document.getElementById('statTotal').textContent = stats.totalResidents;
+
+        // Load recent activity
+        const activities = await getRecentActivity();
+        renderActivity(activities);
+      } catch (err) {
+        console.error('Error loading data:', err);
+        showToast('Failed to load data', true);
+      }
+    }
+
+    // ── Render activity ──
+    function renderActivity(items) {
+      const list = document.getElementById('activityList');
+      if (!items || items.length === 0) {
+        list.innerHTML = '<div class="empty-state" style="padding:16px"><p>No recent activity</p></div>';
+        return;
+      }
+
+      list.innerHTML = items.map(a => `
+        <div class="activity-item">
+          <div class="activity-dot ${a.action === 'Approved' ? 'approved' : 'rejected'}"></div>
+          <div class="activity-text">
+            <div class="line1">${a.studentName} — ${a.action}</div>
+            <div class="line2">${formatDate(a.timestamp)}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // ── Action handlers ──
+    document.getElementById('approveBtn').addEventListener('click', async () => {
+      if (!selectedStudent) return;
+      const hostel = document.getElementById('hostelSelect').value;
+      const room = document.getElementById('roomSelect').value;
+
+      try {
+        await updateRegistrationStatus(selectedStudent.id, 'Approved', {
+          hostel,
+          room,
+          approvedBy: user.uid,
+        });
+        showToast(`${selectedStudent.fullName} approved & assigned to ${room}`);
+        selectedStudent = null;
+        showDetail(null);
+        await loadData();
+      } catch (err) {
+        console.error('Approve error:', err);
+        showToast('Failed to approve: ' + err.message, true);
+      }
+    });
+
+    document.getElementById('holdBtn').addEventListener('click', async () => {
+      if (!selectedStudent) return;
+      try {
+        await updateRegistrationStatus(selectedStudent.id, 'On Hold', {});
+        showToast(`${selectedStudent.fullName} put on hold`);
+        selectedStudent = null;
+        showDetail(null);
+        await loadData();
+      } catch (err) {
+        showToast('Failed: ' + err.message, true);
+      }
+    });
+
+    document.getElementById('rejectBtn').addEventListener('click', async () => {
+      if (!selectedStudent) return;
+      if (!confirm(`Reject ${selectedStudent.fullName}'s registration?`)) return;
+      try {
+        await updateRegistrationStatus(selectedStudent.id, 'Rejected', {
+          rejectedBy: user.uid,
+        });
+        showToast(`${selectedStudent.fullName}'s registration rejected`);
+        selectedStudent = null;
+        showDetail(null);
+        await loadData();
+      } catch (err) {
+        showToast('Failed: ' + err.message, true);
+      }
+    });
+
+    // ── Refresh ──
+    document.getElementById('refreshBtn').addEventListener('click', loadData);
+
+    // ── Logout ──
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      await logOut();
+    });
+
+    // ── Init ──
+    loadData();
+  </script>
+
+</body>
+</html>

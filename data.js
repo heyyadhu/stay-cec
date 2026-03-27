@@ -819,3 +819,132 @@ export async function getMessReductions(uid = null) {
     return [];
   }
 }
+
+// ─────────────────────────────────────────────────────────────
+// HEAD WARDEN — REGISTRATION MANAGEMENT
+// ─────────────────────────────────────────────────────────────
+
+/**
+ * Fetch all students whose registrationStatus is Pending, On Hold, or recently processed.
+ * Returns newest-first.
+ */
+export async function getPendingRegistrations() {
+  try {
+    const ref = collection(db, 'students');
+    const q = query(
+      ref,
+      where('role', '==', 'student'),
+      orderBy('createdAt', 'desc'),
+      limit(50)
+    );
+    const snap = await getDocs(q);
+    // Filter to only show Pending, On Hold, and recently Approved/Rejected
+    return snap.docs
+      .map(d => ({ id: d.id, ...d.data() }))
+      .filter(s => {
+        const status = s.registrationStatus || 'Pending';
+        return ['Pending', 'On Hold', 'Approved', 'Rejected'].includes(status);
+      });
+  } catch (error) {
+    console.error('Error fetching pending registrations:', error);
+    return [];
+  }
+}
+
+/**
+ * Update a student's registration status (Approved / Rejected / On Hold).
+ * When approved, also assigns hostel and room.
+ * Logs the action in the 'registrationActivity' collection.
+ */
+export async function updateRegistrationStatus(studentId, status, extraData = {}) {
+  const studentRef = doc(db, 'students', studentId);
+  const studentSnap = await getDoc(studentRef);
+  if (!studentSnap.exists()) throw new Error('Student not found.');
+
+  const studentData = studentSnap.data();
+  const updatePayload = {
+    registrationStatus: status,
+    registrationUpdatedAt: serverTimestamp(),
+  };
+
+  if (status === 'Approved') {
+    updatePayload.hostel = extraData.hostel || studentData.hostel || "CEC Premium Men's Hostel";
+    updatePayload.room = extraData.room || 'Pending Assignment';
+  }
+
+  await updateDoc(studentRef, updatePayload);
+
+  // Log activity
+  await addDoc(collection(db, 'registrationActivity'), {
+    studentId,
+    studentName: studentData.fullName || 'Unknown',
+    action: status,
+    performedBy: extraData.approvedBy || extraData.rejectedBy || 'system',
+    timestamp: serverTimestamp(),
+  });
+
+  // Notify the student
+  const notifMsg = status === 'Approved'
+    ? `Your hostel registration has been approved! Room: ${updatePayload.room || 'TBD'}.`
+    : status === 'Rejected'
+    ? 'Your hostel registration has been rejected. Please contact the warden office for details.'
+    : 'Your hostel registration is on hold. We will update you soon.';
+
+  await addDoc(collection(db, 'notifications'), {
+    uid: studentId,
+    type: 'registration',
+    title: `Registration ${status}`,
+    message: notifMsg,
+    read: false,
+    createdAt: serverTimestamp(),
+  });
+}
+
+/**
+ * Get stats for the Head Warden dashboard.
+ */
+export async function getHeadWardenStats() {
+  try {
+    const ref = collection(db, 'students');
+    const snap = await getDocs(query(ref, where('role', '==', 'student')));
+
+    let pending = 0;
+    let approvedToday = 0;
+    let totalResidents = snap.size;
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+
+    snap.forEach(d => {
+      const data = d.data();
+      const status = data.registrationStatus || 'Pending';
+      if (status === 'Pending' || status === 'On Hold') pending++;
+      if (status === 'Approved' && data.registrationUpdatedAt) {
+        const updatedDate = data.registrationUpdatedAt.toDate ? data.registrationUpdatedAt.toDate() : new Date(data.registrationUpdatedAt);
+        if (updatedDate >= todayStart) approvedToday++;
+      }
+    });
+
+    return { pending, approvedToday, totalResidents };
+  } catch (error) {
+    console.error('Error fetching head warden stats:', error);
+    return { pending: 0, approvedToday: 0, totalResidents: 0 };
+  }
+}
+
+/**
+ * Fetch recent registration activity log (approve/reject actions).
+ */
+export async function getRecentActivity() {
+  try {
+    const q = query(
+      collection(db, 'registrationActivity'),
+      orderBy('timestamp', 'desc'),
+      limit(10)
+    );
+    const snap = await getDocs(q);
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch (error) {
+    console.error('Error fetching recent activity:', error);
+    return [];
+  }
+}
