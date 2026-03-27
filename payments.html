@@ -61,7 +61,7 @@
               <div class="container-1c">
                 <div class="container-1d">
                   <div class="container-1e">
-                    <span class="current-total-balance">Current Total Balance</span>
+                    <span class="current-total-balance" id="billingCycleLabel">Current Total Balance</span>
                   </div>
                   <div class="heading-1f">
                     <span class="text-20" id="outstandingDisplay">&#8377;0</span><span class="text-21">.00</span>
@@ -69,33 +69,37 @@
                 </div>
                 <div class="container-22">
                   <div class="container-23">
-                    <div class="container-24"><span class="october-cycle-progress">October Cycle Progress</span></div>
-                    <div class="container-25"><span class="text-paid" id="paidPercentage">0% Paid</span></div>
+                    <div class="container-24"><span class="october-cycle-progress" id="cycleProgressLabel">Billing Cycle</span></div>
+                    <div class="container-25"><span class="text-paid" id="paidPercentage">Loading...</span></div>
                   </div>
                   <div class="background">
                     <div id="progressBar" style="width: 0%; height: 100%; background: #12b1a6; border-radius: 9999px; transition: width 0.5s ease;"></div>
                   </div>
                   <div id="overdueOverlay" class="overlay" style="display: none;">
-                    <span class="overdue-by-2-days">Overdue</span>
+                    <span class="overdue-by-2-days" id="overdueLabel">Overdue</span>
                     <div class="container-26"><div class="icon-27"></div></div>
                   </div>
                 </div>
               </div>
               <div class="overlay-border">
                 <div class="container-28">
-                  <div class="container-29"><span class="next-due-date">Next Due Date</span></div>
-                  <div class="container-2a"><span class="oct-15-2023">15 Oct, 2023</span></div>
+                  <div class="container-29"><span class="next-due-date">Due Date</span></div>
+                  <div class="container-2a"><span id="dueDateDisplay" style="font-weight:700;">—</span></div>
                 </div>
                 <div class="margin">
                   <div class="container-2b">
                     <div class="container-2c">
                       <div class="container-2d">
                         <div class="container-2e"><span class="text-hostel">Hostel</span></div>
-                        <div class="container-2f"><span class="text-2300" id="hostelFeeDisplay">&#8377;0</span></div>
+                        <div class="container-2f"><span id="hostelFeeDisplay">&#8377;2,300</span></div>
                       </div>
                       <div class="container-30">
-                        <div class="container-31"><span class="text-mess">Mess</span></div>
-                        <div class="container-32"><span class="text-3300" id="messFeeDisplay">&#8377;0</span></div>
+                        <div class="container-31"><span class="text-mess" id="messLabel">Mess</span></div>
+                        <div class="container-32"><span id="messFeeDisplay">&#8377;—</span></div>
+                      </div>
+                      <div class="container-30" id="lateFeeRow" style="display:none;">
+                        <div class="container-31"><span style="color:#ef4444;font-weight:600;">Late Fee</span></div>
+                        <div class="container-32"><span id="lateFeeDisplay" style="color:#ef4444;font-weight:700;">&#8377;0</span></div>
                       </div>
                     </div>
                     <div class="button" id="payNowBtn">
@@ -332,12 +336,9 @@
         <div class="border"><div class="student-profile-avatar"></div></div>
       </div>
     </div>
-    <script>
-
-    </script>
     <script type="module">
       import { requireAuth, logOut, getStudentProfile } from './auth.js';
-      import { verifyPayment } from './data.js';
+      import { verifyPayment, calculateAndSetMonthlyFee, checkAndNotifyLateFee } from './data.js';
 
       (async () => {
         const user = await requireAuth();
@@ -347,59 +348,95 @@
           window.location.href = 'warden-dashboard.html';
           return;
         }
-        
-        // Data elements
-        const outstandingDisplay = document.getElementById('outstandingDisplay');
-        const hostelFeeDisplay = document.getElementById('hostelFeeDisplay');
-        const messFeeDisplay = document.getElementById('messFeeDisplay');
-        const paidPercentage = document.getElementById('paidPercentage');
-        const progressBar = document.getElementById('progressBar');
-        const overdueOverlay = document.getElementById('overdueOverlay');
-        
+
         // Panels
         const feeFront = document.getElementById('feeFront');
         const feeBack = document.getElementById('feeBack');
         const feeSuccess = document.getElementById('feeSuccess');
 
-        if (profile) {
-          const outstanding = profile.outstandingAmount || 0;
-          outstandingDisplay.textContent = `₹${outstanding.toLocaleString()}`;
-          hostelFeeDisplay.textContent = `₹${(2300).toLocaleString()}`; // Mock fixed
-          messFeeDisplay.textContent = `₹${(3300).toLocaleString()}`; // Mock fixed
-          
-          if (outstanding === 0 || profile.feeStatus === 'Paid') {
+        // ── Calculate dynamic fees ──
+        let feeBreakdown = null;
+        try {
+          feeBreakdown = await calculateAndSetMonthlyFee(user.uid);
+          await checkAndNotifyLateFee(user.uid, feeBreakdown);
+        } catch (e) { console.error('Fee calc error', e); }
+
+        // Display elements
+        const outstandingDisplay  = document.getElementById('outstandingDisplay');
+        const hostelFeeDisplay    = document.getElementById('hostelFeeDisplay');
+        const messFeeDisplay      = document.getElementById('messFeeDisplay');
+        const lateFeeDisplay      = document.getElementById('lateFeeDisplay');
+        const lateFeeRow          = document.getElementById('lateFeeRow');
+        const paidPercentage      = document.getElementById('paidPercentage');
+        const progressBar         = document.getElementById('progressBar');
+        const overdueOverlay      = document.getElementById('overdueOverlay');
+        const dueDateDisplay      = document.getElementById('dueDateDisplay');
+        const cycleProgressLabel  = document.getElementById('cycleProgressLabel');
+        const overdueLabel        = document.getElementById('overdueLabel');
+        const messLabel           = document.getElementById('messLabel');
+
+        if (feeBreakdown) {
+          const { hostelFee, messFee, lateFee, totalDue, daysOverdue,
+                  dueDateStr, billingYearStr, approvedLeaveDays, effectiveMessDays } = feeBreakdown;
+
+          outstandingDisplay.textContent = `₹${totalDue.toLocaleString()}`;
+          hostelFeeDisplay.textContent   = `₹${hostelFee.toLocaleString()}`;
+          messFeeDisplay.textContent     = `₹${messFee.toLocaleString()}`;
+          if (dueDateDisplay) dueDateDisplay.textContent = dueDateStr;
+          if (cycleProgressLabel) cycleProgressLabel.textContent = billingYearStr + ' Bill';
+
+          // Mess label — show reduction note if applicable
+          if (messLabel && approvedLeaveDays > 0) {
+            messLabel.textContent = `Mess (−${approvedLeaveDays}d)`;
+          }
+
+          // Late fee row
+          if (lateFee > 0) {
+            lateFeeDisplay.textContent = `₹${lateFee.toLocaleString()}`;
+            lateFeeRow.style.display = '';
+            overdueOverlay.style.display = 'flex';
+            overdueLabel.textContent = `Overdue ${daysOverdue}d (+₹${lateFee})`;
+          }
+
+          if (totalDue <= 0 || profile?.feeStatus === 'Paid') {
             feeFront.style.display = 'none';
             feeSuccess.style.display = 'flex';
           } else {
-            // Update progress bar (mock)
-            const total = 5600;
-            const paid = total - outstanding;
-            const pct = Math.round((paid / total) * 100);
-            paidPercentage.textContent = `${pct}% Paid`;
-            progressBar.style.width = `${pct}%`;
-            if (outstanding > 0) overdueOverlay.style.display = 'block';
+            // Progress bar not really meaningful for outstanding balance
+            // Use it to show "how close to being resolved"
+            paidPercentage.textContent = daysOverdue > 0 ? `⚠ Overdue by ${daysOverdue} day(s)` : 'Due · Please pay';
+            progressBar.style.width = '0%';
+            progressBar.style.background = daysOverdue > 0 ? '#ef4444' : '#12b1a6';
+          }
+        } else if (profile) {
+          // Fallback to stored profile values
+          const outstanding = profile.outstandingAmount || 0;
+          outstandingDisplay.textContent = `₹${outstanding.toLocaleString()}`;
+          if (outstanding === 0 || profile.feeStatus === 'Paid') {
+            feeFront.style.display = 'none';
+            feeSuccess.style.display = 'flex';
           }
         }
 
-        // Action Logic
-        const payNowBtn = document.getElementById('payNowBtn');
-        const cancelPay = document.getElementById('cancelPay');
-        const qrCodeImg = document.getElementById('qrCodeImg');
-        const verifyBtn = document.getElementById('verifyBtn');
-        const utrInput = document.getElementById('utrInput');
-        const paymentError = document.getElementById('paymentError');
-        const screenshotUpload = document.getElementById('screenshotUpload');
-        const uploadLabel = document.getElementById('uploadLabel');
+        // ── Pay Now flow ──
+        const payNowBtn         = document.getElementById('payNowBtn');
+        const cancelPay         = document.getElementById('cancelPay');
+        const qrCodeImg         = document.getElementById('qrCodeImg');
+        const verifyBtn         = document.getElementById('verifyBtn');
+        const utrInput          = document.getElementById('utrInput');
+        const paymentError      = document.getElementById('paymentError');
+        const screenshotUpload  = document.getElementById('screenshotUpload');
+        const uploadLabel       = document.getElementById('uploadLabel');
         const outstandingDisplayBig = document.getElementById('outstandingDisplayBig');
 
         payNowBtn.addEventListener('click', () => {
-          const upiId = 'fxadhu-2@okaxis';
-          const amount = profile ? profile.outstandingAmount : 5600;
+          const upiId  = 'fxadhu-2@okaxis';
+          const amount = feeBreakdown ? feeBreakdown.totalDue : (profile?.outstandingAmount || 5600);
           const upiString = `upi://pay?pa=${upiId}&pn=StayCEC&am=${amount}&cu=INR`;
           qrCodeImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(upiString)}`;
-          if(outstandingDisplayBig) outstandingDisplayBig.textContent = `₹${amount.toLocaleString()}`;
+          if (outstandingDisplayBig) outstandingDisplayBig.textContent = `₹${amount.toLocaleString()}`;
           feeFront.style.display = 'none';
-          feeBack.style.display = 'flex';
+          feeBack.style.display  = 'flex';
         });
 
         if (screenshotUpload) {
@@ -413,7 +450,7 @@
         }
 
         cancelPay.addEventListener('click', () => {
-          feeBack.style.display = 'none';
+          feeBack.style.display  = 'none';
           feeFront.style.display = 'flex';
         });
 
@@ -424,14 +461,13 @@
             paymentError.style.display = 'block';
             return;
           }
-
           paymentError.style.display = 'none';
           verifyBtn.disabled = true;
           verifyBtn.style.opacity = '0.7';
-
           try {
-            await verifyPayment(user.uid, utr, profile ? profile.outstandingAmount : 5600);
-            feeBack.style.display = 'none';
+            const amount = feeBreakdown ? feeBreakdown.totalDue : (profile?.outstandingAmount || 5600);
+            await verifyPayment(user.uid, utr, amount);
+            feeBack.style.display    = 'none';
             feeSuccess.style.display = 'flex';
           } catch (err) {
             console.error(err);

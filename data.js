@@ -173,6 +173,189 @@ export async function getResidentStats() {
 }
 
 // ─────────────────────────────────────────────────────────────
+// FEE CALCULATION ENGINE
+// ─────────────────────────────────────────────────────────────
+
+/**
+ * CONSTANTS
+ */
+const HOSTEL_FEE = 2300;
+const MESS_RATE_PER_DAY = 110;
+const PAYMENT_GRACE_DAYS = 10; // days after month end to pay without late fee
+const LATE_FEE_PER_DAY = 10;
+
+/**
+ * Returns fee billing info for the given date:
+ *  - billingMonth: the month being billed (previous calendar month)
+ *  - daysInBillingMonth: number of days in that month
+ *  - dueDate: Date object for the due date (10th of current month)
+ *  - today: Date object for today
+ *  - daysOverdue: how many days past the due date (0 if not overdue)
+ */
+function getBillingInfo(now = new Date()) {
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()); // midnight local
+  // Billing month = previous calendar month
+  const billYear  = today.getMonth() === 0 ? today.getFullYear() - 1 : today.getFullYear();
+  const billMonth = today.getMonth() === 0 ? 11 : today.getMonth() - 1;
+  const daysInBillingMonth = new Date(billYear, billMonth + 1, 0).getDate();
+
+  // Due date = 10th of current month
+  const dueDate = new Date(today.getFullYear(), today.getMonth(), PAYMENT_GRACE_DAYS);
+  const daysOverdue = today > dueDate ? Math.floor((today - dueDate) / (1000 * 60 * 60 * 24)) : 0;
+
+  const monthNames = ['January','February','March','April','May','June',
+                      'July','August','September','October','November','December'];
+
+  return {
+    billYear,
+    billMonth,
+    billingMonthName: monthNames[billMonth],
+    billingYearStr: `${monthNames[billMonth]} ${billYear}`,
+    daysInBillingMonth,
+    dueDate,
+    dueDateStr: `${PAYMENT_GRACE_DAYS} ${monthNames[today.getMonth()]} ${today.getFullYear()}`,
+    today,
+    daysOverdue,
+  };
+}
+
+/**
+ * Calculate and persist the monthly fee for a student.
+ * - Checks for any approved mess reduction in the billing month.
+ * - Applies late fee if past the due date.
+ * - Updates the student Firestore document.
+ * @param {string} uid
+ * @returns {object} feeBreakdown
+ */
+export async function calculateAndSetMonthlyFee(uid) {
+  const info = getBillingInfo();
+
+  // Check for approved mess reduction for the billing month
+  let approvedLeaveDays = 0;
+  try {
+    const messQ = query(
+      collection(db, 'messReductions'),
+      where('uid', '==', uid),
+      where('status', '==', 'Approved')
+    );
+    const messSnap = await getDocs(messQ);
+    messSnap.forEach(d => {
+      const req = d.data();
+      // Sum leave days that fall in the billing month
+      if (Array.isArray(req.periods)) {
+        req.periods.forEach(p => {
+          if (!p.from || !p.to) return;
+          const from = new Date(p.from);
+          const to   = new Date(p.to);
+          if (from.getFullYear() === info.billYear && from.getMonth() === info.billMonth) {
+            const days = Math.round((to - from) / (1000 * 60 * 60 * 24)) + 1;
+            approvedLeaveDays += days;
+          }
+        });
+      }
+    });
+  } catch (e) { /* ignore */ }
+
+  const effectiveMessDays = Math.max(0, info.daysInBillingMonth - approvedLeaveDays);
+  const messFee  = effectiveMessDays * MESS_RATE_PER_DAY;
+  const baseFee  = HOSTEL_FEE + messFee;
+  const lateFee  = info.daysOverdue * LATE_FEE_PER_DAY;
+  const totalDue = baseFee + lateFee;
+
+  const feeBreakdown = {
+    hostelFee: HOSTEL_FEE,
+    messFee,
+    effectiveMessDays,
+    approvedLeaveDays,
+    baseFee,
+    lateFee,
+    totalDue,
+    daysOverdue: info.daysOverdue,
+    dueDateStr: info.dueDateStr,
+    billingMonthName: info.billingMonthName,
+    billingYearStr: info.billingYearStr,
+    daysInBillingMonth: info.daysInBillingMonth,
+  };
+
+  try {
+    const studentRef = doc(db, 'students', uid);
+    const studentSnap = await getDoc(studentRef);
+    if (studentSnap.exists()) {
+      const data = studentSnap.data();
+      // Only update if not already paid for this cycle
+      const alreadyPaid = data.feeStatus === 'Paid' && data.billMonthYear === info.billingYearStr;
+      if (!alreadyPaid) {
+        await updateDoc(studentRef, {
+          outstandingAmount: totalDue,
+          feeStatus: totalDue > 0 ? (info.daysOverdue > 0 ? 'Overdue' : 'Pending') : 'Paid',
+          billMonthYear: info.billingYearStr,
+          hostelFee: HOSTEL_FEE,
+          messFee,
+          lateFee,
+          approvedLeaveDays,
+          dueDateStr: info.dueDateStr,
+          feeLastUpdated: serverTimestamp(),
+        });
+      }
+    }
+  } catch (e) {
+    console.error('Error updating fee:', e);
+  }
+
+  return feeBreakdown;
+}
+
+/**
+ * Check if the student has an overdue fee and send a daily notification (at most once per day).
+ * @param {string} uid
+ * @param {object} feeBreakdown - result from calculateAndSetMonthlyFee
+ */
+export async function checkAndNotifyLateFee(uid, feeBreakdown) {
+  if (!feeBreakdown || feeBreakdown.daysOverdue <= 0 || feeBreakdown.totalDue <= 0) return;
+
+  try {
+    const todayStr = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+    // Check if we already sent an overdue notification today
+    const q = query(
+      collection(db, 'notifications'),
+      where('uid', '==', uid),
+      where('type', '==', 'fee_overdue'),
+      where('sentDate', '==', todayStr)
+    );
+    const existing = await getDocs(q);
+    if (!existing.empty) return; // already notified today
+
+    await addDoc(collection(db, 'notifications'), {
+      uid,
+      type: 'fee_overdue',
+      sentDate: todayStr,
+      title: '⚠️ Payment Overdue',
+      message: `Your ${feeBreakdown.billingMonthName} fees are overdue by ${feeBreakdown.daysOverdue} day(s). Outstanding: ₹${feeBreakdown.totalDue.toLocaleString()} (includes ₹${feeBreakdown.lateFee} late fee). Please pay immediately to avoid further charges.`,
+      read: false,
+      createdAt: serverTimestamp(),
+    });
+  } catch (e) {
+    console.error('Error sending overdue notification:', e);
+  }
+}
+
+/**
+ * Returns the estimated mess saving for a given set of absence periods.
+ * @param {Array<{from:string,to:string}>} periods
+ * @returns {number} saving in rupees
+ */
+export function calcMessSaving(periods) {
+  let totalDays = 0;
+  (periods || []).forEach(p => {
+    if (!p.from || !p.to) return;
+    const f = new Date(p.from);
+    const t = new Date(p.to);
+    if (t >= f) totalDays += Math.round((t - f) / (1000 * 60 * 60 * 24)) + 1;
+  });
+  return totalDays * MESS_RATE_PER_DAY;
+}
+
+// ─────────────────────────────────────────────────────────────
 // PAYMENT FUNCTIONS
 // ─────────────────────────────────────────────────────────────
 

@@ -157,6 +157,24 @@
             <div class="container-72"><span class="text-73" id="calcDays">0</span></div>
           </div>
 
+          <!-- Live Savings Estimate -->
+          <div id="savingsCard" style="
+            background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+            border: 1.5px solid #6ee7b7;
+            border-radius: 16px;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+          ">
+            <div style="display:flex; flex-direction:column; gap:2px;">
+              <span style="font-size:12px; font-weight:600; color:#065f46; font-family: Inter, sans-serif;">ESTIMATED MESS SAVING</span>
+              <span style="font-size:11px; color:#047857; font-family: Inter, sans-serif;" id="savingsWindowHint">Submit before the 10th to apply to last month's bill</span>
+            </div>
+            <span style="font-size:26px; font-weight:900; color:#059669; font-family: Inter, sans-serif;" id="savingsDisplay">₹0</span>
+          </div>
+
           <!-- Reason -->
           <div class="reason-section">
             <div class="label">
@@ -187,9 +205,18 @@
 
     <script type="module">
       import { requireAuth, logOut, getStudentProfile } from './auth.js';
-      import { submitMessReduction } from './data.js';
+      import { submitMessReduction, calcMessSaving } from './data.js';
 
       let currentUser = null;
+
+      // Compute submission window hint
+      const now = new Date();
+      const monthNames = ['January','February','March','April','May','June',
+                          'July','August','September','October','November','December'];
+      const currentMonthName = monthNames[now.getMonth()];
+      const billMonthName = monthNames[now.getMonth() === 0 ? 11 : now.getMonth() - 1];
+      const hintEl = document.getElementById('savingsWindowHint');
+      if (hintEl) hintEl.textContent = `Submit before 10 ${currentMonthName} to apply to ${billMonthName}'s bill`;
 
       async function init() {
         try {
@@ -206,8 +233,8 @@
             const rollEl = document.querySelector('.text-2b');
             const roomEl = document.querySelector('.text-block-a');
             if (nameEl) nameEl.textContent = profile.fullName || '—';
-            if (rollEl) rollEl.textContent = profile.registerNumber || '—';
-            if (roomEl) roomEl.textContent = profile.room || '—';
+            if (rollEl) rollEl.textContent  = profile.registerNumber || '—';
+            if (roomEl) roomEl.textContent  = profile.room || '—';
           }
         } catch (err) {
           console.error('Init failed:', err);
@@ -216,7 +243,7 @@
 
       init();
 
-      // Auto-calculate days
+      // Auto-calculate days AND savings
       window.calcRangeDays = function(fromId, toId) {
         const f = new Date(document.getElementById(fromId).value);
         const t = new Date(document.getElementById(toId).value);
@@ -226,9 +253,20 @@
         return 0;
       };
 
+      function getPeriods() {
+        return [
+          { from: document.getElementById('fromDate1').value, to: document.getElementById('toDate1').value },
+          { from: document.getElementById('fromDate2').value, to: document.getElementById('toDate2').value },
+        ];
+      }
+
       window.updateDays = function() {
         const total = calcRangeDays('fromDate1','toDate1') + calcRangeDays('fromDate2','toDate2');
         document.getElementById('calcDays').textContent = total;
+        // Live savings update
+        const saving = calcMessSaving(getPeriods());
+        const savingsEl = document.getElementById('savingsDisplay');
+        if (savingsEl) savingsEl.textContent = `₹${saving.toLocaleString()}`;
       };
 
       ['fromDate1','toDate1','fromDate2','toDate2'].forEach(id => {
@@ -236,12 +274,10 @@
       });
 
       window.submitRequest = async function() {
-        const reason   = document.getElementById('reasonText').value.trim();
+        const reason    = document.getElementById('reasonText').value.trim();
         const totalDays = parseInt(document.getElementById('calcDays').textContent, 10);
-        const periods = [
-          { from: document.getElementById('fromDate1').value, to: document.getElementById('toDate1').value },
-          { from: document.getElementById('fromDate2').value, to: document.getElementById('toDate2').value },
-        ];
+        const periods   = getPeriods();
+        const saving    = calcMessSaving(periods);
 
         const submitBtn = document.querySelector('.button-7c');
         try {
@@ -250,7 +286,7 @@
 
           await submitMessReduction(currentUser.uid, { periods, reason, totalDays });
 
-          alert(`✅ Request submitted!\n\nTotal Days: ${totalDays}\nReason: ${reason}\n\nYour mess reduction request has been submitted for approval.`);
+          alert(`✅ Request submitted!\n\nTotal Days: ${totalDays}\nEstimated Mess Saving: ₹${saving.toLocaleString()}\nReason: ${reason}\n\nYour mess reduction request is under review. The saving will be applied to your next bill once approved.`);
           window.location.href = 'mess.html';
         } catch (err) {
           alert(`❌ Error: ${err.message}`);

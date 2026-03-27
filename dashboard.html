@@ -288,7 +288,7 @@
     </div>
     <script type="module">
       import { requireAuth, getStudentProfile, logOut, updateStudentFees } from './auth.js';
-      import { getRecentComplaints } from './data.js';
+      import { getRecentComplaints, calculateAndSetMonthlyFee, checkAndNotifyLateFee } from './data.js';
 
       async function init() {
         try {
@@ -319,17 +319,43 @@
             }
           }
 
-          // 4. Fee Display Logic
-          const outstanding = (profile && profile.outstandingAmount !== undefined) ? profile.outstandingAmount : 12000;
-          const outstandingDisplay = document.getElementById('outstandingDisplay');
-          const feeFront = document.getElementById('feeFront');
-          const feeSuccess = document.getElementById('feeSuccess');
+          // 4. Fee Display via fee engine
+          let feeBreakdown = null;
+          try {
+            feeBreakdown = await calculateAndSetMonthlyFee(user.uid);
+            await checkAndNotifyLateFee(user.uid, feeBreakdown);
+          } catch (e) { console.error('Fee engine error:', e); }
 
-          if (profile && (profile.feeStatus === 'Paid' || outstanding === 0)) {
-            if (feeFront) feeFront.style.display = 'none';
-            if (feeSuccess) feeSuccess.style.display = 'flex';
+          const outstandingDisplay = document.getElementById('outstandingDisplay');
+          const dueStatusDisplay   = document.getElementById('dueStatusDisplay');
+          const feeFront           = document.getElementById('feeFront');
+          const feeSuccess         = document.getElementById('feeSuccess');
+
+          if (feeBreakdown) {
+            const { totalDue, daysOverdue, dueDateStr, billingMonthName, lateFee } = feeBreakdown;
+            if (totalDue <= 0 || profile?.feeStatus === 'Paid') {
+              if (feeFront)   feeFront.style.display   = 'none';
+              if (feeSuccess) feeSuccess.style.display = 'flex';
+            } else {
+              if (outstandingDisplay) outstandingDisplay.textContent = `₹${totalDue.toLocaleString()}`;
+              if (dueStatusDisplay) {
+                if (daysOverdue > 0) {
+                  dueStatusDisplay.textContent = `OVERDUE — ${daysOverdue} DAY(S) LATE (+₹${lateFee} FEE)`;
+                  dueStatusDisplay.style.color = '#fecaca';
+                } else {
+                  dueStatusDisplay.textContent = `${billingMonthName.toUpperCase()} FEES DUE BY ${dueDateStr.toUpperCase()}`;
+                }
+              }
+            }
           } else {
-            if (outstandingDisplay) outstandingDisplay.textContent = `₹${outstanding.toLocaleString()}`;
+            // Fallback
+            const outstanding = (profile && profile.outstandingAmount !== undefined) ? profile.outstandingAmount : 0;
+            if (profile && (profile.feeStatus === 'Paid' || outstanding === 0)) {
+              if (feeFront)   feeFront.style.display   = 'none';
+              if (feeSuccess) feeSuccess.style.display = 'flex';
+            } else {
+              if (outstandingDisplay) outstandingDisplay.textContent = `₹${outstanding.toLocaleString()}`;
+            }
           }
 
           // 5. Dynamic Complaints
@@ -371,9 +397,10 @@
           if (payNowBtn) {
             payNowBtn.addEventListener('click', () => {
               const upiId = 'fxadhu-2@okaxis';
-              const upiString = `upi://pay?pa=${upiId}&pn=StayCEC&am=${outstanding}&cu=INR`;
+              const amount = feeBreakdown ? feeBreakdown.totalDue : (profile?.outstandingAmount || 0);
+              const upiString = `upi://pay?pa=${upiId}&pn=StayCEC&am=${amount}&cu=INR`;
               if (qrCodeImg) qrCodeImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(upiString)}`;
-              if(outstandingDisplayBig) outstandingDisplayBig.textContent = `₹${outstanding.toLocaleString()}`;
+              if (outstandingDisplayBig) outstandingDisplayBig.textContent = `₹${amount.toLocaleString()}`;
               if (feeFront) feeFront.style.display = 'none';
               if (feeBack) feeBack.style.display = 'flex';
             });
