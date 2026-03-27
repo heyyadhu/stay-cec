@@ -55,7 +55,17 @@
           </div>
         </div>
       </div>
-      <div class="flex-column-be">
+      
+      <!-- Status Overlay -->
+      <div class="status-overlay-container" id="statusOverlay" style="display: none;">
+        <div class="status-card codia-style" id="statusCard">
+          <div class="status-icon" id="statusIcon"></div>
+          <h2 class="status-title" id="statusTitle">Application Pending</h2>
+          <p class="status-message" id="statusMessage">Your application is currently under review by the Head Warden. We will notify you once it is approved.</p>
+        </div>
+      </div>
+
+      <div class="flex-column-be" id="dashboardMainCol1">
         <div class="background-border-shadow">
           <div class="margin">
             <div class="container-19">
@@ -226,7 +236,7 @@
           <div class="container-53"><div class="icon-54"></div></div>
         </div>
       </div>
-      <div class="priority-mess-section">
+      <div class="priority-mess-section" id="dashboardMainCol2">
         <div class="background-border-shadow-55">
           <div class="margin-56">
             <div class="container-57">
@@ -303,8 +313,38 @@
             return;
           }
 
-          // 3. Greeting & Room Info
+          // 3. Check Registration Status & Room Info
           if (profile) {
+            const status = profile.registrationStatus || 'Approved'; // Default to Approved for older docs
+            const overlay = document.getElementById('statusOverlay');
+            const col1 = document.getElementById('dashboardMainCol1');
+            const col2 = document.getElementById('dashboardMainCol2');
+            const title = document.getElementById('statusTitle');
+            const msg = document.getElementById('statusMessage');
+            const icon = document.getElementById('statusIcon');
+            
+            if (status === 'Pending' || status === 'On Hold') {
+              if (col1) col1.style.display = 'none';
+              if (col2) col2.style.display = 'none';
+              if (overlay) overlay.style.display = 'flex';
+              if (title) title.textContent = 'Application Pending';
+              if (msg) msg.textContent = 'Your application is currently under review by the Head Warden. We will notify you once it is approved.';
+              if (icon) icon.innerHTML = '<svg viewBox="0 0 20 20" fill="#F59E0B"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg>';
+            } else if (status === 'Rejected') {
+              if (col1) col1.style.display = 'none';
+              if (col2) col2.style.display = 'none';
+              if (overlay) overlay.style.display = 'flex';
+              if (title) title.textContent = 'Registration Rejected';
+              if (msg) msg.textContent = 'We regret to inform you that your application for a hostel room has been rejected. Please contact the warden office for more details.';
+              if (icon) icon.innerHTML = '<svg viewBox="0 0 20 20" fill="#EF4444"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg>';
+            } else {
+              // Approved, show dashboard
+              if (col1) col1.style.display = 'flex';
+              if (col2) col2.style.display = 'flex';
+              if (overlay) overlay.style.display = 'none';
+            }
+
+            // Greet
             const greetEl = document.getElementById('greetingText');
             const hour = new Date().getHours();
             let greet = 'Good Evening';
@@ -313,9 +353,14 @@
             const firstName = profile.fullName ? profile.fullName.split(' ')[0] : 'Student';
             if (greetEl) greetEl.textContent = `${greet}, ${firstName}`;
 
+            // Room Info
             const roomEl = document.getElementById('roomDisplay');
-            if (roomEl && profile.block && profile.roomNumber) {
-              roomEl.textContent = `${profile.block} • ${profile.roomNumber}`;
+            if (roomEl) {
+              if (profile.hostel && profile.room) {
+                 roomEl.textContent = `${profile.hostel} • ${profile.room}`;
+              } else if (profile.block && profile.roomNumber) {
+                 roomEl.textContent = `${profile.block} • ${profile.roomNumber}`;
+              }
             }
           }
 
