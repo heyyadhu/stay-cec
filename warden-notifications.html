@@ -112,7 +112,7 @@
                   </div>
                   <div class="button-70" id="previewBtn">
                     <div class="button-shadow"></div>
-                    <span class="text-73">Generate Notification</span>
+                    <span class="text-73">✨ Generate AI Draft</span>
                   </div>
                 </div>
               </div>
@@ -242,7 +242,68 @@
       }
 
       document.getElementById('targetAudience').addEventListener('change', updateAudienceCount);
-      document.getElementById('previewBtn').addEventListener('click', updateUIPreview);
+      
+      // ── AI Generation Logic ──
+      const previewBtn = document.getElementById('previewBtn');
+      
+      const aiTemplates = [
+        { keywords: ['water', 'plumbing', 'maintenance'], template: "Dear Residents,\n\nPlease be advised that there will be a scheduled interruption in the water supply for essential maintenance. We apologize for the inconvenience and request you to store sufficient water in advance.\n\nThank you for your cooperation." },
+        { keywords: ['fee', 'dues', 'payment', 'fine', 'overdue'], template: "Dear Students,\n\nThis is a gentle reminder regarding the pending hostel and mess fees. Kindly ensure that all outstanding dues are cleared immediately to avoid late fee accumulation. Payments can be made securely via the portal.\n\nIgnore this message if already paid." },
+        { keywords: ['meeting', 'assembly', 'gather'], template: "Attention Residents,\n\nA mandatory meeting has been scheduled for all students. Please ensure your punctual attendance as important matters regarding hostel regulations and upcoming events will be discussed.\n\nAttendance is strictly required." },
+        { keywords: ['clean', 'waste', 'hygiene'], template: "Dear Residents,\n\nMaintaining hygiene within the hostel premises is everyone's responsibility. Please ensure your rooms and common areas are kept clean, and dispose of waste in the designated bins. Strict action will be taken against violations.\n\nThank you for maintaining decorum." },
+        { keywords: ['holiday', 'festival', 'vacation', 'leave'], template: "Dear Students,\n\nAs the upcoming holidays approach, we request all students planning to vacate the hostel to properly fill out the leave register. Ensure all appliances are switched off and rooms are locked securely before departure.\n\nWishing you a safe and pleasant break!" }
+      ];
+
+      function getSmartTemplate(prompt) {
+        const lowerPrompt = prompt.toLowerCase();
+        for (const t of aiTemplates) {
+          if (t.keywords.some(k => lowerPrompt.includes(k))) {
+            return t.template;
+          }
+        }
+        // Fallback generic formal enhancement
+        if (prompt.length < 5) return "Dear Residents,\n\nThis is an important update from the Warden's office. Please check the notice board for more detailed information regarding recent changes in the hostel administration.\n\nThank you.";
+        return `Dear Residents,\n\nThis is an official notice regarding the following matter:\n\n${prompt}\n\nPlease take note of this and ensure strict compliance. Reach out to the hostel office for any clarifications.\n\nThank you.`;
+      }
+
+      previewBtn.addEventListener('click', async () => {
+        const prompt = notifTitle.value + " " + broadcastMessage.value;
+        if (!prompt.trim()) {
+          alert('Please enter a topic or rough draft in the Title or Message box first!');
+          return;
+        }
+
+        const btnText = previewBtn.querySelector('.text-73');
+        btnText.textContent = 'Generating...';
+        previewBtn.style.opacity = '0.7';
+        previewBtn.style.pointerEvents = 'none';
+
+        const finalTemplate = getSmartTemplate(prompt.trim());
+        
+        // Simulating AI processing delay
+        await new Promise(r => setTimeout(r, 800));
+        
+        broadcastMessage.value = '';
+        updateUIPreview();
+        
+        // Typewriter effect
+        let i = 0;
+        const speed = 15; // ms per char
+        
+        function typeWriter() {
+          if (i < finalTemplate.length) {
+            broadcastMessage.value += finalTemplate.charAt(i);
+            updateUIPreview();
+            i++;
+            setTimeout(typeWriter, speed);
+          } else {
+            btnText.textContent = '✨ Generate AI Draft';
+            previewBtn.style.opacity = '1';
+            previewBtn.style.pointerEvents = 'auto';
+          }
+        }
+        typeWriter();
+      });
 
       // ── Load History ──
       async function loadHistory() {
