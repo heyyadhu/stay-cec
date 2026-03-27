@@ -1,0 +1,219 @@
+:root {
+  --default-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Ubuntu, "Helvetica Neue", Helvetica, Arial, "PingFang SC",
+    "Hiragino Sans GB", "Microsoft Yahei UI", "Microsoft Yahei",
+    "Source Han Sans CN", sans-serif;
+}
+
+.main-container {
+  overflow: hidden;
+  position: relative;
+  width: 1440px;
+  height: 1515px;
+  margin: 0 auto;
+  background: #f8fafb;
+}
+
+.main-container,
+.main-container * {
+  box-sizing: border-box;
+}
+
+input,
+select,
+textarea,
+button {
+  outline: 0;
+}
+
+.rectangle {
+  position: absolute;
+  width: 300px;
+  height: 1515px;
+  top: 0;
+  left: 0;
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+.staycecdesktop {
+  position: relative;
+  width: 235px;
+  height: 132px;
+  margin: 27px 0 0 26px;
+  background: url(https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-27/mwxwbBvKuj.png)
+    no-repeat center;
+  background-size: cover;
+  z-index: 12;
+}
+.navigation-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 24px;
+  margin: 8px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #64748b;
+  text-decoration: none;
+}
+.navigation-item.active {
+  background: #f1f5f9;
+  color: #1e293b;
+  font-weight: 600;
+}
+.navigation-item:hover:not(.active) {
+  background: #f8fafc;
+  color: #334155;
+}
+
+.dashboard-header {
+  margin: 40px 0 30px 340px;
+}
+.dashboard-title {
+  font-family: Inter, var(--default-font-family);
+  font-size: 32px;
+  font-weight: 700;
+  color: #1e293b;
+}
+.dashboard-subtitle {
+  font-family: Inter, var(--default-font-family);
+  font-size: 16px;
+  color: #64748b;
+  margin-top: 8px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin: 0 40px 40px 340px;
+}
+.stat-card {
+  background: #ffffff;
+  padding: 24px;
+  border-radius: 20px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+.stat-label {
+  font-size: 14px;
+  color: #64748b;
+  font-weight: 500;
+}
+.stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-top: 8px;
+}
+
+.main-content-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+  margin: 0 40px 40px 340px;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+.card-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 20px;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+th {
+  text-align: left;
+  padding: 12px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 600;
+}
+td {
+  padding: 16px 12px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #334155;
+  font-size: 14px;
+}
+
+.status-badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.status-pending { background: #fef3c7; color: #92400e; }
+.status-approved { background: #dcfce7; color: #166534; }
+.status-rejected { background: #fee2e2; color: #991b1b; }
+
+.action-btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  transition: all 0.2s;
+}
+.btn-approve {
+  background: #10b981;
+  color: white;
+}
+.btn-reject {
+  background: #f1f5f9;
+  color: #64748b;
+}
+.btn-approve:hover { background: #059669; }
+.btn-reject:hover { background: #e2e8f0; }
+
+.meal-status-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border-radius: 12px;
+  background: #f8fafc;
+  margin-bottom: 12px;
+}
+.meal-info h4 {
+  margin: 0;
+  font-size: 16px;
+  color: #1e293b;
+}
+.meal-info p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: #64748b;
+}
+.meal-count {
+  font-weight: 700;
+  color: #2563eb;
+  font-size: 18px;
+}
+
+.search-bar {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  font-family: inherit;
+}
+
+@media (max-width: 1200px) {
+  .main-content-grid {
+    grid-template-columns: 1fr;
+  }
+}

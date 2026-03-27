@@ -75,21 +75,27 @@ export async function getWardenStats() {
     const totalStudents = studentsSnap.size;
 
     let feePendingCount = 0;
-    studentsSnap.forEach((doc) => {
-      const data = doc.data();
-      if ((data.outstandingAmount !== undefined && data.outstandingAmount > 0) || data.feeStatus === "Pending") {
+    studentsSnap.forEach((d) => {
+      const data = d.data();
+      if ((data.outstandingAmount !== undefined && data.outstandingAmount > 0) || data.feeStatus === "Pending" || data.feeStatus === "Overdue") {
         feePendingCount++;
       }
     });
 
-    const complaintsRef = collection(db, "complaints");
-    const complaintsSnap = await getDocs(query(complaintsRef, where("status", "==", "Pending")));
-    const pendingRequests = complaintsSnap.size;
+    // Count pending complaints
+    const complaintsSnap = await getDocs(query(collection(db, "complaints"), where("status", "==", "Pending")));
+    const pendingComplaints = complaintsSnap.size;
 
-    return { totalStudents, pendingRequests, feePendingCount };
+    // Count pending mess reductions
+    const messSnap = await getDocs(query(collection(db, "messReductions"), where("status", "==", "Pending")));
+    const pendingMess = messSnap.size;
+
+    const pendingRequests = pendingComplaints + pendingMess;
+
+    return { totalStudents, pendingRequests, feePendingCount, pendingComplaints, pendingMess };
   } catch (error) {
     console.error("Error fetching stats:", error);
-    return { totalStudents: 0, pendingRequests: 0, feePendingCount: 0 };
+    return { totalStudents: 0, pendingRequests: 0, feePendingCount: 0, pendingComplaints: 0, pendingMess: 0 };
   }
 }
 
@@ -448,9 +454,10 @@ export async function createComplaint(uid, data) {
     studentName: profile.fullName || 'Unknown',
     registerNumber: profile.registerNumber || '',
     room: profile.room || '',
-    title: data.title,
+    title: data.title || data.category,
     description: data.description,
     category: data.category || 'General',
+    priority: data.priority || 'Medium',
     status: 'Pending',
     createdAt: serverTimestamp(),
   });
@@ -527,21 +534,33 @@ export async function getComplaintStats() {
     const snap = await getDocs(collection(db, 'complaints'));
     let openCount = 0;
     let highPriority = 0;
+    let resolvedTimes = [];
     
     snap.docs.forEach(d => {
       const data = d.data();
       if (data.status !== 'Resolved' && data.status !== 'Rejected') openCount++;
-      if (data.category === 'Emergency' || (data.description && data.description.length > 100)) highPriority++; // Mock logic for priority if not stored
+      if (data.priority === 'high' || data.priority === 'High' || data.category === 'Emergency') highPriority++;
+
+      // Compute real avg resolution time from resolved complaints
+      if (data.status === 'Resolved' && data.createdAt && data.updatedAt) {
+        const created = data.createdAt.toMillis ? data.createdAt.toMillis() : 0;
+        const updated = data.updatedAt.toMillis ? data.updatedAt.toMillis() : 0;
+        if (created && updated) {
+          resolvedTimes.push((updated - created) / (1000 * 60 * 60)); // hours
+        }
+      }
     });
 
-    return {
-      openCount,
-      highPriority,
-      avgTime: '4.2h' // Mocked for now
-    };
+    let avgTime = '—';
+    if (resolvedTimes.length > 0) {
+      const avg = resolvedTimes.reduce((a, b) => a + b, 0) / resolvedTimes.length;
+      avgTime = avg < 1 ? `${Math.round(avg * 60)}m` : `${avg.toFixed(1)}h`;
+    }
+
+    return { openCount, highPriority, avgTime };
   } catch (error) {
     console.error('Error fetching complaint stats:', error);
-    return { openCount: 0, highPriority: 0, avgTime: '0h' };
+    return { openCount: 0, highPriority: 0, avgTime: '—' };
   }
 }
 
@@ -945,6 +964,101 @@ export async function getRecentActivity() {
     return snap.docs.map(d => ({ id: d.id, ...d.data() }));
   } catch (error) {
     console.error('Error fetching recent activity:', error);
+    return [];
+  }
+}
+/**
+ * Get stats for the Mess Manager dashboard.
+ */
+export async function getMessManagerStats() {
+  try {
+    const [reductionsSnap, studentsSnap] = await Promise.all([
+      getDocs(collection(db, 'messReductions')),
+      getDocs(query(collection(db, 'students'), where('role', '==', 'student')))
+    ]);
+
+    let pendingReductions = 0;
+    let approvedToday = 0;
+    let totalResidents = studentsSnap.size;
+    
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+
+    reductionsSnap.forEach(d => {
+      const data = d.data();
+      if (data.status === 'Pending') pendingReductions++;
+      if (data.status === 'Approved' && data.updatedAt) {
+        const updatedDate = data.updatedAt.toDate ? data.updatedAt.toDate() : new Date(data.updatedAt);
+        if (updatedDate >= todayStart) approvedToday++;
+      }
+    });
+
+    // Mocking meal status for dashboard
+    const meals = {
+      breakfast: { served: 145, total: totalResidents },
+      lunch: { served: 132, total: totalResidents },
+      dinner: { served: 0, total: totalResidents }
+    };
+
+    return { pendingReductions, approvedToday, totalResidents, meals };
+  } catch (error) {
+    console.error('Error fetching mess manager stats:', error);
+    return { pendingReductions: 0, approvedToday: 0, totalResidents: 0, meals: {} };
+  }
+}
+
+/**
+ * Update the status of a mess reduction request.
+ */
+export async function updateMessReductionStatus(reductionId, status, processedBy = 'System') {
+  try {
+    const ref = doc(db, 'messReductions', reductionId);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) throw new Error('Reduction request not found.');
+    
+    const data = snap.data();
+    await updateDoc(ref, {
+      status,
+      processedBy,
+      updatedAt: serverTimestamp()
+    });
+
+    // Notify the student
+    const message = status === 'Approved' 
+      ? `Your mess reduction for ${data.totalDays} days has been approved.`
+      : `Your mess reduction request was rejected.`;
+
+    await addDoc(collection(db, 'notifications'), {
+      uid: data.uid,
+      type: 'mess',
+      title: `Mess Reduction ${status}`,
+      message,
+      read: false,
+      createdAt: serverTimestamp()
+    });
+
+    // If approved, we would typically recalculate fees, 
+    // but the calculateAndSetMonthlyFee function already checks 'Approved' status.
+  } catch (error) {
+    console.error('Error updating mess reduction status:', error);
+    throw error;
+  }
+}
+
+/**
+ * Fetch all students with their room and fee status for the directory.
+ */
+export async function getStudentDirectory() {
+  try {
+    const q = query(
+      collection(db, 'students'),
+      where('role', '==', 'student'),
+      orderBy('fullName', 'asc')
+    );
+    const snap = await getDocs(q);
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch (error) {
+    console.error('Error fetching student directory:', error);
     return [];
   }
 }

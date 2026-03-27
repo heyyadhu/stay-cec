@@ -184,15 +184,11 @@
           const dateStr = date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
           const timeStr = date.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
           
+          const rawPriority = c.priority || (c.category === 'Emergency' ? 'High' : 'Medium');
+          const priority = rawPriority.charAt(0).toUpperCase() + rawPriority.slice(1).toLowerCase();
           let priorityClass = 'chip-low';
-          let priority = 'Low';
-          if (c.category === 'Emergency' || c.description.length > 50) {
-            priority = 'High';
-            priorityClass = 'chip-high';
-          } else if (c.description.length > 20) {
-            priority = 'Medium';
-            priorityClass = 'chip-medium';
-          }
+          if (priority === 'High') priorityClass = 'chip-high';
+          else if (priority === 'Medium') priorityClass = 'chip-medium';
 
           let dotClass = 'dot-pending';
           if (c.status === 'In Progress') dotClass = 'dot-progress';

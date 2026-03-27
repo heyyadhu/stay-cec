@@ -73,9 +73,8 @@
               <div class="container-2d"><span class="pending-requests-2e">Pending Requests</span></div>
               <div class="heading-2f"><span class="text-v" id="wsPendingRequests">...</span></div>
               <div class="container-30">
-                <div class="background-31"><span class="text-f">12 Mess</span></div>
-                <div class="background-32"><span class="text-10">8 Leave</span></div>
-                <div class="background-33"><span class="text-11">4 Comp</span></div>
+                <div class="background-31"><span class="text-f" id="wsPendingMess">0 Mess</span></div>
+                <div class="background-33"><span class="text-11" id="wsPendingComp">0 Comp</span></div>
               </div>
             </div>
             <div class="background-34"><div class="icon-35"></div></div>
@@ -175,6 +174,8 @@
           document.getElementById('wsTotalStudents').textContent = stats.totalStudents;
           document.getElementById('wsPendingRequests').textContent = stats.pendingRequests;
           document.getElementById('wsFeePending').textContent = stats.feePendingCount;
+          document.getElementById('wsPendingMess').textContent = `${stats.pendingMess} Mess`;
+          document.getElementById('wsPendingComp').textContent = `${stats.pendingComplaints} Comp`;
 
           // Load activity feed (complaints)
           const complaints = await getAllComplaints();

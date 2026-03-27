@@ -13,9 +13,14 @@ service cloud.firestore {
         get(/databases/$(database)/documents/students/$(request.auth.uid)).data.role == 'head-warden';
     }
 
+    function isMessManager() {
+      return request.auth != null &&
+        get(/databases/$(database)/documents/students/$(request.auth.uid)).data.role == 'mess-manager';
+    }
+
     // ── Students ─────────────────────────────────────────────
     match /students/{uid} {
-      allow read:  if request.auth != null && (request.auth.uid == uid || isWarden() || isHeadWarden());
+      allow read:  if request.auth != null && (request.auth.uid == uid || isWarden() || isHeadWarden() || isMessManager());
       allow write: if request.auth != null && (request.auth.uid == uid || isHeadWarden());
     }
 
@@ -52,9 +57,9 @@ service cloud.firestore {
     // ── Mess Reductions ───────────────────────────────────────
     match /messReductions/{reqId} {
       allow read:   if request.auth != null &&
-                       (resource.data.uid == request.auth.uid || isWarden());
+                       (resource.data.uid == request.auth.uid || isWarden() || isMessManager());
       allow create: if request.auth != null;
-      allow update: if request.auth != null && isWarden();
+      allow update: if request.auth != null && (isWarden() || isMessManager());
     }
 
     // ── Broadcasts ────────────────────────────────────────────

@@ -172,8 +172,8 @@
             <div class="container-33">
               <div class="container-34">
                 <div class="container-35"><span class="text-last-payment">Last Payment</span></div>
-                <div class="heading-36"><span class="text-8200">&#8377;8,200</span></div>
-                <div class="container-37"><span class="text-verified-on-12-sep">Verified on 10 Feb 2026</span></div>
+                <div class="heading-36"><span class="text-8200" id="lastPaymentAmount">&#8377;0</span></div>
+                <div class="container-37"><span class="text-verified-on-12-sep" id="lastPaymentDate">No recent payments</span></div>
               </div>
               <div class="overlay-38"><div class="icon-39"></div></div>
             </div>
@@ -357,6 +357,12 @@
             if (txs.length === 0) {
               txHistoryContainer.innerHTML = '<div style="padding: 40px; text-align: center; color: #64748b; font-weight: 500;">No recent transactions.</div>';
             } else {
+              // Update "Last Payment" card
+              const lastTx = txs[0];
+              const lastPxDate = lastTx.createdAt?.toDate ? lastTx.createdAt.toDate().toLocaleDateString('en-GB', {day:'numeric', month:'short', year:'numeric'}) : 'Recently';
+              document.getElementById('lastPaymentAmount').textContent = `₹${(lastTx.amount || 0).toLocaleString()}`;
+              document.getElementById('lastPaymentDate').textContent = `Verified on ${lastPxDate}`;
+
               txHistoryContainer.innerHTML = txs.map(tx => {
                 const date = tx.createdAt?.toDate ? tx.createdAt.toDate().toLocaleDateString('en-GB', {day:'numeric', month:'short', year:'numeric'}) : 'Just now';
                 return `

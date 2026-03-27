@@ -90,7 +90,7 @@
               <div class="container-2b">
                 <div class="input">
                   <div class="container-2c">
-                    <span class="text-9876543210" id="profilePhone">—</span>
+                    <span class="text-9876543210" id="profilePhone" contenteditable="true" style="outline:none; width:100%; display:inline-block;">—</span>
                   </div>
                 </div>
                 <div class="container-2d">
@@ -103,7 +103,7 @@
                 <span class="label-full-name">Full Name</span>
                 <div class="input-2f">
                   <div class="container-30">
-                    <span class="text-adhu-s-nair" id="profileFullName">—</span>
+                    <span class="text-adhu-s-nair" id="profileFullName" contenteditable="true" style="outline:none; width:100%; display:inline-block;">—</span>
                   </div>
                 </div>
               </div>
@@ -111,7 +111,7 @@
                 <span class="label-register-number">Register Number</span>
                 <div class="input-32">
                   <div class="container-33">
-                    <span class="xxx" id="profileRegNumber">—</span>
+                    <span class="xxx" id="profileRegNumber" contenteditable="true" style="outline:none; width:100%; display:inline-block;">—</span>
                   </div>
                 </div>
               </div>
@@ -121,7 +121,7 @@
                 <span class="label-department">Department</span>
                 <div class="input-35">
                   <div class="container-36">
-                    <span class="computer-science" id="profileDepartment">—</span>
+                    <span class="computer-science" id="profileDepartment" contenteditable="true" style="outline:none; width:100%; display:inline-block;">—</span>
                   </div>
                 </div>
               </div>
@@ -129,7 +129,7 @@
                 <span class="label-year">Year</span>
                 <div class="options" style="cursor: pointer;">
                   <div class="container-38">
-                    <span class="text-39" id="profileYear">—</span>
+                    <span class="text-39" id="profileYear" contenteditable="true" style="outline:none; width:100%; display:inline-block;">—</span>
                   </div>
                   <div class="image-fill"><div class="svg"></div></div>
                 </div>
@@ -230,11 +230,30 @@
 
       // Save changes
       document.getElementById('saveBtn').addEventListener('click', async () => {
+        const saveBtn = document.getElementById('saveBtn');
+        const originalText = saveBtn.querySelector('span').textContent;
+        saveBtn.querySelector('span').textContent = 'Saving...';
+        saveBtn.style.pointerEvents = 'none';
+        saveBtn.style.opacity = '0.7';
+
         try {
-          // For now we just confirm since fields are display-only
-          alert('Profile saved successfully!');
+          const updatedData = {
+            fullName: document.getElementById('profileFullName').textContent.trim(),
+            phone: document.getElementById('profilePhone').textContent.trim(),
+            registerNumber: document.getElementById('profileRegNumber').textContent.trim(),
+            department: document.getElementById('profileDepartment').textContent.trim(),
+            year: document.getElementById('profileYear').textContent.trim().replace(' Year', '')
+          };
+          
+          await updateStudentProfile(updatedData);
+          document.getElementById('profileName').textContent = updatedData.fullName;
+          alert('Profile updated successfully!');
         } catch (err) {
           alert('Failed to save profile: ' + err.message);
+        } finally {
+          saveBtn.querySelector('span').textContent = originalText;
+          saveBtn.style.pointerEvents = 'auto';
+          saveBtn.style.opacity = '1';
         }
       });
 

@@ -21,7 +21,8 @@
   },
   "homepage": "https://github.com/heyyadhu/stay-cec#readme",
   "dependencies": {
-    "firebase": "^12.11.0"
+    "firebase": "^12.11.0",
+    "firebase-admin": "^13.7.0"
   },
   "devDependencies": {
     "vite": "^8.0.2"

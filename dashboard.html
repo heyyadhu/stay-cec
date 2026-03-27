@@ -297,8 +297,8 @@
       </div>
     </div>
     <script type="module">
-      import { requireAuth, getStudentProfile, logOut, updateStudentFees } from './auth.js';
-      import { getRecentComplaints, calculateAndSetMonthlyFee, checkAndNotifyLateFee } from './data.js';
+      import { requireAuth, getStudentProfile, logOut } from './auth.js';
+      import { getRecentComplaints, calculateAndSetMonthlyFee, checkAndNotifyLateFee, verifyPayment } from './data.js';
 
       async function init() {
         try {
@@ -485,7 +485,8 @@
               verifyBtn.style.pointerEvents = 'none';
 
               try {
-                await updateStudentFees(user.uid);
+                const amount = feeBreakdown ? feeBreakdown.totalDue : (profile?.outstandingAmount || 0);
+                await verifyPayment(user.uid, utr, amount);
                 if (feeBack) feeBack.style.display = 'none';
                 if (feeSuccess) feeSuccess.style.display = 'flex';
               } catch (err) {

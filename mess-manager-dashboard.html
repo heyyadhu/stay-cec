@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StayCEC - Mess Manager Dashboard</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="mess-manager-dashboard.css">
+</head>
+<body>
+    <div class="main-container">
+        <!-- Sidebar Navigation -->
+        <div class="rectangle">
+            <div class="staycecdesktop"></div>
+            <div style="margin-top: 40px;">
+                <a href="#" class="navigation-item active" id="navDash">Dashboard</a>
+                <a href="#" class="navigation-item" id="navReductions">Reduction Requests</a>
+                <a href="#" class="navigation-item" id="navDirectory">Student Directory</a>
+                <a href="#" class="navigation-item" id="navReports">Reports</a>
+                <div style="margin-top: auto; padding-top: 300px;">
+                    <button class="navigation-item" id="logoutBtn" style="border:none; background:none; width:100%; text-align:left;">Logout</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Header -->
+        <header class="dashboard-header">
+            <h1 class="dashboard-title">Mess Manager Dashboard</h1>
+            <p class="dashboard-subtitle">Manage mess reductions and daily meal planning for all residents.</p>
+        </header>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Pending Reductions</div>
+                <div class="stat-value" id="statPending">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Processed Today</div>
+                <div class="stat-value" id="statProcessed">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total Residents</div>
+                <div class="stat-value" id="statTotal">0</div>
+            </div>
+        </div>
+
+        <div class="main-content-grid">
+            <!-- Left: Table -->
+            <div class="card">
+                <div class="card-title">Recent Reduction Requests</div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Student</th>
+                                <th>Room</th>
+                                <th>Period</th>
+                                <th>Days</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reductionsTableBody">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Right: Meal Planning & Status -->
+            <div class="card">
+                <div class="card-title">Daily Meal Status</div>
+                <div id="mealStatusList">
+                    <div class="meal-status-item">
+                        <div class="meal-info">
+                            <h4>Breakfast</h4>
+                            <p>7:30 AM - 9:00 AM</p>
+                        </div>
+                        <div class="meal-count" id="breakfastCount">--</div>
+                    </div>
+                    <div class="meal-status-item">
+                        <div class="meal-info">
+                            <h4>Lunch</h4>
+                            <p>12:30 PM - 2:00 PM</p>
+                        </div>
+                        <div class="meal-count" id="lunchCount">--</div>
+                    </div>
+                    <div class="meal-status-item">
+                        <div class="meal-info">
+                            <h4>Dinner</h4>
+                            <p>7:30 PM - 9:00 PM</p>
+                        </div>
+                        <div class="meal-count" id="dinnerCount">--</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Student Directory Section (Hidden by default) -->
+        <div id="directorySection" style="display: none; margin: 0 40px 40px 340px;" class="card">
+             <div class="card-title">Resident Directory</div>
+             <input type="text" class="search-bar" id="studentSearch" placeholder="Search by name, room, or register number...">
+             <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Reg Number</th>
+                            <th>Room</th>
+                            <th>Hostel</th>
+                            <th>Fee Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="directoryTableBody">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+             </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module">
+        import { requireAuth, logOut } from './auth.js';
+        import { 
+            getMessManagerStats, 
+            getMessReductions, 
+            updateMessReductionStatus,
+            getStudentDirectory 
+        } from './data.js';
+
+        let currentSection = 'dashboard';
+
+        // Auth Protection
+        const user = await requireAuth();
+
+        async function initDashboard() {
+            try {
+                const stats = await getMessManagerStats();
+                document.getElementById('statPending').textContent = stats.pendingReductions;
+                document.getElementById('statProcessed').textContent = stats.approvedToday;
+                document.getElementById('statTotal').textContent = stats.totalResidents;
+
+                if (stats.meals) {
+                    document.getElementById('breakfastCount').textContent = `${stats.meals.breakfast.served}/${stats.meals.breakfast.total}`;
+                    document.getElementById('lunchCount').textContent = `${stats.meals.lunch.served}/${stats.meals.lunch.total}`;
+                    document.getElementById('dinnerCount').textContent = `${stats.meals.dinner.served}/${stats.meals.dinner.total}`;
+                }
+
+                const reductions = await getMessReductions();
+                renderReductions(reductions);
+            } catch (err) {
+                console.error('Error initializing dashboard:', err);
+            }
+        }
+
+        function renderReductions(reductions) {
+            const tbody = document.getElementById('reductionsTableBody');
+            tbody.innerHTML = reductions.map(r => {
+                const period = r.periods && r.periods.length > 0 
+                  ? `${r.periods[0].from} to ${r.periods[0].to}` 
+                  : 'N/A';
+                
+                const statusClass = `status-${r.status.toLowerCase()}`;
+                const isPending = r.status === 'Pending';
+
+                return `
+                    <tr>
+                        <td><strong>${r.studentName || 'Student'}</strong></td>
+                        <td>${r.room || 'TBD'}</td>
+                        <td>${period}</td>
+                        <td>${r.totalDays || 0}</td>
+                        <td><span class="status-badge ${statusClass}">${r.status}</span></td>
+                        <td>
+                            ${isPending ? `
+                                <button class="action-btn btn-approve" data-id="${r.id}">Approve</button>
+                                <button class="action-btn btn-reject" data-id="${r.id}" style="margin-left: 8px;">Reject</button>
+                            ` : '<span style="color: #94a3b8; font-size: 12px;">Processed</span>'}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            // Add Event Listeners
+            tbody.querySelectorAll('.btn-approve').forEach(btn => {
+                btn.onclick = async () => handleAction(btn.dataset.id, 'Approved');
+            });
+            tbody.querySelectorAll('.btn-reject').forEach(btn => {
+                btn.onclick = async () => handleAction(btn.dataset.id, 'Rejected');
+            });
+        }
+
+        async function handleAction(id, status) {
+            try {
+                await updateMessReductionStatus(id, status, 'Mess Manager');
+                initDashboard(); // Refresh
+            } catch (err) {
+                alert('Action failed: ' + err.message);
+            }
+        }
+
+        async function initDirectory() {
+            const students = await getStudentDirectory();
+            renderDirectory(students);
+        }
+
+        function renderDirectory(students) {
+            const tbody = document.getElementById('directoryTableBody');
+            tbody.innerHTML = students.map(s => `
+                <tr>
+                    <td><strong>${s.fullName}</strong></td>
+                    <td>${s.registerNumber || '--'}</td>
+                    <td>${s.room || '--'}</td>
+                    <td>${s.hostel || '--'}</td>
+                    <td><span class="status-badge ${s.feeStatus === 'Paid' ? 'status-approved' : 'status-pending'}">${s.feeStatus || 'Pending'}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        // Navigation Logic
+        const navItems = {
+            navDash: { show: ['.main-content-grid', '.stats-grid'], hide: ['#directorySection'] },
+            navReductions: { show: ['.main-content-grid'], hide: ['.stats-grid', '#directorySection'] },
+            navDirectory: { show: ['#directorySection'], hide: ['.main-content-grid', '.stats-grid'] }
+        };
+
+        Object.keys(navItems).forEach(id => {
+            document.getElementById(id).onclick = (e) => {
+                e.preventDefault();
+                // Toggle classes
+                document.querySelectorAll('.navigation-item').forEach(el => el.classList.remove('active'));
+                document.getElementById(id).classList.add('active');
+
+                // Toggle visibility
+                navItems[id].show.forEach(sel => {
+                    const el = document.querySelector(sel) || document.getElementById(sel.replace('#',''));
+                    if (el) el.style.display = sel.startsWith('.') ? 'grid' : 'block';
+                });
+                navItems[id].hide.forEach(sel => {
+                    const el = document.querySelector(sel) || document.getElementById(sel.replace('#',''));
+                    if (el) el.style.display = 'none';
+                });
+
+                if (id === 'navDirectory') initDirectory();
+                if (id === 'navDash' || id === 'navReductions') initDashboard();
+            };
+        });
+
+        // Search Logic
+        document.getElementById('studentSearch').oninput = (e) => {
+            const term = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('#directoryTableBody tr');
+            rows.forEach(row => {
+                row.style.display = row.textContent.toLowerCase().includes(term) ? '' : 'none';
+            });
+        };
+
+        // Logout
+        document.getElementById('logoutBtn').onclick = logOut;
+
+        // Initial Load
+        initDashboard();
+    </script>
+</body>
+</html>
