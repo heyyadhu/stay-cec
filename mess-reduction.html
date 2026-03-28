@@ -41,7 +41,7 @@
             <div class="container-13"><div class="icon-14"></div></div>
             <div class="container-15"><span class="text-16">Settings</span></div>
           </div>
-          <div class="link-17" onclick="navigateTo('index.html')" style="cursor:pointer;">
+          <div class="link-17" id="logoutBtn" style="cursor:pointer;">
             <div class="container-18"><div class="icon-19"></div></div>
             <div class="container-1a"><span class="text-1b">Logout</span></div>
           </div>
@@ -223,8 +223,15 @@
           currentUser = await requireAuth();
           const profile = await getStudentProfile(currentUser.uid);
 
-          if (profile && profile.role === 'warden') {
+          // Role-based redirect
+          if (profile && profile.role === 'head-warden') {
+            window.location.href = 'head-warden-dashboard.html';
+            return;
+          } else if (profile && profile.role === 'warden') {
             window.location.href = 'warden-dashboard.html';
+            return;
+          } else if (profile && profile.role === 'mess-manager') {
+            window.location.href = 'mess-manager-dashboard.html';
             return;
           }
 
@@ -242,6 +249,10 @@
       }
 
       init();
+
+      // Add logout listener
+      const logoutBtn = document.getElementById('logoutBtn');
+      if (logoutBtn) logoutBtn.addEventListener('click', () => logOut());
 
       // Auto-calculate days AND savings
       window.calcRangeDays = function(fromId, toId) {
@@ -294,9 +305,6 @@
           submitBtn.style.pointerEvents = '';
         }
       };
-
-      const logoutBtn = document.querySelector('.link-17');
-      if (logoutBtn) logoutBtn.addEventListener('click', (e) => { e.preventDefault(); logOut(); });
     </script>
   </body>
 </html>

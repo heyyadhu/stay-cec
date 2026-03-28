@@ -254,8 +254,15 @@
         const user    = await requireAuth();
         const profile = await getStudentProfile(user.uid);
 
-        if (profile && profile.role === 'warden') {
+        // Role-based redirect - only students should access this page
+        if (profile && profile.role === 'head-warden') {
+          window.location.href = 'head-warden-dashboard.html';
+          return;
+        } else if (profile && profile.role === 'warden') {
           window.location.href = 'warden-dashboard.html';
+          return;
+        } else if (profile && profile.role === 'mess-manager') {
+          window.location.href = 'mess-manager-dashboard.html';
           return;
         }
 

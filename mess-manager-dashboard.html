@@ -122,7 +122,7 @@
 
     <!-- Scripts -->
     <script type="module">
-        import { requireAuth, logOut } from './auth.js';
+        import { requireAuth, logOut, getStudentProfile } from './auth.js';
         import { 
             getMessManagerStats, 
             getMessReductions, 
@@ -132,8 +132,15 @@
 
         let currentSection = 'dashboard';
 
-        // Auth Protection
+        // Auth Protection + Role Check
         const user = await requireAuth();
+        const profile = await getStudentProfile(user.uid);
+        
+        // Only mess-managers allowed
+        if (!profile || profile.role !== 'mess-manager') {
+            window.location.href = 'index.html';
+            return;
+        }
 
         async function initDashboard() {
             try {

@@ -308,10 +308,18 @@
           // 2. Fetch the Firestore profile
           const profile = await getStudentProfile(user.uid);
           
-          if (profile && profile.role === 'warden') {
+          // Role-based redirect - only students should access this dashboard
+          if (profile && profile.role === 'head-warden') {
+            window.location.href = 'head-warden-dashboard.html';
+            return;
+          } else if (profile && profile.role === 'warden') {
             window.location.href = 'warden-dashboard.html';
             return;
+          } else if (profile && profile.role === 'mess-manager') {
+            window.location.href = 'mess-manager-dashboard.html';
+            return;
           }
+          // Students and users without a role stay on this dashboard
 
           // 3. Check Registration Status & Room Info
           if (profile) {

@@ -91,6 +91,21 @@
                 <select id="regRole" style="width:100%;padding:14px 16px;border-radius:10px;border:1px solid rgba(0,0,0,0.1);background:#f8f9fa;font-family:'Inter',sans-serif;font-size:15px;color:#1a1a2e;appearance:auto;cursor:pointer;outline:none;margin-top:8px;font-weight:600;">
                   <option value="student">Student</option>
                   <option value="warden">Warden</option>
+                  <option value="head-warden">Head Warden</option>
+                  <option value="mess-manager">Mess Manager</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="gender-selection" style="margin-bottom: 24px;">
+              <div class="full-name">
+                <div class="label">
+                  <span class="full-name-13">Gender</span>
+                </div>
+                <select id="regGender" style="width:100%;padding:14px 16px;border-radius:10px;border:1px solid rgba(0,0,0,0.1);background:#f8f9fa;font-family:'Inter',sans-serif;font-size:15px;color:#1a1a2e;appearance:auto;cursor:pointer;outline:none;margin-top:8px;font-weight:600;">
+                  <option value="" disabled selected>Select Gender</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
                 </select>
               </div>
             </div>
@@ -253,10 +268,11 @@
         const password = document.getElementById('regPassword').value;
 
         const role = document.getElementById('regRole').value;
+        const gender = document.getElementById('regGender').value;
 
         // Validation
         const isStudent = role === 'student';
-        const basicFields = !fullName || !registerNumber || !department || !phone || !email || !password;
+        const basicFields = !fullName || !registerNumber || !department || !phone || !email || !password || !gender;
         const studentFields = isStudent && !year;
 
         if (basicFields || studentFields) {
@@ -289,7 +305,8 @@
             department,
             phone,
             role,
-            hostel: role === 'warden' ? 'Administration' : 'CEC Premium Men\'s Hostel',
+            gender,
+            hostel: ['warden', 'head-warden', 'mess-manager'].includes(role) ? 'Administration' : 'CEC Premium Men\'s Hostel',
           };
 
           if (role === 'student') {
@@ -336,14 +353,15 @@
       const idLabel = document.getElementById('idLabel');
 
       regRole.addEventListener('change', () => {
-        if (regRole.value === 'warden') {
-          studentFieldsRow.style.display = 'none';
-          idLabel.textContent = 'Staff ID';
-          document.getElementById('regRegNumber').placeholder = 'ST-101';
-        } else {
+        if (regRole.value === 'student') {
           studentFieldsRow.style.display = 'flex';
           idLabel.textContent = 'Register Number';
           document.getElementById('regRegNumber').placeholder = '2024CS101';
+        } else {
+          // For warden, head-warden, mess-manager - hide student fields
+          studentFieldsRow.style.display = 'none';
+          idLabel.textContent = 'Staff ID';
+          document.getElementById('regRegNumber').placeholder = 'ST-101';
         }
       });
     </script>

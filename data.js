@@ -49,13 +49,11 @@ export async function getRecentComplaints(uid) {
 export async function getUpcomingMeetings() {
   try {
     const meetingsRef = collection(db, "meetings");
-    // Only fetch meetings scheduled for today or in the future
-    const now = Timestamp.now();
+    // Fetch recent meetings ordered by creation date
     const q = query(
       meetingsRef,
-      where("date", ">=", now),
-      orderBy("date", "asc"),
-      limit(2)
+      orderBy("createdAt", "desc"),
+      limit(5)
     );
     const snap = await getDocs(q);
     return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -850,20 +848,22 @@ export async function getMessReductions(uid = null) {
 export async function getPendingRegistrations() {
   try {
     const ref = collection(db, 'students');
-    const q = query(
-      ref,
-      where('role', '==', 'student'),
-      orderBy('createdAt', 'desc'),
-      limit(50)
-    );
+    // Use simple query without composite index, filter client-side
+    const q = query(ref, where('role', '==', 'student'));
     const snap = await getDocs(q);
-    // Filter to only show Pending, On Hold, and recently Approved/Rejected
+    // Filter and sort client-side
     return snap.docs
       .map(d => ({ id: d.id, ...d.data() }))
       .filter(s => {
         const status = s.registrationStatus || 'Pending';
         return ['Pending', 'On Hold', 'Approved', 'Rejected'].includes(status);
-      });
+      })
+      .sort((a, b) => {
+        const aTime = a.createdAt?.toMillis?.() || 0;
+        const bTime = b.createdAt?.toMillis?.() || 0;
+        return bTime - aTime; // newest first
+      })
+      .slice(0, 50);
   } catch (error) {
     console.error('Error fetching pending registrations:', error);
     return [];
@@ -925,16 +925,21 @@ export async function updateRegistrationStatus(studentId, status, extraData = {}
 export async function getHeadWardenStats() {
   try {
     const ref = collection(db, 'students');
-    const snap = await getDocs(query(ref, where('role', '==', 'student')));
+    // Use simple query without composite index
+    const snap = await getDocs(ref);
 
     let pending = 0;
     let approvedToday = 0;
-    let totalResidents = snap.size;
+    let totalResidents = 0;
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
 
     snap.forEach(d => {
       const data = d.data();
+      // Only count actual students
+      if (data.role !== 'student') return;
+      
+      totalResidents++;
       const status = data.registrationStatus || 'Pending';
       if (status === 'Pending' || status === 'On Hold') pending++;
       if (status === 'Approved' && data.registrationUpdatedAt) {

@@ -259,8 +259,9 @@
     // ── Auth guard ──
     const user = await requireAuth();
     const profile = await getStudentProfile(user.uid);
-    if (!profile || (profile.role !== 'warden' && profile.role !== 'head-warden')) {
+    if (!profile || profile.role !== 'head-warden') {
       window.location.href = 'index.html';
+      return;
     }
 
     // ── State ──

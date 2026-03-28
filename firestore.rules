@@ -71,8 +71,8 @@ service cloud.firestore {
     // ── Meetings ──────────────────────────────────────────────
     match /meetings/{meetingId} {
       allow read:   if request.auth != null;
-      allow create: if request.auth != null && isWarden();
-      allow update: if request.auth != null && isWarden();
+      allow create: if request.auth != null; // Students can request meetings
+      allow update: if request.auth != null && isWarden(); // Only wardens approve
     }
   }
 }
