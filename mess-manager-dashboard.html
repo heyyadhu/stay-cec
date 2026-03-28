@@ -290,28 +290,44 @@
         `).join('');
       }
 
-      function renderSchedule() {
+      async function renderSchedule() {
         const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
         const dates = [12, 13, 14, 15, 16, 17, 18];
         const container = document.getElementById('scheduleGrid');
-        const meals = [
-          { bf: ['Belgian Waffles', 'Fresh berries, maple syrup,...'], lun: ['Mediterranean Bowl', 'Quinoa, grilled chicken,...'], din: ['Herb Roasted Steak', '8oz Sirloin with seasona...'] },
-          { bf: ['Scrambled Eggs', 'Eggs, toast, bacon bits,...'], lun: ['Caesar Salad', 'Romaine, parmesan,...'], din: ['Grilled Salmon', 'Atlantic salmon, herbs,...'] },
-          { bf: ['Oatmeal Bowl', 'Blueberries, honey, nuts,...'], lun: ['Chicken Wrap', 'Grilled chicken, veggies,...'], din: ['Pasta Primavera', 'Penne, seasonal veggies,...'] },
-          { bf: ['Pancakes', 'Strawberries, whipped cream,...'], lun: ['Burger & Fries', 'Beef patty, cheddar,...'], din: ['Chicken Curry', 'Rice, naan, spices,...'] },
-          { bf: ['French Toast', 'Cinnamon, powdered sugar,...'], lun: ['Fish Tacos', 'Cod, cabbage slaw,...'], din: ['Beef Stir Fry', 'Rice, vegetables,...'] },
-          { bf: ['Continental', 'Pastries, fruit, coffee,...'], lun: ['Margherita Pizza', 'Mozzarella, basil,...'], din: ['Roast Chicken', 'Potatoes, gravy,...'] },
-          { bf: ['Brunch Special', 'Eggs Benedict, hash browns,...'], lun: ['Club Sandwich', 'Turkey, bacon, avocado,...'], din: ['Pasta Carbonara', 'Bacon, egg, parmesan,...'] }
-        ];
         const imgs = ['J0qSt4xdtj.png', '9e14JJiNhV.png', 'RHQM4qeFsA.png'];
         const flags = ['8i3FbhibEw.png', 'VGUtGuiP6o.png', 'UaY1agGm5Y.png'];
         const icons = ['sun', 'cloud-sun', 'moon'];
         
+        // Fetch saved meals from database
+        let weeklyData = {};
+        try {
+          weeklyData = await getWeeklyMealSchedule(formatDateKey(currentWeekStart));
+        } catch (err) {
+          console.error('Error loading schedule:', err);
+        }
+        
         container.innerHTML = days.map((day, i) => {
           const opacity = i === 0 ? 'opacity-100' : (i === 1 ? 'opacity-75' : 'opacity-40');
           const hidden = i >= 4 ? (i >= 5 ? 'hidden lg:flex' : 'hidden md:flex') : '';
-          const m = meals[i];
           const dateKey = formatDateKey(new Date(currentWeekStart.getTime() + i * 24 * 60 * 60 * 1000));
+          const dayData = weeklyData[dateKey] || {};
+          
+          // Default meal data
+          const defaultMeals = [
+            { bf: ['Belgian Waffles', 'Fresh berries, maple syrup,...'], lun: ['Mediterranean Bowl', 'Quinoa, grilled chicken,...'], din: ['Herb Roasted Steak', '8oz Sirloin with seasona...'] },
+            { bf: ['Scrambled Eggs', 'Eggs, toast, bacon bits,...'], lun: ['Caesar Salad', 'Romaine, parmesan,...'], din: ['Grilled Salmon', 'Atlantic salmon, herbs,...'] },
+            { bf: ['Oatmeal Bowl', 'Blueberries, honey, nuts,...'], lun: ['Chicken Wrap', 'Grilled chicken, veggies,...'], din: ['Pasta Primavera', 'Penne, seasonal veggies,...'] },
+            { bf: ['Pancakes', 'Strawberries, whipped cream,...'], lun: ['Burger & Fries', 'Beef patty, cheddar,...'], din: ['Chicken Curry', 'Rice, naan, spices,...'] },
+            { bf: ['French Toast', 'Cinnamon, powdered sugar,...'], lun: ['Fish Tacos', 'Cod, cabbage slaw,...'], din: ['Beef Stir Fry', 'Rice, vegetables,...'] },
+            { bf: ['Continental', 'Pastries, fruit, coffee,...'], lun: ['Margherita Pizza', 'Mozzarella, basil,...'], din: ['Roast Chicken', 'Potatoes, gravy,...'] },
+            { bf: ['Brunch Special', 'Eggs Benedict, hash browns,...'], lun: ['Club Sandwich', 'Turkey, bacon, avocado,...'], din: ['Pasta Carbonara', 'Bacon, egg, parmesan,...'] }
+          ];
+          const m = defaultMeals[i];
+          
+          // Use saved meal or default
+          const bf = dayData.breakfast || { title: m.bf[0], description: m.bf[1] };
+          const lun = dayData.lunch || { title: m.lun[0], description: m.lun[1] };
+          const din = dayData.dinner || { title: m.din[0], description: m.din[1] };
           
           if (i === 0) {
             return `
@@ -320,9 +336,9 @@
                   <span class="text-neutral-muted text-xs font-bold uppercase tracking-tight">${day}</span>
                   <span class="text-neutral-text text-lg font-black leading-7">${dates[i]}</span>
                 </div>
-                <div onclick="openEditModal('${dateKey}', 'breakfast')">${renderMealCard(imgs[0], m.bf[0], m.bf[1], icons[0], flags[0], 'Breakfast', dateKey, 'breakfast')}</div>
-                <div onclick="openEditModal('${dateKey}', 'lunch')">${renderMealCard(imgs[1], m.lun[0], m.lun[1], icons[1], flags[1], 'Lunch', dateKey, 'lunch')}</div>
-                <div onclick="openEditModal('${dateKey}', 'dinner')">${renderMealCard(imgs[2], m.din[0], m.din[1], icons[2], flags[2], 'Dinner', dateKey, 'dinner')}</div>
+                <div onclick="openEditModal('${dateKey}', 'breakfast', '${dayData.breakfast?.id || ''}')">${renderMealCard(dayData.breakfast?.imageUrl || imgs[0], bf.title, bf.description, icons[0], flags[0], 'Breakfast', dateKey, 'breakfast')}</div>
+                <div onclick="openEditModal('${dateKey}', 'lunch', '${dayData.lunch?.id || ''}')">${renderMealCard(dayData.lunch?.imageUrl || imgs[1], lun.title, lun.description, icons[1], flags[1], 'Lunch', dateKey, 'lunch')}</div>
+                <div onclick="openEditModal('${dateKey}', 'dinner', '${dayData.dinner?.id || ''}')">${renderMealCard(dayData.dinner?.imageUrl || imgs[2], din.title, din.description, icons[2], flags[2], 'Dinner', dateKey, 'dinner')}</div>
               </div>`;
           } else if (i === 1) {
             return `
