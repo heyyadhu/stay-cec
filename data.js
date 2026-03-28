@@ -1073,3 +1073,36 @@ export async function getStudentDirectory() {
     return [];
   }
 }
+
+/**
+ * Fetch pending mess reduction requests for mess manager dashboard.
+ */
+export async function getPendingMessReductions() {
+  try {
+    const q = query(
+      collection(db, 'messReductions'),
+      where('status', '==', 'Pending')
+    );
+    const snap = await getDocs(q);
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch (error) {
+    console.error('Error fetching pending mess reductions:', error);
+    return [];
+  }
+}
+
+/**
+ * Fetch students for mess manager directory with fee status.
+ */
+export async function getMessManagerStudents() {
+  try {
+    const snap = await getDocs(collection(db, 'students'));
+    return snap.docs
+      .map(d => ({ id: d.id, ...d.data() }))
+      .filter(s => s.role === 'student')
+      .slice(0, 10);
+  } catch (error) {
+    console.error('Error fetching mess manager students:', error);
+    return [];
+  }
+}

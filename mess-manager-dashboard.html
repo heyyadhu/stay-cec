@@ -3,169 +3,186 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>StayCEC – Mess Manager Dashboard</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" />
+    <title>StayCEC Hostel Management Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: { sans: ['Inter', 'sans-serif'] },
+            colors: {
+              brand: { primary: '#12B1A6', dark: '#006A63', light: '#75F7EA' },
+              neutral: { main: '#F8FAFB', sidebar: '#D9D9D9', text: '#191C1D', muted: '#3C4947', light: '#64748B', border: 'rgba(187, 201, 199, 0.2)' }
+            }
+          }
+        }
+      }
+    </script>
     <style>
-      :root { --default-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", Helvetica, Arial, sans-serif; }
-      * { box-sizing: border-box; }
-      body { margin: 0; font-family: Inter, var(--default-font-family); background: #f8fafb; }
-      .main-container { position: relative; width: 1440px; height: 1515px; margin: 0 auto; background: #f8fafb; overflow: hidden; }
-      .rectangle { position: absolute; width: 300px; height: 1515px; top: 0; left: 0; background: #d9d9d9; }
-      .staycecdesktop { position: relative; width: 235px; height: 132px; margin: 27px 0 0 26px; background: url(https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-28/DokUENoGSP.png) no-repeat center; background-size: cover; z-index: 12; }
-      .container { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; position: relative; width: 224px; margin: 1216px 0 0 33px; z-index: 1; }
-      .link { display: flex; align-items: center; gap: 12px; padding: 12px 16px; cursor: pointer; border-radius: 8px; transition: background 0.2s; }
-      .link:hover { background: rgba(255,255,255,0.5); }
-      .icon { width: 18.792px; height: 19px; background: url(https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-28/QrGFCyaRhT.png) no-repeat center; background-size: cover; }
-      .settings { color: #3c4947; font-size: 14px; font-weight: 400; }
-      .logout { color: rgba(186, 26, 26, 0.8); font-size: 14px; font-weight: 400; }
-      .nav { display: flex; flex-direction: column; gap: 6px; position: absolute; width: 216px; top: 175px; left: 45px; z-index: 19; }
-      .link-7 { display: flex; align-items: center; gap: 12px; padding: 10px 16px; background: #ffffff; border-radius: 20px; box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.05); cursor: pointer; }
-      .dashboard { color: #12b1a6; font-size: 14px; font-weight: 600; }
-      .nav-b { display: flex; flex-direction: column; gap: 8px; position: absolute; width: 224px; top: 235px; left: 45px; z-index: 25; }
-      .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; cursor: pointer; border-radius: 8px; transition: background 0.2s; }
-      .nav-item:hover { background: #e8eaea; }
-      .nav-item.active { background: #f2f4f5; }
-      .nav-item.active .nav-text { color: #006a63; font-weight: 600; }
-      .nav-text { color: #64748b; font-size: 14px; font-weight: 500; }
-      .flex-column-fce { position: absolute; top: 59px; right: 85px; left: 363px; z-index: 297; }
-      .border { position: absolute; width: 48px; height: 48px; top: 0; left: 930px; padding: 2px; border: 2px solid #75f7ea; border-radius: 9999px; }
-      .student-profile-avatar { width: 100%; height: 100%; background: url(https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-28/U7w7EpXRb4.png) no-repeat center; background-size: cover; border-radius: 9999px; }
-      .content-area { position: absolute; top: 40px; left: 0; right: 0; padding: 32px; display: flex; flex-direction: column; gap: 48px; }
-      
-      .stats-row { display: flex; gap: 24px; margin-bottom: 24px; }
-      .stat-card { background: #ffffff; padding: 24px; border-radius: 16px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); flex: 1; }
-      .stat-label { color: #64748b; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
-      .stat-value { color: #191c1d; font-size: 28px; font-weight: 800; }
-      .stat-subtext { color: #8e8e93; font-size: 12px; margin-top: 4px; }
-      
-      .mess-reduction-requests { display: flex; flex-direction: column; gap: 24px; padding: 32px; background: #f2f4f5; border-radius: 24px; }
-      .section-header { display: flex; align-items: center; justify-content: space-between; }
-      .section-title { color: #191c1d; font-size: 20px; font-weight: 700; }
-      .badge { padding: 4px 12px; background: rgba(0, 106, 99, 0.1); border-radius: 9999px; color: #006a63; font-size: 12px; font-weight: 700; }
-      .requests-list { display: flex; flex-direction: column; gap: 16px; }
-      .request-row { display: flex; align-items: center; justify-content: space-between; padding: 20px; background: #ffffff; border-radius: 24px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-      .request-info { display: flex; align-items: center; gap: 16px; }
-      .avatar { width: 48px; height: 48px; border-radius: 9999px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; background: rgba(59, 90, 175, 0.1); color: #3b5aaf; }
-      .avatar.female { background: rgba(0, 106, 99, 0.1); color: #006a63; }
-      .student-name { color: #191c1d; font-size: 16px; font-weight: 700; }
-      .request-meta { color: #3c4947; font-size: 12px; }
-      .request-actions { display: flex; gap: 8px; }
-      .btn-approve { padding: 8px 16px; border: 1px solid rgba(18, 177, 166, 0.2); border-radius: 9999px; color: #12b1a6; font-size: 12px; font-weight: 700; cursor: pointer; background: transparent; }
-      .btn-approve:hover { background: rgba(18, 177, 166, 0.1); }
-      .btn-reject { padding: 8px 16px; border-radius: 9999px; color: #bbc9c7; font-size: 12px; font-weight: 700; cursor: pointer; background: transparent; border: none; }
-      .btn-reject:hover { background: rgba(186, 26, 26, 0.1); color: #ba1a1a; }
-      
-      .section-mess-student-directory { display: flex; flex-direction: column; gap: 24px; padding: 32px; background: #f2f4f5; border-radius: 24px; }
-      .table-container { background: #ffffff; border: 1px solid rgba(187, 201, 199, 0.2); border-radius: 12px; overflow: hidden; }
-      .table-header { display: flex; background: rgba(230, 232, 233, 0.5); padding: 16px 24px; }
-      .table-header-cell { flex: 1; color: #3c4947; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
-      .table-header-cell:last-child { text-align: right; }
-      .table-row { display: flex; align-items: center; padding: 16px 24px; border-bottom: 1px solid rgba(187, 201, 199, 0.1); }
-      .table-cell { flex: 1; display: flex; align-items: center; }
-      .student-cell { display: flex; align-items: center; gap: 12px; }
-      .student-avatar { width: 32px; height: 32px; border-radius: 9999px; background: #e8eaea; }
-      .student-cell-name { color: #191c1d; font-size: 14px; font-weight: 600; }
-      .room-cell { color: #3c4947; font-size: 14px; }
-      .status-cell { justify-content: flex-end; }
-      .status-badge { display: flex; align-items: center; gap: 6px; padding: 2px 10px; border-radius: 9999px; font-size: 10px; font-weight: 700; }
-      .status-paid { background: #dcfce7; color: #15803d; }
-      .status-paid::before { content: ''; width: 6px; height: 6px; background: #22c55e; border-radius: 9999px; }
-      .status-pending { background: #ffedd5; color: #c2410c; }
-      .status-pending::before { content: ''; width: 6px; height: 6px; background: #f97316; border-radius: 9999px; }
-      
-      .footer { position: absolute; bottom: 32px; left: 363px; right: 85px; text-align: center; color: #3c4947; font-size: 12px; font-weight: 500; }
-      .loading { text-align: center; padding: 40px; color: #8e8e93; }
-      .empty-state { text-align: center; padding: 40px; color: #8e8e93; }
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
   </head>
-  <body>
-    <div class="main-container">
-      <div class="rectangle">
-        <div class="staycecdesktop"></div>
-        <div class="container">
-          <div class="link">
-            <div class="icon"></div>
-            <span class="settings">Settings</span>
-          </div>
-          <div class="link" id="logoutBtn">
-            <div class="icon" style="background:url(https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-28/x2Y1r4mNpC.png) no-repeat center; background-size:cover; width:17px; height:17px;"></div>
-            <span class="logout">Logout</span>
-          </div>
-        </div>
-        <div class="nav">
-          <div class="link-7">
-            <div style="width:16.5px; height:16.5px; background:url(https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-28/xQVyRVe4R7.png) no-repeat center; background-size:cover;"></div>
-            <span class="dashboard">Dashboard</span>
-          </div>
-        </div>
-        <div class="nav-b">
-          <div class="nav-item active">
-            <div style="width:20px; height:16.4px; background:url(https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-28/qdfvn4nwGt.png) no-repeat center; background-size:cover;"></div>
-            <span class="nav-text" style="color:#006a63; font-weight:600;">Registrations</span>
-          </div>
-          <div class="nav-item">
-            <div style="width:16px; height:20px; background:url(https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-28/wrgtLJ9iiM.png) no-repeat center; background-size:cover;"></div>
-            <span class="nav-text">Wardens</span>
-          </div>
-          <div class="nav-item">
-            <div style="width:18px; height:18px; background:url(https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-28/5HQmTZ6hAN.png) no-repeat center; background-size:cover;"></div>
-            <span class="nav-text">Reports</span>
-          </div>
-        </div>
+  <body class="bg-neutral-main text-neutral-text font-sans h-screen flex overflow-hidden selection:bg-brand-primary selection:text-white">
+    <aside class="w-64 lg:w-[300px] bg-neutral-sidebar flex-shrink-0 flex flex-col h-full transition-all duration-300 z-20 absolute lg:relative -translate-x-full lg:translate-x-0" id="sidebar">
+      <div class="px-6 pt-8 pb-10">
+        <img src="https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-28/DokUENoGSP.png" alt="StayCEC Logo" class="w-full h-auto object-contain" />
+      </div>
+      <nav class="flex-1 px-8 lg:px-11 flex flex-col gap-2">
+        <a href="#" class="flex items-center gap-3 px-4 py-2.5 bg-white shadow-[0_4px_12px_rgba(0,0,0,0.05)] rounded-2xl group transition-all">
+          <i data-lucide="layout-dashboard" class="w-4 h-4 text-brand-primary"></i>
+          <span class="text-brand-primary text-sm font-semibold tracking-tight">Dashboard</span>
+        </a>
+        <a href="#" class="flex items-center gap-3 px-4 py-3 mt-4 bg-[#F2F4F5] rounded-lg group hover:bg-white transition-all">
+          <i data-lucide="clipboard-list" class="w-4 h-4 text-brand-dark"></i>
+          <span class="text-brand-dark text-sm font-semibold tracking-tight">Registrations</span>
+        </a>
+        <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg group hover:bg-[#F2F4F5] transition-all">
+          <i data-lucide="shield-check" class="w-4 h-4 text-neutral-light group-hover:text-brand-dark"></i>
+          <span class="text-neutral-light group-hover:text-brand-dark text-sm font-medium tracking-tight transition-colors">Wardens</span>
+        </a>
+        <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg group hover:bg-[#F2F4F5] transition-all">
+          <i data-lucide="file-bar-chart" class="w-4 h-4 text-neutral-light group-hover:text-brand-dark"></i>
+          <span class="text-neutral-light group-hover:text-brand-dark text-sm font-medium tracking-tight transition-colors">Reports</span>
+        </a>
+      </nav>
+      <div class="px-8 lg:px-11 pb-12 flex flex-col gap-1">
+        <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-black/5 transition-all">
+          <i data-lucide="settings" class="w-4 h-4 text-neutral-muted"></i>
+          <span class="text-neutral-muted text-sm font-medium tracking-tight">Settings</span>
+        </a>
+        <a href="#" id="logoutBtn" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-red-50 transition-all cursor-pointer">
+          <i data-lucide="log-out" class="w-4 h-4 text-red-600/80"></i>
+          <span class="text-red-600/80 text-sm font-medium tracking-tight">Logout</span>
+        </a>
+      </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col h-full overflow-hidden relative">
+      <div class="lg:hidden flex items-center justify-between p-4 bg-white shadow-sm z-10 relative">
+        <button onclick="document.getElementById('sidebar').classList.toggle('-translate-x-full')" class="p-2 rounded-md hover:bg-gray-100">
+          <i data-lucide="menu" class="w-6 h-6"></i>
+        </button>
+        <img src="https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-28/U7w7EpXRb4.png" alt="Profile" class="w-8 h-8 rounded-full ring-2 ring-brand-light object-cover" />
       </div>
 
-      <div class="flex-column-fce">
-        <div class="border"><div class="student-profile-avatar"></div></div>
-        
-        <div class="content-area">
-          <div class="stats-row">
-            <div class="stat-card">
-              <div class="stat-label">Total Residents</div>
-              <div class="stat-value" id="totalResidents">0</div>
-              <div class="stat-subtext">Active students</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-label">Pending Reductions</div>
-              <div class="stat-value" id="pendingReductions">0</div>
-              <div class="stat-subtext">Awaiting approval</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-label">Monthly Savings</div>
-              <div class="stat-value" id="monthlySavings">₹0</div>
-              <div class="stat-subtext">From approved reductions</div>
+      <div class="flex-1 overflow-y-auto no-scrollbar">
+        <div class="max-w-[1050px] mx-auto px-6 lg:px-12 py-8 lg:py-14 flex flex-col gap-12 relative">
+          <div class="hidden lg:flex absolute top-14 right-12 items-center gap-6">
+            <button class="relative p-2 rounded-full hover:bg-black/5 transition-colors">
+              <i data-lucide="bell" class="w-5 h-5 text-neutral-muted"></i>
+              <span class="absolute top-2 right-2 w-2 h-2 bg-brand-primary rounded-full border-2 border-neutral-main" id="notifBadge"></span>
+            </button>
+            <div class="p-0.5 rounded-full border-2 border-brand-light cursor-pointer hover:shadow-lg transition-shadow">
+              <img src="https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-28/U7w7EpXRb4.png" alt="Profile" class="w-10 h-10 rounded-full object-cover" />
             </div>
           </div>
 
-          <div class="mess-reduction-requests">
-            <div class="section-header">
-              <span class="section-title">Reduction Requests</span>
-              <span class="badge" id="pendingBadge">0 Pending</span>
+          <!-- Weekly Planning -->
+          <section class="flex flex-col gap-8">
+            <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+              <div class="flex flex-col gap-1">
+                <span class="text-brand-dark text-xs font-bold uppercase tracking-[1.2px]">Weekly Planning</span>
+                <h1 class="text-neutral-text text-[30px] font-extrabold leading-tight tracking-tight">Schedule Editor</h1>
+              </div>
+              <div class="flex p-1 bg-[#F2F4F5] rounded-xl self-start sm:self-auto">
+                <button class="px-4 py-2 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.05)] rounded-lg text-brand-dark text-sm font-semibold transition-all">This Week</button>
+                <button class="px-4 py-2 rounded-lg text-neutral-muted text-sm font-semibold hover:bg-black/5 transition-all">Next Week</button>
+              </div>
             </div>
-            <div class="requests-list" id="requestsList">
-              <div class="loading">Loading requests...</div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4" id="scheduleGrid">
+              <!-- Schedule populated by JS -->
             </div>
+          </section>
+
+          <!-- Bottom Columns -->
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Reduction Requests -->
+            <section class="bg-[#F2F4F5] p-6 lg:p-8 rounded-3xl flex flex-col gap-6">
+              <div class="flex justify-between items-center">
+                <h2 class="text-neutral-text text-xl font-bold">Reduction Requests</h2>
+                <div class="px-3 py-1 bg-brand-dark/10 rounded-full">
+                  <span class="text-brand-dark text-xs font-bold" id="pendingBadge">0 Pending</span>
+                </div>
+              </div>
+              <div class="flex flex-col gap-4" id="requestsList">
+                <div class="text-center py-8 text-neutral-muted">Loading requests...</div>
+              </div>
+            </section>
+
+            <!-- Student Directory -->
+            <section class="bg-[#F2F4F5] p-6 lg:p-8 rounded-3xl flex flex-col gap-6">
+              <div class="flex justify-between items-center">
+                <h2 class="text-neutral-text text-xl font-bold">Student Directory</h2>
+                <a href="#" class="text-brand-dark text-sm font-semibold hover:underline">View All</a>
+              </div>
+              <div class="bg-white border border-neutral-border rounded-xl overflow-hidden flex flex-col shadow-sm">
+                <div class="bg-[#E6E8E9]/50 flex items-center px-4 md:px-6 py-4 text-[10px] font-bold text-neutral-muted uppercase tracking-wide">
+                  <div class="flex-1">Student Name</div>
+                  <div class="w-20 md:w-24">Room</div>
+                  <div class="w-24 md:w-28 text-right">Payment<br/>Status</div>
+                </div>
+                <div class="flex flex-col" id="studentsTable">
+                  <div class="text-center py-8 text-neutral-muted">Loading students...</div>
+                </div>
+              </div>
+            </section>
           </div>
 
-          <div class="section-mess-student-directory">
-            <div class="section-header">
-              <span class="section-title">Student Directory</span>
-              <span class="view-all" style="color:#006a63; font-size:14px; font-weight:600; cursor:pointer;">View All</span>
-            </div>
-            <div class="table-container">
-              <div class="table-header">
-                <div class="table-header-cell">Student Name</div>
-                <div class="table-header-cell">Room</div>
-                <div class="table-header-cell">Payment Status</div>
+          <footer class="pt-8 mt-4 border-t border-neutral-border/50 flex justify-center pb-8">
+            <p class="text-neutral-muted text-xs font-medium text-center">&copy; 2024 StayCEC Hostel Management • Premium Living Standards</p>
+          </footer>
+        </div>
+      </div>
+    </main>
+
+    <!-- Edit Meal Modal -->
+    <div id="editMealModal" class="hidden fixed inset-0 bg-neutral-text/40 z-50 flex items-center justify-center backdrop-blur-sm px-4 opacity-0 transition-opacity duration-300">
+      <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col transform scale-95 transition-transform duration-300" id="editMealModalContent">
+        <div class="px-6 py-4 border-b border-neutral-border flex justify-between items-center bg-neutral-main/50">
+          <h2 class="text-lg font-extrabold text-neutral-text flex items-center gap-2">
+            <i data-lucide="utensils" class="w-5 h-5 text-brand-primary"></i> Edit Meal Details
+          </h2>
+          <button onclick="closeEditModal()" class="p-1 text-neutral-muted hover:text-red-500 hover:bg-red-50 rounded-full transition-colors outline-none">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+        <div class="p-6 flex flex-col gap-5">
+          <div class="flex flex-col gap-2">
+            <label class="text-xs font-bold text-neutral-muted uppercase tracking-wide">Meal Image</label>
+            <div class="h-36 bg-neutral-main rounded-2xl border-2 border-dashed border-brand-primary/30 flex flex-col items-center justify-center cursor-pointer hover:bg-brand-primary/5 hover:border-brand-primary transition-all group relative overflow-hidden">
+              <img src="https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-28/J0qSt4xdtj.png" class="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:opacity-10 transition-opacity" alt="Current meal bg">
+              <div class="flex flex-col items-center gap-2 text-brand-primary group-hover:scale-105 transition-transform relative z-10">
+                <div class="p-3 bg-white rounded-full shadow-sm"><i data-lucide="camera" class="w-6 h-6"></i></div>
+                <span class="text-xs font-bold">Replace Image</span>
               </div>
-              <div id="studentsTable">
-                <div class="loading">Loading students...</div>
-              </div>
             </div>
+          </div>
+          <div class="flex flex-col gap-2">
+            <label class="text-xs font-bold text-neutral-muted uppercase tracking-wide">Meal Type</label>
+            <select class="w-full px-4 py-3 bg-neutral-main border border-neutral-border rounded-xl text-sm font-semibold text-neutral-text focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all appearance-none cursor-pointer">
+              <option>Breakfast</option><option>Lunch</option><option>Dinner</option><option>Snack</option>
+            </select>
+          </div>
+          <div class="flex flex-col gap-2">
+            <label class="text-xs font-bold text-neutral-muted uppercase tracking-wide">Meal Title</label>
+            <input type="text" value="Belgian Waffles" class="w-full px-4 py-3 bg-white border border-neutral-border rounded-xl text-sm font-bold text-neutral-text focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all shadow-sm" placeholder="e.g. Herb Roasted Chicken" />
+          </div>
+          <div class="flex flex-col gap-2">
+            <label class="text-xs font-bold text-neutral-muted uppercase tracking-wide">Description & Ingredients</label>
+            <textarea rows="3" class="w-full px-4 py-3 bg-white border border-neutral-border rounded-xl text-sm font-medium text-neutral-muted focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-all resize-none shadow-sm" placeholder="List ingredients or description...">Fresh berries, maple syrup, and powdered sugar.</textarea>
           </div>
         </div>
-
-        <div class="footer">
-          <span>© 2024 StayCEC Hostel Management • Premium Living Standards</span>
+        <div class="px-6 py-4 bg-neutral-main border-t border-neutral-border flex justify-end gap-3">
+          <button onclick="closeEditModal()" class="px-5 py-2.5 rounded-xl text-neutral-muted text-sm font-bold hover:bg-neutral-sidebar/50 transition-colors outline-none">Cancel</button>
+          <button onclick="saveAndCloseModal(event)" class="px-6 py-2.5 bg-brand-primary text-white rounded-xl text-sm font-bold shadow-lg shadow-brand-primary/30 hover:bg-brand-dark transition-all flex items-center gap-2 outline-none">
+            <i data-lucide="check" class="w-4 h-4"></i> Save Meal
+          </button>
         </div>
       </div>
     </div>
@@ -177,114 +194,201 @@
 
       async function init() {
         onAuthStateChanged(auth, async (user) => {
-          if (!user) {
-            window.location.href = 'index.html';
-            return;
-          }
+          if (!user) { window.location.href = 'index.html'; return; }
           const profile = await getStudentProfile(user.uid);
-          if (!profile || profile.role !== 'mess-manager') {
-            window.location.href = 'dashboard.html';
-            return;
-          }
+          if (!profile || profile.role !== 'mess-manager') { window.location.href = 'dashboard.html'; return; }
           await loadDashboard();
         });
-
         document.getElementById('logoutBtn').addEventListener('click', logOut);
+        lucide.createIcons();
       }
 
       async function loadDashboard() {
         try {
           const stats = await getMessManagerStats();
-          document.getElementById('totalResidents').textContent = stats.totalResidents || 0;
-          document.getElementById('pendingReductions').textContent = stats.pendingMess || 0;
-          document.getElementById('monthlySavings').textContent = `₹${(stats.monthlySavings || 0).toLocaleString()}`;
           document.getElementById('pendingBadge').textContent = `${stats.pendingMess || 0} Pending`;
+          document.getElementById('notifBadge').style.display = stats.pendingMess > 0 ? 'block' : 'none';
 
           const requests = await getPendingMessReductions();
           renderRequests(requests);
 
           const students = await getMessManagerStudents();
           renderStudents(students);
-        } catch (err) {
-          console.error('Dashboard load error:', err);
-        }
+
+          renderSchedule();
+        } catch (err) { console.error('Dashboard load error:', err); }
       }
 
       function renderRequests(requests) {
         const container = document.getElementById('requestsList');
         if (!requests || requests.length === 0) {
-          container.innerHTML = '<div class="empty-state">No pending reduction requests</div>';
+          container.innerHTML = '<div class="text-center py-8 text-neutral-muted">No pending reduction requests</div>';
           return;
         }
-
-        container.innerHTML = requests.map(req => `
-          <div class="request-row" data-id="${req.id}">
-            <div class="request-info">
-              <div class="avatar ${req.gender === 'female' ? 'female' : ''}">${getInitials(req.studentName)}</div>
-              <div class="request-details">
-                <span class="student-name">${req.studentName}</span>
-                <span class="request-meta">${formatDate(req.periods?.[0]?.from)} - ${formatDate(req.periods?.[0]?.to)} • ${req.reason || 'No reason'}</span>
+        container.innerHTML = requests.slice(0, 4).map((req, i) => {
+          const initials = req.studentName ? req.studentName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : '??';
+          const bgColors = ['bg-[#3B5AAF]/10 text-[#3B5AAF]', 'bg-brand-dark/10 text-brand-dark', 'bg-[#91A2A1]/10 text-[#91A2A1]'];
+          const bgClass = bgColors[i % 3];
+          const from = req.periods?.[0]?.from ? new Date(req.periods[0].from).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'N/A';
+          const to = req.periods?.[0]?.to ? new Date(req.periods[0].to).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : 'N/A';
+          return `
+            <div class="bg-white p-5 rounded-3xl shadow-[0_1px_2px_rgba(0,0,0,0.05)] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 hover:shadow-md transition-shadow">
+              <div class="flex items-center gap-4">
+                <div class="w-10 h-12 ${bgClass} rounded-full flex items-center justify-center text-base font-bold shrink-0">${initials}</div>
+                <div class="flex flex-col">
+                  <span class="text-neutral-text text-base font-bold">${req.studentName || 'Unknown'}</span>
+                  <span class="text-neutral-muted text-xs leading-tight mt-0.5">${from} - ${to} &bull;<br/>${req.reason || 'No reason'}</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 self-end sm:self-auto w-full sm:w-auto">
+                <button onclick="window.handleApprove('${req.id}', '${req.studentId}')" class="flex-1 sm:flex-none px-4 py-2 rounded-full border border-brand-primary/20 text-brand-primary text-xs font-bold hover:bg-brand-primary hover:text-white transition-colors">Approve</button>
+                <button onclick="window.handleReject('${req.id}', '${req.studentId}')" class="flex-1 sm:flex-none px-4 py-2 rounded-full text-[#BBC9C7] text-xs font-bold hover:bg-red-50 hover:text-red-500 transition-colors">Reject</button>
               </div>
             </div>
-            <div class="request-actions">
-              <button class="btn-approve" onclick="handleApprove('${req.id}', '${req.studentId}')">Approve</button>
-              <button class="btn-reject" onclick="handleReject('${req.id}', '${req.studentId}')">Reject</button>
-            </div>
-          </div>
-        `).join('');
+          `;
+        }).join('');
+        lucide.createIcons();
       }
 
       function renderStudents(students) {
         const container = document.getElementById('studentsTable');
         if (!students || students.length === 0) {
-          container.innerHTML = '<div class="empty-state">No students found</div>';
+          container.innerHTML = '<div class="text-center py-8 text-neutral-muted">No students found</div>';
           return;
         }
-
-        container.innerHTML = students.map(student => `
-          <div class="table-row">
-            <div class="table-cell student-cell">
-              <div class="student-avatar" style="background:url(https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-28/QHvKtOcWvz.png) no-repeat center; background-size:cover;"></div>
-              <span class="student-cell-name">${student.fullName}</span>
+        const avatars = ['QHvKtOcWvz.png', 'bno5YHuNnF.png', 'ZpdbApOuUb.png', 'mNfBhmROej.png'];
+        container.innerHTML = students.slice(0, 4).map((student, i) => `
+          <div class="flex items-center px-4 md:px-6 py-4 border-b border-neutral-border/50 hover:bg-gray-50 transition-colors">
+            <div class="flex-1 flex items-center gap-3">
+              <img src="https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-28/${avatars[i % 4]}" alt="${student.fullName}" class="w-8 h-8 md:w-9 md:h-9 rounded-full object-cover shrink-0" />
+              <span class="text-neutral-text text-sm font-semibold leading-tight">${student.fullName}</span>
             </div>
-            <div class="table-cell room-cell">${student.room || 'N/A'}</div>
-            <div class="table-cell status-cell">
-              <span class="status-badge ${student.feeStatus === 'Paid' ? 'status-paid' : 'status-pending'}">${student.feeStatus || 'Pending'}</span>
+            <div class="w-20 md:w-24 text-neutral-muted text-sm">${student.room || 'N/A'}</div>
+            <div class="w-24 md:w-28 flex justify-end">
+              <span class="flex items-center gap-1.5 px-2.5 py-1 ${student.feeStatus === 'Paid' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'} rounded-full text-[10px] font-bold">
+                <span class="w-1.5 h-1.5 ${student.feeStatus === 'Paid' ? 'bg-green-500' : 'bg-orange-500'} rounded-full"></span> ${student.feeStatus === 'Paid' ? 'PAID' : 'PENDING'}
+              </span>
             </div>
           </div>
         `).join('');
       }
 
-      function getInitials(name) {
-        if (!name) return '??';
-        return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+      function renderSchedule() {
+        const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+        const dates = [12, 13, 14, 15, 16, 17, 18];
+        const container = document.getElementById('scheduleGrid');
+        const meals = [
+          { bf: ['Belgian Waffles', 'Fresh berries, maple syrup,...'], lun: ['Mediterranean Bowl', 'Quinoa, grilled chicken,...'], din: ['Herb Roasted Steak', '8oz Sirloin with seasona...'] },
+          { bf: ['Scrambled Eggs', 'Eggs, toast, bacon bits,...'], lun: ['Caesar Salad', 'Romaine, parmesan,...'], din: ['Grilled Salmon', 'Atlantic salmon, herbs,...'] },
+          { bf: ['Oatmeal Bowl', 'Blueberries, honey, nuts,...'], lun: ['Chicken Wrap', 'Grilled chicken, veggies,...'], din: ['Pasta Primavera', 'Penne, seasonal veggies,...'] },
+          { bf: ['Pancakes', 'Strawberries, whipped cream,...'], lun: ['Burger & Fries', 'Beef patty, cheddar,...'], din: ['Chicken Curry', 'Rice, naan, spices,...'] },
+          { bf: ['French Toast', 'Cinnamon, powdered sugar,...'], lun: ['Fish Tacos', 'Cod, cabbage slaw,...'], din: ['Beef Stir Fry', 'Rice, vegetables,...'] },
+          { bf: ['Continental', 'Pastries, fruit, coffee,...'], lun: ['Margherita Pizza', 'Mozzarella, basil,...'], din: ['Roast Chicken', 'Potatoes, gravy,...'] },
+          { bf: ['Brunch Special', 'Eggs Benedict, hash browns,...'], lun: ['Club Sandwich', 'Turkey, bacon, avocado,...'], din: ['Pasta Carbonara', 'Bacon, egg, parmesan,...'] }
+        ];
+        const imgs = ['J0qSt4xdtj.png', '9e14JJiNhV.png', 'RHQM4qeFsA.png'];
+        const flags = ['8i3FbhibEw.png', 'VGUtGuiP6o.png', 'UaY1agGm5Y.png'];
+        const icons = ['sun', 'cloud-sun', 'moon'];
+        
+        container.innerHTML = days.map((day, i) => {
+          const opacity = i === 0 ? 'opacity-100' : (i === 1 ? 'opacity-75' : 'opacity-40');
+          const hidden = i >= 4 ? (i >= 5 ? 'hidden lg:flex' : 'hidden md:flex') : '';
+          const m = meals[i];
+          
+          if (i === 0) {
+            return `
+              <div class="flex flex-col gap-4 relative z-10">
+                <div class="bg-[#E6E8E9]/50 py-2 rounded-xl flex flex-col items-center">
+                  <span class="text-neutral-muted text-xs font-bold uppercase tracking-tight">${day}</span>
+                  <span class="text-neutral-text text-lg font-black leading-7">${dates[i]}</span>
+                </div>
+                ${renderMealCard(imgs[0], m.bf[0], m.bf[1], icons[0], flags[0], 'Breakfast')}
+                ${renderMealCard(imgs[1], m.lun[0], m.lun[1], icons[1], flags[1], 'Lunch')}
+                ${renderMealCard(imgs[2], m.din[0], m.din[1], icons[2], flags[2], 'Dinner')}
+              </div>`;
+          } else if (i === 1) {
+            return `
+              <div class="flex flex-col gap-4 ${opacity} ${hidden}">
+                <div class="bg-[#F2F4F5] py-2 rounded-xl flex flex-col items-center">
+                  <span class="text-neutral-muted text-xs font-bold uppercase tracking-tight">${day}</span>
+                  <span class="text-neutral-text text-lg font-black leading-7">${dates[i]}</span>
+                </div>
+                <button onclick="openEditModal()" class="h-28 bg-[#F2F4F5] rounded-3xl border-2 border-dashed border-neutral-border flex items-center justify-center hover:bg-brand-primary/5 hover:border-brand-primary/50 hover:text-brand-primary transition-all group outline-none"><i data-lucide="plus" class="w-5 h-5 text-[#BBC9C7] group-hover:text-brand-primary group-hover:scale-110 transition-all"></i></button>
+                <button onclick="openEditModal()" class="h-28 bg-[#F2F4F5] rounded-3xl border-2 border-dashed border-neutral-border flex items-center justify-center hover:bg-brand-primary/5 hover:border-brand-primary/50 hover:text-brand-primary transition-all group outline-none"><i data-lucide="plus" class="w-5 h-5 text-[#BBC9C7] group-hover:text-brand-primary group-hover:scale-110 transition-all"></i></button>
+                <button onclick="openEditModal()" class="h-28 bg-[#F2F4F5] rounded-3xl border-2 border-dashed border-neutral-border flex items-center justify-center hover:bg-brand-primary/5 hover:border-brand-primary/50 hover:text-brand-primary transition-all group outline-none"><i data-lucide="plus" class="w-5 h-5 text-[#BBC9C7] group-hover:text-brand-primary group-hover:scale-110 transition-all"></i></button>
+              </div>`;
+          } else {
+            return `
+              <div class="flex flex-col gap-4 ${opacity} ${hidden}">
+                <div class="bg-[#F2F4F5] py-2 rounded-xl flex flex-col items-center"><span class="text-neutral-muted text-xs font-bold uppercase tracking-tight">${day}</span><span class="text-neutral-text text-lg font-black leading-7">${dates[i]}</span></div>
+                <div class="h-28 bg-[#F2F4F5] rounded-3xl"></div>
+                <div class="h-28 bg-[#F2F4F5] rounded-3xl"></div>
+                <div class="h-28 bg-[#F2F4F5] rounded-3xl"></div>
+              </div>`;
+          }
+        }).join('');
+        lucide.createIcons();
       }
 
-      function formatDate(dateStr) {
-        if (!dateStr) return 'N/A';
-        const d = new Date(dateStr);
-        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      function renderMealCard(img, title, desc, icon, flag, label) {
+        return `
+          <div onclick="openEditModal()" class="bg-white rounded-3xl shadow-[0_1px_2px_rgba(0,0,0,0.05)] overflow-hidden flex flex-col group cursor-pointer border border-transparent hover:border-brand-primary/50 hover:shadow-lg transition-all relative">
+            <div class="absolute inset-0 bg-white/40 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 z-20 flex items-center justify-center transition-all duration-300">
+              <div class="bg-brand-primary text-white px-4 py-2 rounded-full flex items-center gap-2 font-bold text-sm shadow-lg transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300"><i data-lucide="pencil" class="w-4 h-4"></i> Edit</div>
+            </div>
+            <div class="h-28 relative">
+              <img src="https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-28/${img}" class="w-full h-full object-cover" alt="${label}" />
+              <div class="absolute inset-0 top-1/2 bg-gradient-to-t from-black/60 to-transparent"></div>
+              <div class="absolute top-2 right-2 bg-white/80 backdrop-blur-md p-1.5 rounded-full shadow-sm"><i data-lucide="${icon}" class="w-3 h-3 text-neutral-text"></i></div>
+              <span class="absolute bottom-2 left-3 text-white text-[10px] font-bold uppercase tracking-wide">${label}</span>
+            </div>
+            <div class="p-4 flex flex-col gap-1">
+              <div class="flex justify-between items-start">
+                <h3 class="text-neutral-text text-sm font-bold truncate pr-1">${title}</h3>
+                <div class="w-4 h-3 bg-[url('https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-28/${flag}')] bg-cover shrink-0 mt-1"></div>
+              </div>
+              <p class="text-neutral-muted text-xs leading-tight mt-0.5 line-clamp-2">${desc}</p>
+            </div>
+          </div>`;
       }
 
       window.handleApprove = async function(id, studentId) {
-        try {
-          await updateMessReductionStatus(id, 'Approved', studentId);
-          alert('✅ Request approved successfully');
-          loadDashboard();
-        } catch (err) {
-          alert('❌ Error: ' + err.message);
-        }
+        try { await updateMessReductionStatus(id, 'Approved', studentId); alert('Request approved successfully'); loadDashboard(); }
+        catch (err) { alert('Error: ' + err.message); }
       };
 
       window.handleReject = async function(id, studentId) {
-        try {
-          await updateMessReductionStatus(id, 'Rejected', studentId);
-          alert('❌ Request rejected');
-          loadDashboard();
-        } catch (err) {
-          alert('❌ Error: ' + err.message);
-        }
+        try { await updateMessReductionStatus(id, 'Rejected', studentId); alert('Request rejected'); loadDashboard(); }
+        catch (err) { alert('Error: ' + err.message); }
       };
+
+      window.openEditModal = function() {
+        const modal = document.getElementById('editMealModal');
+        const content = document.getElementById('editMealModalContent');
+        modal.classList.remove('hidden');
+        setTimeout(() => { modal.classList.remove('opacity-0'); content.classList.remove('scale-95'); }, 10);
+      };
+
+      window.closeEditModal = function() {
+        const modal = document.getElementById('editMealModal');
+        const content = document.getElementById('editMealModalContent');
+        modal.classList.add('opacity-0'); content.classList.add('scale-95');
+        setTimeout(() => { modal.classList.add('hidden'); }, 300);
+      };
+
+      window.saveAndCloseModal = function(e) {
+        const btn = e.currentTarget;
+        btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Saving...'; lucide.createIcons();
+        setTimeout(() => {
+          btn.innerHTML = '<i data-lucide="check-circle-2" class="w-4 h-4"></i> Saved!';
+          btn.classList.replace('bg-brand-primary', 'bg-green-500');
+          btn.classList.replace('shadow-brand-primary/30', 'shadow-green-500/30');
+          lucide.createIcons();
+          setTimeout(() => { closeEditModal(); setTimeout(() => { btn.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i> Save Meal'; btn.classList.replace('bg-green-500', 'bg-brand-primary'); btn.classList.replace('shadow-green-500/30', 'shadow-brand-primary/30'); lucide.createIcons(); }, 300); }, 600);
+        }, 600);
+      };
+
+      document.getElementById('editMealModal').addEventListener('click', function(e) { if (e.target === this) closeEditModal(); });
 
       init();
     </script>
