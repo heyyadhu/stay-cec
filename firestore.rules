@@ -68,6 +68,14 @@ service cloud.firestore {
       allow create: if request.auth != null && isWarden();
     }
 
+    // ── Meal Schedules ──────────────────────────────────────
+    match /mealSchedules/{mealId} {
+      allow read:   if request.auth != null; // All authenticated users can view meals
+      allow create: if request.auth != null && isMessManager();
+      allow update: if request.auth != null && isMessManager();
+      allow delete: if request.auth != null && isMessManager();
+    }
+
     // ── Meetings ──────────────────────────────────────────────
     match /meetings/{meetingId} {
       allow read:   if request.auth != null;

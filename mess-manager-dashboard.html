@@ -206,7 +206,11 @@
       }
 
       function formatDateKey(d) {
-        return d.toISOString().split('T')[0];
+        // Use local date to avoid timezone issues
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
       }
 
       async function init() {
@@ -291,19 +295,34 @@
       }
 
       async function renderSchedule() {
+        // Always recalculate from current date to ensure freshness
+        currentWeekStart = getMonday(new Date());
+        
+        console.log('[mess-manager] currentWeekStart:', formatDateKey(currentWeekStart));
+        
         const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-        const dates = [12, 13, 14, 15, 16, 17, 18];
         const container = document.getElementById('scheduleGrid');
         const imgs = ['J0qSt4xdtj.png', '9e14JJiNhV.png', 'RHQM4qeFsA.png'];
         const flags = ['8i3FbhibEw.png', 'VGUtGuiP6o.png', 'UaY1agGm5Y.png'];
         const icons = ['sun', 'cloud-sun', 'moon'];
         
+        // Calculate actual dates for the week
+        const dates = days.map((_, i) => {
+          const d = new Date(currentWeekStart);
+          d.setDate(d.getDate() + i);
+          return d.getDate();
+        });
+        
         // Fetch saved meals from database
+        const weekStartStr = formatDateKey(currentWeekStart);
+        console.log('[mess-manager] Querying week starting:', weekStartStr);
+        
         let weeklyData = {};
         try {
-          weeklyData = await getWeeklyMealSchedule(formatDateKey(currentWeekStart));
+          weeklyData = await getWeeklyMealSchedule(weekStartStr);
+          console.log('[mess-manager] Loaded weekly data:', weeklyData);
         } catch (err) {
-          console.error('Error loading schedule:', err);
+          console.error('[mess-manager] Error loading schedule:', err);
         }
         
         container.innerHTML = days.map((day, i) => {
@@ -329,37 +348,17 @@
           const lun = dayData.lunch || { title: m.lun[0], description: m.lun[1] };
           const din = dayData.dinner || { title: m.din[0], description: m.din[1] };
           
-          if (i === 0) {
-            return `
-              <div class="flex flex-col gap-4 relative z-10">
-                <div class="bg-[#E6E8E9]/50 py-2 rounded-xl flex flex-col items-center">
-                  <span class="text-neutral-muted text-xs font-bold uppercase tracking-tight">${day}</span>
-                  <span class="text-neutral-text text-lg font-black leading-7">${dates[i]}</span>
-                </div>
-                <div onclick="openEditModal('${dateKey}', 'breakfast', '${dayData.breakfast?.id || ''}')">${renderMealCard(dayData.breakfast?.imageUrl || imgs[0], bf.title, bf.description, icons[0], flags[0], 'Breakfast', dateKey, 'breakfast')}</div>
-                <div onclick="openEditModal('${dateKey}', 'lunch', '${dayData.lunch?.id || ''}')">${renderMealCard(dayData.lunch?.imageUrl || imgs[1], lun.title, lun.description, icons[1], flags[1], 'Lunch', dateKey, 'lunch')}</div>
-                <div onclick="openEditModal('${dateKey}', 'dinner', '${dayData.dinner?.id || ''}')">${renderMealCard(dayData.dinner?.imageUrl || imgs[2], din.title, din.description, icons[2], flags[2], 'Dinner', dateKey, 'dinner')}</div>
-              </div>`;
-          } else if (i === 1) {
-            return `
-              <div class="flex flex-col gap-4 ${opacity} ${hidden}">
-                <div class="bg-[#F2F4F5] py-2 rounded-xl flex flex-col items-center">
-                  <span class="text-neutral-muted text-xs font-bold uppercase tracking-tight">${day}</span>
-                  <span class="text-neutral-text text-lg font-black leading-7">${dates[i]}</span>
-                </div>
-                <button onclick="openEditModal('${dateKey}', 'breakfast')" class="h-28 bg-[#F2F4F5] rounded-3xl border-2 border-dashed border-neutral-border flex items-center justify-center hover:bg-brand-primary/5 hover:border-brand-primary/50 hover:text-brand-primary transition-all group outline-none"><i data-lucide="plus" class="w-5 h-5 text-[#BBC9C7] group-hover:text-brand-primary group-hover:scale-110 transition-all"></i></button>
-                <button onclick="openEditModal('${dateKey}', 'lunch')" class="h-28 bg-[#F2F4F5] rounded-3xl border-2 border-dashed border-neutral-border flex items-center justify-center hover:bg-brand-primary/5 hover:border-brand-primary/50 hover:text-brand-primary transition-all group outline-none"><i data-lucide="plus" class="w-5 h-5 text-[#BBC9C7] group-hover:text-brand-primary group-hover:scale-110 transition-all"></i></button>
-                <button onclick="openEditModal('${dateKey}', 'dinner')" class="h-28 bg-[#F2F4F5] rounded-3xl border-2 border-dashed border-neutral-border flex items-center justify-center hover:bg-brand-primary/5 hover:border-brand-primary/50 hover:text-brand-primary transition-all group outline-none"><i data-lucide="plus" class="w-5 h-5 text-[#BBC9C7] group-hover:text-brand-primary group-hover:scale-110 transition-all"></i></button>
-              </div>`;
-          } else {
-            return `
-              <div class="flex flex-col gap-4 ${opacity} ${hidden}">
-                <div class="bg-[#F2F4F5] py-2 rounded-xl flex flex-col items-center"><span class="text-neutral-muted text-xs font-bold uppercase tracking-tight">${day}</span><span class="text-neutral-text text-lg font-black leading-7">${dates[i]}</span></div>
-                <div class="h-28 bg-[#F2F4F5] rounded-3xl"></div>
-                <div class="h-28 bg-[#F2F4F5] rounded-3xl"></div>
-                <div class="h-28 bg-[#F2F4F5] rounded-3xl"></div>
-              </div>`;
-          }
+          // All days now show meal cards
+          return `
+            <div class="flex flex-col gap-4 ${i === 0 ? 'relative z-10' : ''} ${opacity} ${hidden}">
+              <div class="bg-[${i === 0 ? '#E6E8E9' : '#F2F4F5'}] ${i === 0 ? 'bg-opacity-50' : ''} py-2 rounded-xl flex flex-col items-center">
+                <span class="text-neutral-muted text-xs font-bold uppercase tracking-tight">${day}</span>
+                <span class="text-neutral-text text-lg font-black leading-7">${dates[i]}</span>
+              </div>
+              <div onclick="openEditModal('${dateKey}', 'breakfast', '${dayData.breakfast?.id || ''}')">${renderMealCard(dayData.breakfast?.imageUrl || imgs[0], bf.title, bf.description, icons[0], flags[0], 'Breakfast', dateKey, 'breakfast')}</div>
+              <div onclick="openEditModal('${dateKey}', 'lunch', '${dayData.lunch?.id || ''}')">${renderMealCard(dayData.lunch?.imageUrl || imgs[1], lun.title, lun.description, icons[1], flags[1], 'Lunch', dateKey, 'lunch')}</div>
+              <div onclick="openEditModal('${dateKey}', 'dinner', '${dayData.dinner?.id || ''}')">${renderMealCard(dayData.dinner?.imageUrl || imgs[2], din.title, din.description, icons[2], flags[2], 'Dinner', dateKey, 'dinner')}</div>
+            </div>`;
         }).join('');
         lucide.createIcons();
       }

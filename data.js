@@ -1159,15 +1159,19 @@ export async function saveMealSchedule(mealData) {
       updatedAt: serverTimestamp(),
     };
     
+    console.log('[saveMealSchedule] Saving meal:', { date, type, title, id: id || 'new' });
+    
     let docRef;
     if (id) {
       // Update existing
       docRef = doc(db, 'mealSchedules', id);
       await updateDoc(docRef, data);
+      console.log('[saveMealSchedule] Updated existing meal:', id);
     } else {
       // Create new
       data.createdAt = serverTimestamp();
       docRef = await addDoc(collection(db, 'mealSchedules'), data);
+      console.log('[saveMealSchedule] Created new meal:', docRef.id);
     }
     
     return docRef.id || id;
@@ -1185,15 +1189,30 @@ export async function saveMealSchedule(mealData) {
  */
 export async function getMealSchedules(startDate, endDate) {
   try {
-    const q = query(
-      collection(db, 'mealSchedules'),
-      where('date', '>=', startDate),
-      where('date', '<=', endDate),
-      orderBy('date', 'asc')
-    );
+    console.log('[getMealSchedules] Querying range:', { startDate, endDate });
     
-    const snap = await getDocs(q);
-    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    // Use simple collection fetch - no ordering to avoid index requirements
+    const snap = await getDocs(collection(db, 'mealSchedules'));
+    const allMeals = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    
+    console.log('[getMealSchedules] Total meals in DB:', allMeals.length);
+    if (allMeals.length > 0) {
+      console.log('[getMealSchedules] Sample meal:', allMeals[0]);
+      console.log('[getMealSchedules] All meal dates:', allMeals.map(m => m.date));
+    }
+    
+    // Filter client-side by date range
+    const filtered = allMeals.filter(meal => {
+      // Handle both string dates and Timestamp objects
+      const mealDate = meal.date?.toString ? meal.date.toString() : meal.date;
+      const inRange = mealDate >= startDate && mealDate <= endDate;
+      console.log(`[getMealSchedules] Checking ${mealDate}: ${inRange ? 'IN RANGE' : 'out of range'}`);
+      return inRange;
+    });
+    
+    console.log('[getMealSchedules] Filtered meals for range:', filtered.length);
+    
+    return filtered;
   } catch (error) {
     console.error('Error fetching meal schedules:', error);
     return [];
@@ -1207,12 +1226,24 @@ export async function getMealSchedules(startDate, endDate) {
  */
 export async function getWeeklyMealSchedule(weekStartDate) {
   try {
+    console.log('[getWeeklyMealSchedule] Called with:', weekStartDate);
+    
     const start = new Date(weekStartDate);
     const end = new Date(start);
     end.setDate(end.getDate() + 6);
     
-    const startStr = start.toISOString().split('T')[0];
-    const endStr = end.toISOString().split('T')[0];
+    // Format as local date strings to avoid timezone issues
+    const formatLocalDate = (d) => {
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
+    
+    const startStr = formatLocalDate(start);
+    const endStr = formatLocalDate(end);
+    
+    console.log('[getWeeklyMealSchedule] Date range:', { startStr, endStr });
     
     const meals = await getMealSchedules(startStr, endStr);
     
@@ -1221,7 +1252,7 @@ export async function getWeeklyMealSchedule(weekStartDate) {
     for (let i = 0; i < 7; i++) {
       const d = new Date(start);
       d.setDate(d.getDate() + i);
-      const dateStr = d.toISOString().split('T')[0];
+      const dateStr = formatLocalDate(d);
       weeklySchedule[dateStr] = {
         breakfast: null,
         lunch: null,
@@ -1229,12 +1260,19 @@ export async function getWeeklyMealSchedule(weekStartDate) {
       };
     }
     
+    console.log('[getWeeklyMealSchedule] Weekly schedule keys:', Object.keys(weeklySchedule));
+    
     meals.forEach(meal => {
+      console.log('[getWeeklyMealSchedule] Processing meal:', { date: meal.date, type: meal.type, title: meal.title });
       if (weeklySchedule[meal.date]) {
         weeklySchedule[meal.date][meal.type] = meal;
+        console.log('[getWeeklyMealSchedule] Added meal to:', meal.date, meal.type);
+      } else {
+        console.log('[getWeeklyMealSchedule] Date not in schedule:', meal.date);
       }
     });
     
+    console.log('[getWeeklyMealSchedule] Final schedule:', weeklySchedule);
     return weeklySchedule;
   } catch (error) {
     console.error('Error fetching weekly schedule:', error);

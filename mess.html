@@ -290,11 +290,23 @@
 
       async function loadWeeklySchedule() {
         try {
+          console.log('[mess.html] Loading weekly schedule...');
           const today = new Date();
           const monday = getMonday(today);
-          const weekStart = monday.toISOString().split('T')[0];
+          
+          // Format as local date string to avoid timezone issues
+          const formatLocalDate = (d) => {
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+          };
+          
+          const weekStart = formatLocalDate(monday);
+          console.log('[mess.html] Week start:', weekStart);
           
           const weeklyData = await getWeeklyMealSchedule(weekStart);
+          console.log('[mess.html] Received weekly data:', weeklyData);
           
           // Update week display
           const weekEnd = new Date(monday);
@@ -315,7 +327,7 @@
           updateDaySchedule('sunday', 6, monday, weeklyData);
           
         } catch (err) {
-          console.error('Error loading weekly schedule:', err);
+          console.error('[mess.html] Error loading weekly schedule:', err);
         }
       }
 
@@ -335,7 +347,14 @@
       }
 
       function updateCurrentMeal(weeklyData, today) {
-        const dateKey = today.toISOString().split('T')[0];
+        function formatDateKey(d) {
+          // Use local date to avoid timezone issues
+          const year = d.getFullYear();
+          const month = String(d.getMonth() + 1).padStart(2, '0');
+          const day = String(d.getDate()).padStart(2, '0');
+          return `${year}-${month}-${day}`;
+        }
+        const dateKey = formatDateKey(today);
         const dayData = weeklyData[dateKey];
         
         if (!dayData) return;
@@ -369,7 +388,13 @@
       function updateDaySchedule(dayClass, dayOffset, monday, weeklyData, isToday = false) {
         const date = new Date(monday);
         date.setDate(date.getDate() + dayOffset);
-        const dateKey = date.toISOString().split('T')[0];
+        
+        // Use local date to avoid timezone issues
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const dateKey = `${year}-${month}-${day}`;
+        
         const dayData = weeklyData[dateKey] || {};
         
         const dayElement = document.querySelector(`.${dayClass}`);
