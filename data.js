@@ -979,15 +979,20 @@ export async function getMessManagerStats() {
   try {
     const [reductionsSnap, studentsSnap] = await Promise.all([
       getDocs(collection(db, 'messReductions')),
-      getDocs(query(collection(db, 'students'), where('role', '==', 'student')))
+      getDocs(collection(db, 'students'))
     ]);
 
     let pendingReductions = 0;
     let approvedToday = 0;
-    let totalResidents = studentsSnap.size;
+    let totalResidents = 0;
     
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
+
+    studentsSnap.forEach(d => {
+      const data = d.data();
+      if (data.role === 'student') totalResidents++;
+    });
 
     reductionsSnap.forEach(d => {
       const data = d.data();
@@ -1055,13 +1060,12 @@ export async function updateMessReductionStatus(reductionId, status, processedBy
  */
 export async function getStudentDirectory() {
   try {
-    const q = query(
-      collection(db, 'students'),
-      where('role', '==', 'student'),
-      orderBy('fullName', 'asc')
-    );
-    const snap = await getDocs(q);
-    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    // Use simple query without composite index, filter and sort client-side
+    const snap = await getDocs(collection(db, 'students'));
+    return snap.docs
+      .map(d => ({ id: d.id, ...d.data() }))
+      .filter(d => d.role === 'student')
+      .sort((a, b) => (a.fullName || '').localeCompare(b.fullName || ''));
   } catch (error) {
     console.error('Error fetching student directory:', error);
     return [];

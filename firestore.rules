@@ -72,7 +72,14 @@ service cloud.firestore {
     match /meetings/{meetingId} {
       allow read:   if request.auth != null;
       allow create: if request.auth != null; // Students can request meetings
-      allow update: if request.auth != null && isWarden(); // Only wardens approve
+      allow update: if request.auth != null && (isWarden() || isHeadWarden()); // Only wardens/head-wardens approve
+    }
+
+    // ── Gender-specific hostels (optional rule for future filtering)
+    // This allows querying by gender if you add it to documents
+    match /hostels/{hostelId} {
+      allow read:   if request.auth != null;
+      allow write:  if request.auth != null && isHeadWarden();
     }
   }
 }
