@@ -1204,7 +1204,16 @@ export async function getMealSchedules(startDate, endDate) {
     // Filter client-side by date range
     const filtered = allMeals.filter(meal => {
       // Handle both string dates and Timestamp objects
-      const mealDate = meal.date?.toString ? meal.date.toString() : meal.date;
+      let mealDate;
+      if (meal.date?.toDate) {
+        // Firestore Timestamp - convert to YYYY-MM-DD
+        const d = meal.date.toDate();
+        mealDate = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      } else if (typeof meal.date === 'string') {
+        mealDate = meal.date;
+      } else {
+        mealDate = meal.date?.toString ? meal.date.toString() : '';
+      }
       const inRange = mealDate >= startDate && mealDate <= endDate;
       console.log(`[getMealSchedules] Checking ${mealDate}: ${inRange ? 'IN RANGE' : 'out of range'}`);
       return inRange;
