@@ -299,14 +299,26 @@
 
         try {
           const role = document.getElementById('regRole').value;
+          const genderValue = document.getElementById('regGender').value;
+          
+          // Determine hostel based on role and gender
+          let hostelAssignment;
+          if (['warden', 'head-warden', 'mess-manager'].includes(role)) {
+            hostelAssignment = 'Administration';
+          } else if (genderValue === 'female') {
+            hostelAssignment = "CEC Women's Hostel";
+          } else {
+            hostelAssignment = "CEC Premium Men's Hostel";
+          }
+          
           const profileData = {
             fullName,
             registerNumber,
             department,
             phone,
             role,
-            gender,
-            hostel: ['warden', 'head-warden', 'mess-manager'].includes(role) ? 'Administration' : 'CEC Premium Men\'s Hostel',
+            gender: genderValue,
+            hostel: hostelAssignment,
           };
 
           if (role === 'student') {

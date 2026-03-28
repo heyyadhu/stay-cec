@@ -85,7 +85,10 @@
           <div class="chart-card">
             <div class="card-header">
               <span class="card-title">Occupancy Distribution</span>
-              <div class="export-btn" onclick="alert('Exporting data...')">Export CSV</div>
+              <div style="display:flex;gap:8px;">
+                <div class="export-btn" id="exportCSV">Export CSV</div>
+                <div class="export-btn" id="exportPDF">Export PDF</div>
+              </div>
             </div>
             <div class="chart-container">
               <div class="bar-row">
@@ -193,6 +196,105 @@
       });
 
       document.getElementById('logoutBtn').addEventListener('click', logOut);
+
+      // Export Functions
+      async function exportReportToCSV() {
+        const data = await getReportData();
+        if (!data) return;
+
+        const csvRows = [
+          ['StayCEC Report', new Date().toLocaleString()],
+          [],
+          ['Metric', 'Value'],
+          ['Total Revenue', `₹${data.revenue.toLocaleString()}`],
+          ['Pending Fees', data.pendingFees],
+          ['Total Residents', data.occupancy.total],
+          ['Men\'s Hostel', data.occupancy.men],
+          ['Women\'s Hostel', data.occupancy.women],
+          ['Resolved Complaints', data.complaints.resolved],
+          ['Open Complaints', data.complaints.open],
+          [],
+          ['Mess Reductions'],
+          ['Student', 'Days', 'Status']
+        ];
+
+        data.recentMess.forEach(m => {
+          csvRows.push([m.studentName, m.totalDays, m.status]);
+        });
+
+        const csvContent = csvRows.map(row => row.join(',')).join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `staycec-report-${new Date().toISOString().split('T')[0]}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+
+      async function exportReportToPDF() {
+        const data = await getReportData();
+        if (!data) return;
+
+        // Create a printable window
+        const printWindow = window.open('', '_blank');
+        const rate = data.complaints.total > 0 
+          ? Math.round((data.complaints.resolved / data.complaints.total) * 100) 
+          : 0;
+        
+        printWindow.document.write(`
+          <html>
+          <head><title>StayCEC Report - ${new Date().toLocaleDateString()}</title>
+          <style>
+            body { font-family: Inter, sans-serif; padding: 40px; }
+            h1 { color: #1a1a2e; }
+            .stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin: 20px 0; }
+            .stat { background: #f8f9fa; padding: 20px; border-radius: 10px; }
+            .label { color: #6b7280; font-size: 14px; }
+            .value { color: #1a1a2e; font-size: 24px; font-weight: 700; }
+            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+            th, td { padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb; }
+            th { background: #f3f4f6; font-weight: 600; }
+          </style>
+          </head>
+          <body>
+            <h1>🏠 StayCEC Hostel Report</h1>
+            <p>Generated on: ${new Date().toLocaleString()}</p>
+            <div class="stats">
+              <div class="stat">
+                <div class="label">Total Revenue</div>
+                <div class="value">₹${data.revenue.toLocaleString()}</div>
+              </div>
+              <div class="stat">
+                <div class="label">Pending Fees</div>
+                <div class="value">${data.pendingFees}</div>
+              </div>
+              <div class="stat">
+                <div class="label">Total Residents</div>
+                <div class="value">${data.occupancy.total}</div>
+              </div>
+              <div class="stat">
+                <div class="label">Complaint Resolution Rate</div>
+                <div class="value">${rate}%</div>
+              </div>
+            </div>
+            <h2>Occupancy</h2>
+            <p>Men's Hostel: ${data.occupancy.men} residents</p>
+            <p>Women's Hostel: ${data.occupancy.women} residents</p>
+            <h2>Recent Mess Reductions</h2>
+            <table>
+              <tr><th>Student</th><th>Days</th><th>Status</th></tr>
+              ${data.recentMess.map(m => `<tr><td>${m.studentName}</td><td>${m.totalDays}</td><td>${m.status}</td></tr>`).join('')}
+            </table>
+          </body>
+          </html>
+        `);
+        printWindow.document.close();
+        printWindow.print();
+      }
+
+      document.getElementById('exportCSV').addEventListener('click', exportReportToCSV);
+      document.getElementById('exportPDF').addEventListener('click', exportReportToPDF);
     </script>
   </body>
 </html>

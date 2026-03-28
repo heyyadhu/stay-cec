@@ -68,31 +68,33 @@ export async function getUpcomingMeetings() {
  */
 export async function getWardenStats() {
   try {
-    const studentsRef = collection(db, "students");
-    const studentsSnap = await getDocs(query(studentsRef, where("role", "==", "student")));
-    const totalStudents = studentsSnap.size;
-
+    // Use simple query without composite index, filter client-side
+    const studentsSnap = await getDocs(collection(db, 'students'));
+    let totalStudents = 0;
     let feePendingCount = 0;
+    
     studentsSnap.forEach((d) => {
       const data = d.data();
-      if ((data.outstandingAmount !== undefined && data.outstandingAmount > 0) || data.feeStatus === "Pending" || data.feeStatus === "Overdue") {
+      if (data.role !== 'student') return;
+      totalStudents++;
+      if ((data.outstandingAmount !== undefined && data.outstandingAmount > 0) || data.feeStatus === 'Pending' || data.feeStatus === 'Overdue') {
         feePendingCount++;
       }
     });
 
     // Count pending complaints
-    const complaintsSnap = await getDocs(query(collection(db, "complaints"), where("status", "==", "Pending")));
+    const complaintsSnap = await getDocs(query(collection(db, 'complaints'), where('status', '==', 'Pending')));
     const pendingComplaints = complaintsSnap.size;
 
     // Count pending mess reductions
-    const messSnap = await getDocs(query(collection(db, "messReductions"), where("status", "==", "Pending")));
+    const messSnap = await getDocs(query(collection(db, 'messReductions'), where('status', '==', 'Pending')));
     const pendingMess = messSnap.size;
 
     const pendingRequests = pendingComplaints + pendingMess;
 
     return { totalStudents, pendingRequests, feePendingCount, pendingComplaints, pendingMess };
   } catch (error) {
-    console.error("Error fetching stats:", error);
+    console.error('Error fetching stats:', error);
     return { totalStudents: 0, pendingRequests: 0, feePendingCount: 0, pendingComplaints: 0, pendingMess: 0 };
   }
 }

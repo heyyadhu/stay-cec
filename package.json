@@ -6,7 +6,10 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest",
+    "test:unit": "vitest run",
+    "test:system": "vitest run --config vitest.system.config.js"
   },
   "repository": {
     "type": "git",
@@ -25,6 +28,10 @@
     "firebase-admin": "^13.7.0"
   },
   "devDependencies": {
-    "vite": "^8.0.2"
+    "vite": "^8.0.2",
+    "vitest": "^2.0.0",
+    "@vitest/ui": "^2.0.0",
+    "jsdom": "^24.0.0",
+    "@testing-library/jest-dom": "^6.0.0"
   }
 }

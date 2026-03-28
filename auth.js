@@ -93,12 +93,13 @@ export async function updateStudentProfile(data) {
  *   const user = await requireAuth();
  */
 export function requireAuth() {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     onAuthStateChanged(auth, (user) => {
       if (user) {
         resolve(user);
       } else {
         window.location.href = "index.html";
+        reject(new Error("Not authenticated"));
       }
     });
   });
