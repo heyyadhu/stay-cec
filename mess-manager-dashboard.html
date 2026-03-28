@@ -1,273 +1,292 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StayCEC - Mess Manager Dashboard</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
-    <link rel="stylesheet" href="mess-manager-dashboard.css">
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StayCEC – Mess Manager Dashboard</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" />
+    <style>
+      :root { --default-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", Helvetica, Arial, sans-serif; }
+      * { box-sizing: border-box; }
+      body { margin: 0; font-family: Inter, var(--default-font-family); background: #f8fafb; }
+      .main-container { position: relative; width: 1440px; height: 1515px; margin: 0 auto; background: #f8fafb; overflow: hidden; }
+      .rectangle { position: absolute; width: 300px; height: 1515px; top: 0; left: 0; background: #d9d9d9; }
+      .staycecdesktop { position: relative; width: 235px; height: 132px; margin: 27px 0 0 26px; background: url(https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-28/DokUENoGSP.png) no-repeat center; background-size: cover; z-index: 12; }
+      .container { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; position: relative; width: 224px; margin: 1216px 0 0 33px; z-index: 1; }
+      .link { display: flex; align-items: center; gap: 12px; padding: 12px 16px; cursor: pointer; border-radius: 8px; transition: background 0.2s; }
+      .link:hover { background: rgba(255,255,255,0.5); }
+      .icon { width: 18.792px; height: 19px; background: url(https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-28/QrGFCyaRhT.png) no-repeat center; background-size: cover; }
+      .settings { color: #3c4947; font-size: 14px; font-weight: 400; }
+      .logout { color: rgba(186, 26, 26, 0.8); font-size: 14px; font-weight: 400; }
+      .nav { display: flex; flex-direction: column; gap: 6px; position: absolute; width: 216px; top: 175px; left: 45px; z-index: 19; }
+      .link-7 { display: flex; align-items: center; gap: 12px; padding: 10px 16px; background: #ffffff; border-radius: 20px; box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.05); cursor: pointer; }
+      .dashboard { color: #12b1a6; font-size: 14px; font-weight: 600; }
+      .nav-b { display: flex; flex-direction: column; gap: 8px; position: absolute; width: 224px; top: 235px; left: 45px; z-index: 25; }
+      .nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; cursor: pointer; border-radius: 8px; transition: background 0.2s; }
+      .nav-item:hover { background: #e8eaea; }
+      .nav-item.active { background: #f2f4f5; }
+      .nav-item.active .nav-text { color: #006a63; font-weight: 600; }
+      .nav-text { color: #64748b; font-size: 14px; font-weight: 500; }
+      .flex-column-fce { position: absolute; top: 59px; right: 85px; left: 363px; z-index: 297; }
+      .border { position: absolute; width: 48px; height: 48px; top: 0; left: 930px; padding: 2px; border: 2px solid #75f7ea; border-radius: 9999px; }
+      .student-profile-avatar { width: 100%; height: 100%; background: url(https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-28/U7w7EpXRb4.png) no-repeat center; background-size: cover; border-radius: 9999px; }
+      .content-area { position: absolute; top: 40px; left: 0; right: 0; padding: 32px; display: flex; flex-direction: column; gap: 48px; }
+      
+      .stats-row { display: flex; gap: 24px; margin-bottom: 24px; }
+      .stat-card { background: #ffffff; padding: 24px; border-radius: 16px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); flex: 1; }
+      .stat-label { color: #64748b; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+      .stat-value { color: #191c1d; font-size: 28px; font-weight: 800; }
+      .stat-subtext { color: #8e8e93; font-size: 12px; margin-top: 4px; }
+      
+      .mess-reduction-requests { display: flex; flex-direction: column; gap: 24px; padding: 32px; background: #f2f4f5; border-radius: 24px; }
+      .section-header { display: flex; align-items: center; justify-content: space-between; }
+      .section-title { color: #191c1d; font-size: 20px; font-weight: 700; }
+      .badge { padding: 4px 12px; background: rgba(0, 106, 99, 0.1); border-radius: 9999px; color: #006a63; font-size: 12px; font-weight: 700; }
+      .requests-list { display: flex; flex-direction: column; gap: 16px; }
+      .request-row { display: flex; align-items: center; justify-content: space-between; padding: 20px; background: #ffffff; border-radius: 24px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+      .request-info { display: flex; align-items: center; gap: 16px; }
+      .avatar { width: 48px; height: 48px; border-radius: 9999px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; background: rgba(59, 90, 175, 0.1); color: #3b5aaf; }
+      .avatar.female { background: rgba(0, 106, 99, 0.1); color: #006a63; }
+      .student-name { color: #191c1d; font-size: 16px; font-weight: 700; }
+      .request-meta { color: #3c4947; font-size: 12px; }
+      .request-actions { display: flex; gap: 8px; }
+      .btn-approve { padding: 8px 16px; border: 1px solid rgba(18, 177, 166, 0.2); border-radius: 9999px; color: #12b1a6; font-size: 12px; font-weight: 700; cursor: pointer; background: transparent; }
+      .btn-approve:hover { background: rgba(18, 177, 166, 0.1); }
+      .btn-reject { padding: 8px 16px; border-radius: 9999px; color: #bbc9c7; font-size: 12px; font-weight: 700; cursor: pointer; background: transparent; border: none; }
+      .btn-reject:hover { background: rgba(186, 26, 26, 0.1); color: #ba1a1a; }
+      
+      .section-mess-student-directory { display: flex; flex-direction: column; gap: 24px; padding: 32px; background: #f2f4f5; border-radius: 24px; }
+      .table-container { background: #ffffff; border: 1px solid rgba(187, 201, 199, 0.2); border-radius: 12px; overflow: hidden; }
+      .table-header { display: flex; background: rgba(230, 232, 233, 0.5); padding: 16px 24px; }
+      .table-header-cell { flex: 1; color: #3c4947; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+      .table-header-cell:last-child { text-align: right; }
+      .table-row { display: flex; align-items: center; padding: 16px 24px; border-bottom: 1px solid rgba(187, 201, 199, 0.1); }
+      .table-cell { flex: 1; display: flex; align-items: center; }
+      .student-cell { display: flex; align-items: center; gap: 12px; }
+      .student-avatar { width: 32px; height: 32px; border-radius: 9999px; background: #e8eaea; }
+      .student-cell-name { color: #191c1d; font-size: 14px; font-weight: 600; }
+      .room-cell { color: #3c4947; font-size: 14px; }
+      .status-cell { justify-content: flex-end; }
+      .status-badge { display: flex; align-items: center; gap: 6px; padding: 2px 10px; border-radius: 9999px; font-size: 10px; font-weight: 700; }
+      .status-paid { background: #dcfce7; color: #15803d; }
+      .status-paid::before { content: ''; width: 6px; height: 6px; background: #22c55e; border-radius: 9999px; }
+      .status-pending { background: #ffedd5; color: #c2410c; }
+      .status-pending::before { content: ''; width: 6px; height: 6px; background: #f97316; border-radius: 9999px; }
+      
+      .footer { position: absolute; bottom: 32px; left: 363px; right: 85px; text-align: center; color: #3c4947; font-size: 12px; font-weight: 500; }
+      .loading { text-align: center; padding: 40px; color: #8e8e93; }
+      .empty-state { text-align: center; padding: 40px; color: #8e8e93; }
+    </style>
+  </head>
+  <body>
     <div class="main-container">
-        <!-- Sidebar Navigation -->
-        <div class="rectangle">
-            <div class="staycecdesktop"></div>
-            <div style="margin-top: 40px;">
-                <a href="#" class="navigation-item active" id="navDash">Dashboard</a>
-                <a href="#" class="navigation-item" id="navReductions">Reduction Requests</a>
-                <a href="#" class="navigation-item" id="navDirectory">Student Directory</a>
-                <a href="#" class="navigation-item" id="navReports">Reports</a>
-                <div style="margin-top: auto; padding-top: 300px;">
-                    <button class="navigation-item" id="logoutBtn" style="border:none; background:none; width:100%; text-align:left;">Logout</button>
-                </div>
-            </div>
+      <div class="rectangle">
+        <div class="staycecdesktop"></div>
+        <div class="container">
+          <div class="link">
+            <div class="icon"></div>
+            <span class="settings">Settings</span>
+          </div>
+          <div class="link" id="logoutBtn">
+            <div class="icon" style="background:url(https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-28/x2Y1r4mNpC.png) no-repeat center; background-size:cover; width:17px; height:17px;"></div>
+            <span class="logout">Logout</span>
+          </div>
         </div>
+        <div class="nav">
+          <div class="link-7">
+            <div style="width:16.5px; height:16.5px; background:url(https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-28/xQVyRVe4R7.png) no-repeat center; background-size:cover;"></div>
+            <span class="dashboard">Dashboard</span>
+          </div>
+        </div>
+        <div class="nav-b">
+          <div class="nav-item active">
+            <div style="width:20px; height:16.4px; background:url(https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-28/qdfvn4nwGt.png) no-repeat center; background-size:cover;"></div>
+            <span class="nav-text" style="color:#006a63; font-weight:600;">Registrations</span>
+          </div>
+          <div class="nav-item">
+            <div style="width:16px; height:20px; background:url(https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-28/wrgtLJ9iiM.png) no-repeat center; background-size:cover;"></div>
+            <span class="nav-text">Wardens</span>
+          </div>
+          <div class="nav-item">
+            <div style="width:18px; height:18px; background:url(https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-28/5HQmTZ6hAN.png) no-repeat center; background-size:cover;"></div>
+            <span class="nav-text">Reports</span>
+          </div>
+        </div>
+      </div>
 
-        <!-- Header -->
-        <header class="dashboard-header">
-            <h1 class="dashboard-title">Mess Manager Dashboard</h1>
-            <p class="dashboard-subtitle">Manage mess reductions and daily meal planning for all residents.</p>
-        </header>
-
-        <!-- Stats Grid -->
-        <div class="stats-grid">
+      <div class="flex-column-fce">
+        <div class="border"><div class="student-profile-avatar"></div></div>
+        
+        <div class="content-area">
+          <div class="stats-row">
             <div class="stat-card">
-                <div class="stat-label">Pending Reductions</div>
-                <div class="stat-value" id="statPending">0</div>
+              <div class="stat-label">Total Residents</div>
+              <div class="stat-value" id="totalResidents">0</div>
+              <div class="stat-subtext">Active students</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Processed Today</div>
-                <div class="stat-value" id="statProcessed">0</div>
+              <div class="stat-label">Pending Reductions</div>
+              <div class="stat-value" id="pendingReductions">0</div>
+              <div class="stat-subtext">Awaiting approval</div>
             </div>
             <div class="stat-card">
-                <div class="stat-label">Total Residents</div>
-                <div class="stat-value" id="statTotal">0</div>
+              <div class="stat-label">Monthly Savings</div>
+              <div class="stat-value" id="monthlySavings">₹0</div>
+              <div class="stat-subtext">From approved reductions</div>
             </div>
+          </div>
+
+          <div class="mess-reduction-requests">
+            <div class="section-header">
+              <span class="section-title">Reduction Requests</span>
+              <span class="badge" id="pendingBadge">0 Pending</span>
+            </div>
+            <div class="requests-list" id="requestsList">
+              <div class="loading">Loading requests...</div>
+            </div>
+          </div>
+
+          <div class="section-mess-student-directory">
+            <div class="section-header">
+              <span class="section-title">Student Directory</span>
+              <span class="view-all" style="color:#006a63; font-size:14px; font-weight:600; cursor:pointer;">View All</span>
+            </div>
+            <div class="table-container">
+              <div class="table-header">
+                <div class="table-header-cell">Student Name</div>
+                <div class="table-header-cell">Room</div>
+                <div class="table-header-cell">Payment Status</div>
+              </div>
+              <div id="studentsTable">
+                <div class="loading">Loading students...</div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div class="main-content-grid">
-            <!-- Left: Table -->
-            <div class="card">
-                <div class="card-title">Recent Reduction Requests</div>
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Student</th>
-                                <th>Room</th>
-                                <th>Period</th>
-                                <th>Days</th>
-                                <th>Status</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="reductionsTableBody">
-                            <!-- Populated by JS -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Right: Meal Planning & Status -->
-            <div class="card">
-                <div class="card-title">Daily Meal Status</div>
-                <div id="mealStatusList">
-                    <div class="meal-status-item">
-                        <div class="meal-info">
-                            <h4>Breakfast</h4>
-                            <p>7:30 AM - 9:00 AM</p>
-                        </div>
-                        <div class="meal-count" id="breakfastCount">--</div>
-                    </div>
-                    <div class="meal-status-item">
-                        <div class="meal-info">
-                            <h4>Lunch</h4>
-                            <p>12:30 PM - 2:00 PM</p>
-                        </div>
-                        <div class="meal-count" id="lunchCount">--</div>
-                    </div>
-                    <div class="meal-status-item">
-                        <div class="meal-info">
-                            <h4>Dinner</h4>
-                            <p>7:30 PM - 9:00 PM</p>
-                        </div>
-                        <div class="meal-count" id="dinnerCount">--</div>
-                    </div>
-                </div>
-            </div>
+        <div class="footer">
+          <span>© 2024 StayCEC Hostel Management • Premium Living Standards</span>
         </div>
-
-        <!-- Student Directory Section (Hidden by default) -->
-        <div id="directorySection" style="display: none; margin: 0 40px 40px 340px;" class="card">
-             <div class="card-title">Resident Directory</div>
-             <input type="text" class="search-bar" id="studentSearch" placeholder="Search by name, room, or register number...">
-             <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Reg Number</th>
-                            <th>Room</th>
-                            <th>Hostel</th>
-                            <th>Fee Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="directoryTableBody">
-                        <!-- Populated by JS -->
-                    </tbody>
-                </table>
-             </div>
-        </div>
+      </div>
     </div>
 
-    <!-- Scripts -->
     <script type="module">
-        import { requireAuth, logOut, getStudentProfile } from './auth.js';
-        import { 
-            getMessManagerStats, 
-            getMessReductions, 
-            updateMessReductionStatus,
-            getStudentDirectory 
-        } from './data.js';
+      import { auth, onAuthStateChanged } from './firebase-config.js';
+      import { logOut, getStudentProfile } from './auth.js';
+      import { getMessManagerStats, getPendingMessReductions, getMessManagerStudents, updateMessReductionStatus } from './data.js';
 
-        let currentSection = 'dashboard';
-
-        // Auth Protection + Role Check
-        const user = await requireAuth();
-        const profile = await getStudentProfile(user.uid);
-        
-        // Only mess-managers allowed
-        if (!profile || profile.role !== 'mess-manager') {
+      async function init() {
+        onAuthStateChanged(auth, async (user) => {
+          if (!user) {
             window.location.href = 'index.html';
             return;
-        }
-
-        async function initDashboard() {
-            try {
-                const stats = await getMessManagerStats();
-                document.getElementById('statPending').textContent = stats.pendingReductions;
-                document.getElementById('statProcessed').textContent = stats.approvedToday;
-                document.getElementById('statTotal').textContent = stats.totalResidents;
-
-                if (stats.meals) {
-                    document.getElementById('breakfastCount').textContent = `${stats.meals.breakfast.served}/${stats.meals.breakfast.total}`;
-                    document.getElementById('lunchCount').textContent = `${stats.meals.lunch.served}/${stats.meals.lunch.total}`;
-                    document.getElementById('dinnerCount').textContent = `${stats.meals.dinner.served}/${stats.meals.dinner.total}`;
-                }
-
-                const reductions = await getMessReductions();
-                renderReductions(reductions);
-            } catch (err) {
-                console.error('Error initializing dashboard:', err);
-            }
-        }
-
-        function renderReductions(reductions) {
-            const tbody = document.getElementById('reductionsTableBody');
-            tbody.innerHTML = reductions.map(r => {
-                const period = r.periods && r.periods.length > 0 
-                  ? `${r.periods[0].from} to ${r.periods[0].to}` 
-                  : 'N/A';
-                
-                const statusClass = `status-${r.status.toLowerCase()}`;
-                const isPending = r.status === 'Pending';
-
-                return `
-                    <tr>
-                        <td><strong>${r.studentName || 'Student'}</strong></td>
-                        <td>${r.room || 'TBD'}</td>
-                        <td>${period}</td>
-                        <td>${r.totalDays || 0}</td>
-                        <td><span class="status-badge ${statusClass}">${r.status}</span></td>
-                        <td>
-                            ${isPending ? `
-                                <button class="action-btn btn-approve" data-id="${r.id}">Approve</button>
-                                <button class="action-btn btn-reject" data-id="${r.id}" style="margin-left: 8px;">Reject</button>
-                            ` : '<span style="color: #94a3b8; font-size: 12px;">Processed</span>'}
-                        </td>
-                    </tr>
-                `;
-            }).join('');
-
-            // Add Event Listeners
-            tbody.querySelectorAll('.btn-approve').forEach(btn => {
-                btn.onclick = async () => handleAction(btn.dataset.id, 'Approved');
-            });
-            tbody.querySelectorAll('.btn-reject').forEach(btn => {
-                btn.onclick = async () => handleAction(btn.dataset.id, 'Rejected');
-            });
-        }
-
-        async function handleAction(id, status) {
-            try {
-                await updateMessReductionStatus(id, status, 'Mess Manager');
-                initDashboard(); // Refresh
-            } catch (err) {
-                alert('Action failed: ' + err.message);
-            }
-        }
-
-        async function initDirectory() {
-            const students = await getStudentDirectory();
-            renderDirectory(students);
-        }
-
-        function renderDirectory(students) {
-            const tbody = document.getElementById('directoryTableBody');
-            tbody.innerHTML = students.map(s => `
-                <tr>
-                    <td><strong>${s.fullName}</strong></td>
-                    <td>${s.registerNumber || '--'}</td>
-                    <td>${s.room || '--'}</td>
-                    <td>${s.hostel || '--'}</td>
-                    <td><span class="status-badge ${s.feeStatus === 'Paid' ? 'status-approved' : 'status-pending'}">${s.feeStatus || 'Pending'}</span></td>
-                </tr>
-            `).join('');
-        }
-
-        // Navigation Logic
-        const navItems = {
-            navDash: { show: ['.main-content-grid', '.stats-grid'], hide: ['#directorySection'] },
-            navReductions: { show: ['.main-content-grid'], hide: ['.stats-grid', '#directorySection'] },
-            navDirectory: { show: ['#directorySection'], hide: ['.main-content-grid', '.stats-grid'] }
-        };
-
-        Object.keys(navItems).forEach(id => {
-            document.getElementById(id).onclick = (e) => {
-                e.preventDefault();
-                // Toggle classes
-                document.querySelectorAll('.navigation-item').forEach(el => el.classList.remove('active'));
-                document.getElementById(id).classList.add('active');
-
-                // Toggle visibility
-                navItems[id].show.forEach(sel => {
-                    const el = document.querySelector(sel) || document.getElementById(sel.replace('#',''));
-                    if (el) el.style.display = sel.startsWith('.') ? 'grid' : 'block';
-                });
-                navItems[id].hide.forEach(sel => {
-                    const el = document.querySelector(sel) || document.getElementById(sel.replace('#',''));
-                    if (el) el.style.display = 'none';
-                });
-
-                if (id === 'navDirectory') initDirectory();
-                if (id === 'navDash' || id === 'navReductions') initDashboard();
-            };
+          }
+          const profile = await getStudentProfile(user.uid);
+          if (!profile || profile.role !== 'mess-manager') {
+            window.location.href = 'dashboard.html';
+            return;
+          }
+          await loadDashboard();
         });
 
-        // Search Logic
-        document.getElementById('studentSearch').oninput = (e) => {
-            const term = e.target.value.toLowerCase();
-            const rows = document.querySelectorAll('#directoryTableBody tr');
-            rows.forEach(row => {
-                row.style.display = row.textContent.toLowerCase().includes(term) ? '' : 'none';
-            });
-        };
+        document.getElementById('logoutBtn').addEventListener('click', logOut);
+      }
 
-        // Logout
-        document.getElementById('logoutBtn').onclick = logOut;
+      async function loadDashboard() {
+        try {
+          const stats = await getMessManagerStats();
+          document.getElementById('totalResidents').textContent = stats.totalResidents || 0;
+          document.getElementById('pendingReductions').textContent = stats.pendingMess || 0;
+          document.getElementById('monthlySavings').textContent = `₹${(stats.monthlySavings || 0).toLocaleString()}`;
+          document.getElementById('pendingBadge').textContent = `${stats.pendingMess || 0} Pending`;
 
-        // Initial Load
-        initDashboard();
+          const requests = await getPendingMessReductions();
+          renderRequests(requests);
+
+          const students = await getMessManagerStudents();
+          renderStudents(students);
+        } catch (err) {
+          console.error('Dashboard load error:', err);
+        }
+      }
+
+      function renderRequests(requests) {
+        const container = document.getElementById('requestsList');
+        if (!requests || requests.length === 0) {
+          container.innerHTML = '<div class="empty-state">No pending reduction requests</div>';
+          return;
+        }
+
+        container.innerHTML = requests.map(req => `
+          <div class="request-row" data-id="${req.id}">
+            <div class="request-info">
+              <div class="avatar ${req.gender === 'female' ? 'female' : ''}">${getInitials(req.studentName)}</div>
+              <div class="request-details">
+                <span class="student-name">${req.studentName}</span>
+                <span class="request-meta">${formatDate(req.periods?.[0]?.from)} - ${formatDate(req.periods?.[0]?.to)} • ${req.reason || 'No reason'}</span>
+              </div>
+            </div>
+            <div class="request-actions">
+              <button class="btn-approve" onclick="handleApprove('${req.id}', '${req.studentId}')">Approve</button>
+              <button class="btn-reject" onclick="handleReject('${req.id}', '${req.studentId}')">Reject</button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      function renderStudents(students) {
+        const container = document.getElementById('studentsTable');
+        if (!students || students.length === 0) {
+          container.innerHTML = '<div class="empty-state">No students found</div>';
+          return;
+        }
+
+        container.innerHTML = students.map(student => `
+          <div class="table-row">
+            <div class="table-cell student-cell">
+              <div class="student-avatar" style="background:url(https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-28/QHvKtOcWvz.png) no-repeat center; background-size:cover;"></div>
+              <span class="student-cell-name">${student.fullName}</span>
+            </div>
+            <div class="table-cell room-cell">${student.room || 'N/A'}</div>
+            <div class="table-cell status-cell">
+              <span class="status-badge ${student.feeStatus === 'Paid' ? 'status-paid' : 'status-pending'}">${student.feeStatus || 'Pending'}</span>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      function getInitials(name) {
+        if (!name) return '??';
+        return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+      }
+
+      function formatDate(dateStr) {
+        if (!dateStr) return 'N/A';
+        const d = new Date(dateStr);
+        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      }
+
+      window.handleApprove = async function(id, studentId) {
+        try {
+          await updateMessReductionStatus(id, 'Approved', studentId);
+          alert('✅ Request approved successfully');
+          loadDashboard();
+        } catch (err) {
+          alert('❌ Error: ' + err.message);
+        }
+      };
+
+      window.handleReject = async function(id, studentId) {
+        try {
+          await updateMessReductionStatus(id, 'Rejected', studentId);
+          alert('❌ Request rejected');
+          loadDashboard();
+        } catch (err) {
+          alert('❌ Error: ' + err.message);
+        }
+      };
+
+      init();
     </script>
-</body>
+  </body>
 </html>

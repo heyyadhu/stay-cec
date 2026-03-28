@@ -4,7 +4,7 @@
 const admin = require('firebase-admin');
 
 // Initialize with service account
-const serviceAccount = require('./stay-cec-firebase-adminsdk-fbsvc-8f9f45b9df.json');
+const serviceAccount = require('C:/Users/fxadh/Downloads/stay-cec-firebase-adminsdk-fbsvc-8f9f45b9df.json');
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
