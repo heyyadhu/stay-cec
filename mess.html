@@ -264,6 +264,7 @@
     </script>
     <script type="module">
       import { requireAuth, logOut, getStudentProfile } from './auth.js';
+      import { getWeeklyMealSchedule } from './data.js';
 
       (async () => {
         const user = await requireAuth();
@@ -282,7 +283,130 @@
         }
 
         document.getElementById('mainContainer').style.opacity = '1';
+        
+        // Load weekly meal schedule from database
+        await loadWeeklySchedule();
       })();
+
+      async function loadWeeklySchedule() {
+        try {
+          const today = new Date();
+          const monday = getMonday(today);
+          const weekStart = monday.toISOString().split('T')[0];
+          
+          const weeklyData = await getWeeklyMealSchedule(weekStart);
+          
+          // Update week display
+          const weekEnd = new Date(monday);
+          weekEnd.setDate(weekEnd.getDate() + 6);
+          const weekRangeText = `Week of ${formatDate(monday)} – ${formatDate(weekEnd)}`;
+          document.querySelector('.week-schedule').textContent = weekRangeText;
+          
+          // Update today's current meal
+          updateCurrentMeal(weeklyData, today);
+          
+          // Update each day in the schedule
+          updateDaySchedule('monday', 0, monday, weeklyData);
+          updateDaySchedule('tuesday-today', 1, monday, weeklyData, true);
+          updateDaySchedule('wednesday', 2, monday, weeklyData);
+          updateDaySchedule('thursday', 3, monday, weeklyData);
+          updateDaySchedule('friday', 4, monday, weeklyData);
+          updateDaySchedule('saturday', 5, monday, weeklyData);
+          updateDaySchedule('sunday', 6, monday, weeklyData);
+          
+        } catch (err) {
+          console.error('Error loading weekly schedule:', err);
+        }
+      }
+
+      function getMonday(d) {
+        d = new Date(d);
+        const day = d.getDay();
+        const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+        return new Date(d.setDate(diff));
+      }
+
+      function formatDate(date) {
+        return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+      }
+
+      function formatShortDate(date) {
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      }
+
+      function updateCurrentMeal(weeklyData, today) {
+        const dateKey = today.toISOString().split('T')[0];
+        const dayData = weeklyData[dateKey];
+        
+        if (!dayData) return;
+        
+        const hour = today.getHours();
+        let currentMeal = null;
+        let mealType = '';
+        
+        // Determine current meal based on time
+        if (hour >= 6 && hour < 11) {
+          currentMeal = dayData.breakfast;
+          mealType = "Today's Breakfast";
+        } else if (hour >= 11 && hour < 16) {
+          currentMeal = dayData.lunch;
+          mealType = "Today's Lunch";
+        } else if (hour >= 16 || hour < 6) {
+          currentMeal = dayData.dinner;
+          mealType = "Tonight's Dinner";
+        }
+        
+        if (currentMeal) {
+          document.querySelector('.current-meal').textContent = `Current Meal: ${mealType}`;
+          document.querySelector('.pesto-pasta-garlic-bread').textContent = currentMeal.title;
+          document.querySelector('.description').innerHTML = currentMeal.description || 'Enjoy your meal!';
+          if (currentMeal.imageUrl) {
+            document.querySelector('.todays-lunch').style.backgroundImage = `url(${currentMeal.imageUrl})`;
+          }
+        }
+      }
+
+      function updateDaySchedule(dayClass, dayOffset, monday, weeklyData, isToday = false) {
+        const date = new Date(monday);
+        date.setDate(date.getDate() + dayOffset);
+        const dateKey = date.toISOString().split('T')[0];
+        const dayData = weeklyData[dateKey] || {};
+        
+        const dayElement = document.querySelector(`.${dayClass}`);
+        if (!dayElement) return;
+        
+        // Update date
+        const dateEl = dayElement.querySelector('[class*="oct-"], [class*="heading"] span');
+        if (dateEl) {
+          dateEl.textContent = formatShortDate(date);
+        }
+        
+        // Update meals
+        const overlays = dayElement.querySelectorAll('[class*="overlay"]');
+        overlays.forEach((overlay, index) => {
+          let meal = null;
+          let mealLabel = '';
+          
+          if (index === 0) {
+            meal = dayData.breakfast;
+            mealLabel = isToday && dayData.breakfast ? 'Breakfast (Today)' : 'Breakfast';
+          } else if (index === 1) {
+            meal = dayData.lunch;
+            mealLabel = 'Lunch';
+          } else if (index === 2) {
+            meal = dayData.dinner;
+            mealLabel = 'Dinner';
+          }
+          
+          if (meal) {
+            const labelEl = overlay.querySelector('span[class*="breakfast"], span[class*="lunch"], span[class*="dinner"], span[class*="brunch"], span[class*="evening"]');
+            const titleEl = overlay.querySelector('span:last-child');
+            
+            if (labelEl) labelEl.textContent = mealLabel;
+            if (titleEl) titleEl.textContent = meal.title;
+          }
+        });
+      }
 
       document.getElementById('logoutBtn').addEventListener('click', () => logOut());
     </script>

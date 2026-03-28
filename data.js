@@ -3,7 +3,7 @@
  * data.js — Data fetching and Firestore helpers for StayCEC
  */
 
-import { db } from "./firebase-config.js";
+import { db, storage } from "./firebase-config.js";
 import { 
   collection, 
   query, 
@@ -22,6 +22,7 @@ import {
   serverTimestamp,
   doc,
 } from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 /**
  * Fetch the 3 most recent complaints for a specific student.
@@ -1104,5 +1105,152 @@ export async function getMessManagerStudents() {
   } catch (error) {
     console.error('Error fetching mess manager students:', error);
     return [];
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// MEAL SCHEDULE & IMAGE UPLOAD FUNCTIONS
+// ─────────────────────────────────────────────────────────────
+
+/**
+ * Upload a meal image to Firebase Storage.
+ * @param {File} file - The image file to upload
+ * @param {string} mealType - 'breakfast', 'lunch', or 'dinner'
+ * @param {string} date - ISO date string (YYYY-MM-DD)
+ * @returns {Promise<string>} Download URL
+ */
+export async function uploadMealImage(file, mealType, date) {
+  try {
+    const timestamp = Date.now();
+    const fileName = `${date}_${mealType}_${timestamp}_${file.name}`;
+    const storageRef = ref(storage, `meals/${fileName}`);
+    
+    const snapshot = await uploadBytes(storageRef, file);
+    const downloadURL = await getDownloadURL(snapshot.ref);
+    
+    return downloadURL;
+  } catch (error) {
+    console.error('Error uploading meal image:', error);
+    throw new Error('Failed to upload image: ' + error.message);
+  }
+}
+
+/**
+ * Save or update a meal schedule entry.
+ * @param {Object} mealData
+ * @param {string} mealData.date - ISO date string (YYYY-MM-DD)
+ * @param {string} mealData.type - 'breakfast', 'lunch', or 'dinner'
+ * @param {string} mealData.title - Meal title
+ * @param {string} mealData.description - Meal description/ingredients
+ * @param {string} mealData.imageUrl - URL to the meal image
+ * @param {string} [mealData.id] - Optional ID for updates
+ * @returns {Promise<string>} Document ID
+ */
+export async function saveMealSchedule(mealData) {
+  try {
+    const { date, type, title, description, imageUrl, id } = mealData;
+    
+    const data = {
+      date,
+      type,
+      title,
+      description,
+      imageUrl,
+      updatedAt: serverTimestamp(),
+    };
+    
+    let docRef;
+    if (id) {
+      // Update existing
+      docRef = doc(db, 'mealSchedules', id);
+      await updateDoc(docRef, data);
+    } else {
+      // Create new
+      data.createdAt = serverTimestamp();
+      docRef = await addDoc(collection(db, 'mealSchedules'), data);
+    }
+    
+    return docRef.id || id;
+  } catch (error) {
+    console.error('Error saving meal schedule:', error);
+    throw new Error('Failed to save meal: ' + error.message);
+  }
+}
+
+/**
+ * Get meal schedules for a date range.
+ * @param {string} startDate - ISO date string (YYYY-MM-DD)
+ * @param {string} endDate - ISO date string (YYYY-MM-DD)
+ * @returns {Promise<Array>} Array of meal schedule objects
+ */
+export async function getMealSchedules(startDate, endDate) {
+  try {
+    const q = query(
+      collection(db, 'mealSchedules'),
+      where('date', '>=', startDate),
+      where('date', '<=', endDate),
+      orderBy('date', 'asc')
+    );
+    
+    const snap = await getDocs(q);
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch (error) {
+    console.error('Error fetching meal schedules:', error);
+    return [];
+  }
+}
+
+/**
+ * Get weekly meal schedule starting from a given date.
+ * @param {string} weekStartDate - ISO date string for Monday of the week
+ * @returns {Promise<Object>} Object with meals organized by day
+ */
+export async function getWeeklyMealSchedule(weekStartDate) {
+  try {
+    const start = new Date(weekStartDate);
+    const end = new Date(start);
+    end.setDate(end.getDate() + 6);
+    
+    const startStr = start.toISOString().split('T')[0];
+    const endStr = end.toISOString().split('T')[0];
+    
+    const meals = await getMealSchedules(startStr, endStr);
+    
+    // Organize by day
+    const weeklySchedule = {};
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(start);
+      d.setDate(d.getDate() + i);
+      const dateStr = d.toISOString().split('T')[0];
+      weeklySchedule[dateStr] = {
+        breakfast: null,
+        lunch: null,
+        dinner: null
+      };
+    }
+    
+    meals.forEach(meal => {
+      if (weeklySchedule[meal.date]) {
+        weeklySchedule[meal.date][meal.type] = meal;
+      }
+    });
+    
+    return weeklySchedule;
+  } catch (error) {
+    console.error('Error fetching weekly schedule:', error);
+    return {};
+  }
+}
+
+/**
+ * Delete a meal schedule entry.
+ * @param {string} mealId
+ */
+export async function deleteMealSchedule(mealId) {
+  try {
+    await deleteDoc(doc(db, 'mealSchedules', mealId));
+  } catch (error) {
+    console.error('Error deleting meal schedule:', error);
+    throw new Error('Failed to delete meal: ' + error.message);
   }
 }

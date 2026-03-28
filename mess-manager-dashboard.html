@@ -187,10 +187,27 @@
       </div>
     </div>
 
+    <input type="file" id="mealImageInput" accept="image/*" class="hidden" />
+
     <script type="module">
       import { auth, onAuthStateChanged } from './firebase-config.js';
       import { logOut, getStudentProfile } from './auth.js';
-      import { getMessManagerStats, getPendingMessReductions, getMessManagerStudents, updateMessReductionStatus } from './data.js';
+      import { getMessManagerStats, getPendingMessReductions, getMessManagerStudents, updateMessReductionStatus, uploadMealImage, saveMealSchedule, getWeeklyMealSchedule, deleteMealSchedule } from './data.js';
+
+      let currentWeekStart = getMonday(new Date());
+      let currentEditingMeal = null;
+      let selectedImageFile = null;
+
+      function getMonday(d) {
+        d = new Date(d);
+        const day = d.getDay();
+        const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+        return new Date(d.setDate(diff));
+      }
+
+      function formatDateKey(d) {
+        return d.toISOString().split('T')[0];
+      }
 
       async function init() {
         onAuthStateChanged(auth, async (user) => {
@@ -294,6 +311,7 @@
           const opacity = i === 0 ? 'opacity-100' : (i === 1 ? 'opacity-75' : 'opacity-40');
           const hidden = i >= 4 ? (i >= 5 ? 'hidden lg:flex' : 'hidden md:flex') : '';
           const m = meals[i];
+          const dateKey = formatDateKey(new Date(currentWeekStart.getTime() + i * 24 * 60 * 60 * 1000));
           
           if (i === 0) {
             return `
@@ -302,9 +320,9 @@
                   <span class="text-neutral-muted text-xs font-bold uppercase tracking-tight">${day}</span>
                   <span class="text-neutral-text text-lg font-black leading-7">${dates[i]}</span>
                 </div>
-                ${renderMealCard(imgs[0], m.bf[0], m.bf[1], icons[0], flags[0], 'Breakfast')}
-                ${renderMealCard(imgs[1], m.lun[0], m.lun[1], icons[1], flags[1], 'Lunch')}
-                ${renderMealCard(imgs[2], m.din[0], m.din[1], icons[2], flags[2], 'Dinner')}
+                <div onclick="openEditModal('${dateKey}', 'breakfast')">${renderMealCard(imgs[0], m.bf[0], m.bf[1], icons[0], flags[0], 'Breakfast', dateKey, 'breakfast')}</div>
+                <div onclick="openEditModal('${dateKey}', 'lunch')">${renderMealCard(imgs[1], m.lun[0], m.lun[1], icons[1], flags[1], 'Lunch', dateKey, 'lunch')}</div>
+                <div onclick="openEditModal('${dateKey}', 'dinner')">${renderMealCard(imgs[2], m.din[0], m.din[1], icons[2], flags[2], 'Dinner', dateKey, 'dinner')}</div>
               </div>`;
           } else if (i === 1) {
             return `
@@ -313,9 +331,9 @@
                   <span class="text-neutral-muted text-xs font-bold uppercase tracking-tight">${day}</span>
                   <span class="text-neutral-text text-lg font-black leading-7">${dates[i]}</span>
                 </div>
-                <button onclick="openEditModal()" class="h-28 bg-[#F2F4F5] rounded-3xl border-2 border-dashed border-neutral-border flex items-center justify-center hover:bg-brand-primary/5 hover:border-brand-primary/50 hover:text-brand-primary transition-all group outline-none"><i data-lucide="plus" class="w-5 h-5 text-[#BBC9C7] group-hover:text-brand-primary group-hover:scale-110 transition-all"></i></button>
-                <button onclick="openEditModal()" class="h-28 bg-[#F2F4F5] rounded-3xl border-2 border-dashed border-neutral-border flex items-center justify-center hover:bg-brand-primary/5 hover:border-brand-primary/50 hover:text-brand-primary transition-all group outline-none"><i data-lucide="plus" class="w-5 h-5 text-[#BBC9C7] group-hover:text-brand-primary group-hover:scale-110 transition-all"></i></button>
-                <button onclick="openEditModal()" class="h-28 bg-[#F2F4F5] rounded-3xl border-2 border-dashed border-neutral-border flex items-center justify-center hover:bg-brand-primary/5 hover:border-brand-primary/50 hover:text-brand-primary transition-all group outline-none"><i data-lucide="plus" class="w-5 h-5 text-[#BBC9C7] group-hover:text-brand-primary group-hover:scale-110 transition-all"></i></button>
+                <button onclick="openEditModal('${dateKey}', 'breakfast')" class="h-28 bg-[#F2F4F5] rounded-3xl border-2 border-dashed border-neutral-border flex items-center justify-center hover:bg-brand-primary/5 hover:border-brand-primary/50 hover:text-brand-primary transition-all group outline-none"><i data-lucide="plus" class="w-5 h-5 text-[#BBC9C7] group-hover:text-brand-primary group-hover:scale-110 transition-all"></i></button>
+                <button onclick="openEditModal('${dateKey}', 'lunch')" class="h-28 bg-[#F2F4F5] rounded-3xl border-2 border-dashed border-neutral-border flex items-center justify-center hover:bg-brand-primary/5 hover:border-brand-primary/50 hover:text-brand-primary transition-all group outline-none"><i data-lucide="plus" class="w-5 h-5 text-[#BBC9C7] group-hover:text-brand-primary group-hover:scale-110 transition-all"></i></button>
+                <button onclick="openEditModal('${dateKey}', 'dinner')" class="h-28 bg-[#F2F4F5] rounded-3xl border-2 border-dashed border-neutral-border flex items-center justify-center hover:bg-brand-primary/5 hover:border-brand-primary/50 hover:text-brand-primary transition-all group outline-none"><i data-lucide="plus" class="w-5 h-5 text-[#BBC9C7] group-hover:text-brand-primary group-hover:scale-110 transition-all"></i></button>
               </div>`;
           } else {
             return `
@@ -330,9 +348,9 @@
         lucide.createIcons();
       }
 
-      function renderMealCard(img, title, desc, icon, flag, label) {
+      function renderMealCard(img, title, desc, icon, flag, label, dateKey, mealType) {
         return `
-          <div onclick="openEditModal()" class="bg-white rounded-3xl shadow-[0_1px_2px_rgba(0,0,0,0.05)] overflow-hidden flex flex-col group cursor-pointer border border-transparent hover:border-brand-primary/50 hover:shadow-lg transition-all relative">
+          <div onclick="openEditModal('${dateKey}', '${mealType}')" class="bg-white rounded-3xl shadow-[0_1px_2px_rgba(0,0,0,0.05)] overflow-hidden flex flex-col group cursor-pointer border border-transparent hover:border-brand-primary/50 hover:shadow-lg transition-all relative">
             <div class="absolute inset-0 bg-white/40 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 z-20 flex items-center justify-center transition-all duration-300">
               <div class="bg-brand-primary text-white px-4 py-2 rounded-full flex items-center gap-2 font-bold text-sm shadow-lg transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300"><i data-lucide="pencil" class="w-4 h-4"></i> Edit</div>
             </div>
@@ -362,9 +380,32 @@
         catch (err) { alert('Error: ' + err.message); }
       };
 
-      window.openEditModal = function() {
+      window.openEditModal = function(date, type, mealId = null) {
+        console.log('openEditModal called:', { date, type, mealId });
+        
+        if (!date) {
+          console.error('No date provided to openEditModal');
+          alert('Error: Could not determine meal date. Please refresh and try again.');
+          return;
+        }
+        
+        currentEditingMeal = { date, type, id: mealId };
+        selectedImageFile = null;
+        
         const modal = document.getElementById('editMealModal');
         const content = document.getElementById('editMealModalContent');
+        
+        // Reset form - use more specific selectors
+        const selectEl = modal.querySelector('select');
+        const inputEl = modal.querySelector('input[type="text"]');
+        const textareaEl = modal.querySelector('textarea');
+        const imgEl = modal.querySelector('img');
+        
+        if (selectEl) selectEl.value = type ? type.charAt(0).toUpperCase() + type.slice(1) : 'Breakfast';
+        if (inputEl) inputEl.value = '';
+        if (textareaEl) textareaEl.value = '';
+        if (imgEl) imgEl.src = 'https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-28/J0qSt4xdtj.png';
+        
         modal.classList.remove('hidden');
         setTimeout(() => { modal.classList.remove('opacity-0'); content.classList.remove('scale-95'); }, 10);
       };
@@ -373,20 +414,118 @@
         const modal = document.getElementById('editMealModal');
         const content = document.getElementById('editMealModalContent');
         modal.classList.add('opacity-0'); content.classList.add('scale-95');
-        setTimeout(() => { modal.classList.add('hidden'); }, 300);
+        setTimeout(() => { modal.classList.add('hidden'); currentEditingMeal = null; selectedImageFile = null; }, 300);
       };
 
-      window.saveAndCloseModal = function(e) {
+      window.saveAndCloseModal = async function(e) {
         const btn = e.currentTarget;
-        btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Saving...'; lucide.createIcons();
-        setTimeout(() => {
+        const originalContent = btn.innerHTML;
+        
+        try {
+          btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Saving...';
+          lucide.createIcons();
+          btn.disabled = true;
+          
+          // Check if currentEditingMeal exists
+          if (!currentEditingMeal || !currentEditingMeal.date) {
+            alert('Error: No date selected. Please close and reopen the modal.');
+            btn.innerHTML = originalContent;
+            btn.disabled = false;
+            lucide.createIcons();
+            return;
+          }
+          
+          const type = document.querySelector('#editMealModal select').value.toLowerCase();
+          const titleInput = document.querySelector('#editMealModal input[type="text"]');
+          const title = titleInput ? titleInput.value : '';
+          const descTextarea = document.querySelector('#editMealModal textarea');
+          const description = descTextarea ? descTextarea.value : '';
+          
+          if (!title.trim()) {
+            alert('Please enter a meal title');
+            btn.innerHTML = originalContent;
+            btn.disabled = false;
+            lucide.createIcons();
+            return;
+          }
+          
+          let imageUrl = 'https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-28/J0qSt4xdtj.png';
+          
+          // Upload image if selected
+          if (selectedImageFile) {
+            console.log('Uploading image...', selectedImageFile.name);
+            imageUrl = await uploadMealImage(selectedImageFile, type, currentEditingMeal.date);
+            console.log('Image uploaded:', imageUrl);
+          }
+          
+          // Save to database
+          console.log('Saving meal schedule:', { date: currentEditingMeal.date, type, title });
+          await saveMealSchedule({
+            date: currentEditingMeal.date,
+            type: type,
+            title: title,
+            description: description,
+            imageUrl: imageUrl,
+            id: currentEditingMeal.id
+          });
+          console.log('Meal saved successfully');
+          
           btn.innerHTML = '<i data-lucide="check-circle-2" class="w-4 h-4"></i> Saved!';
           btn.classList.replace('bg-brand-primary', 'bg-green-500');
           btn.classList.replace('shadow-brand-primary/30', 'shadow-green-500/30');
           lucide.createIcons();
-          setTimeout(() => { closeEditModal(); setTimeout(() => { btn.innerHTML = '<i data-lucide="check" class="w-4 h-4"></i> Save Meal'; btn.classList.replace('bg-green-500', 'bg-brand-primary'); btn.classList.replace('shadow-green-500/30', 'shadow-brand-primary/30'); lucide.createIcons(); }, 300); }, 600);
-        }, 600);
+          
+          setTimeout(() => {
+            closeEditModal();
+            renderSchedule(); // Refresh schedule
+            setTimeout(() => {
+              btn.innerHTML = originalContent;
+              btn.classList.replace('bg-green-500', 'bg-brand-primary');
+              btn.classList.replace('shadow-green-500/30', 'shadow-brand-primary/30');
+              btn.disabled = false;
+              lucide.createIcons();
+            }, 300);
+          }, 600);
+        } catch (err) {
+          console.error('Save error:', err);
+          alert('Error saving meal: ' + err.message);
+          btn.innerHTML = originalContent;
+          btn.disabled = false;
+          lucide.createIcons();
+        }
       };
+
+      // Handle file input change
+      document.getElementById('mealImageInput').addEventListener('change', function(e) {
+        if (e.target.files && e.target.files[0]) {
+          selectedImageFile = e.target.files[0];
+          const reader = new FileReader();
+          reader.onload = function(event) {
+            document.querySelector('#editMealModal img').src = event.target.result;
+          };
+          reader.readAsDataURL(selectedImageFile);
+        }
+      });
+
+      // Handle image upload click - attach after modal is in DOM
+      document.addEventListener('click', function(e) {
+        const imgContainer = e.target.closest('#editMealModal .h-36');
+        if (imgContainer) {
+          e.preventDefault();
+          e.stopPropagation();
+          document.getElementById('mealImageInput').click();
+        }
+      });
+
+      // Handle save button click with delegation
+      document.addEventListener('click', function(e) {
+        const saveBtn = e.target.closest('button[onclick="saveAndCloseModal(event)"]');
+        if (saveBtn && !saveBtn.disabled) {
+          e.preventDefault();
+          e.stopPropagation();
+          saveAndCloseModal({ currentTarget: saveBtn });
+        }
+      });
 
       document.getElementById('editMealModal').addEventListener('click', function(e) { if (e.target === this) closeEditModal(); });
 
