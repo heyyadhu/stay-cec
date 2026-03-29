@@ -255,19 +255,17 @@
               </div>
             </div>
           </div>
-          <div class="container-60">
+          <div class="container-60" id="todayMealsContainer">
             <div class="container-61">
               <div class="background-62">
                 <div class="container-63"><div class="icon-64"></div></div>
               </div>
               <div class="container-65">
                 <div class="container-66">
-                  <span class="text-67">Lunch</span>
+                  <span class="text-67" id="meal1Label">Lunch</span>
                 </div>
                 <div class="container-68">
-                  <span class="text-69"
-                    >Vegetable<br />Pulao, Curd,<br />Salad</span
-                  >
+                  <span class="text-69" id="meal1Text">Loading...</span>
                 </div>
               </div>
             </div>
@@ -277,10 +275,10 @@
               </div>
               <div class="container-6e">
                 <div class="container-6f">
-                  <span class="text-70">Dinner</span>
+                  <span class="text-70" id="meal2Label">Dinner</span>
                 </div>
                 <div class="container-71">
-                  <span class="text-72">Paneer Tikka,<br />Butter Naan</span>
+                  <span class="text-72" id="meal2Text">Loading...</span>
                 </div>
               </div>
             </div>
@@ -298,7 +296,7 @@
     </div>
     <script type="module">
       import { requireAuth, getStudentProfile, logOut } from './auth.js';
-      import { getRecentComplaints, calculateAndSetMonthlyFee, checkAndNotifyLateFee, verifyPayment } from './data.js';
+      import { getRecentComplaints, calculateAndSetMonthlyFee, checkAndNotifyLateFee, verifyPayment, getWeeklyMealSchedule } from './data.js';
 
       async function init() {
         try {
@@ -372,7 +370,90 @@
             }
           }
 
-          // 4. Fee Display via fee engine
+          // 4. Live Mess Menu - Fetch from database
+          try {
+            const today = new Date();
+            const day = today.getDay();
+            const diff = today.getDate() - day + (day === 0 ? -6 : 1);
+            const monday = new Date(today.setDate(diff));
+            
+            const formatLocalDate = (d) => {
+              const year = d.getFullYear();
+              const month = String(d.getMonth() + 1).padStart(2, '0');
+              const day = String(d.getDate()).padStart(2, '0');
+              return `${year}-${month}-${day}`;
+            };
+            
+            const weekStart = formatLocalDate(monday);
+            const weeklyData = await getWeeklyMealSchedule(weekStart);
+            
+            const todayKey = formatLocalDate(new Date());
+            const todayMeals = weeklyData[todayKey];
+            
+            if (todayMeals) {
+              const hour = new Date().getHours();
+              
+              // Determine which meals to show based on time
+              let meal1Type, meal2Type;
+              if (hour < 11) {
+                meal1Type = 'breakfast';
+                meal2Type = 'lunch';
+              } else if (hour < 16) {
+                meal1Type = 'lunch';
+                meal2Type = 'dinner';
+              } else {
+                meal1Type = 'dinner';
+                meal2Type = null;
+              }
+              
+              // Update meal 1
+              const meal1Label = document.getElementById('meal1Label');
+              const meal1Text = document.getElementById('meal1Text');
+              if (meal1Label && meal1Text) {
+                const meal1 = todayMeals[meal1Type];
+                if (meal1) {
+                  meal1Label.textContent = meal1Type.charAt(0).toUpperCase() + meal1Type.slice(1);
+                  meal1Text.textContent = meal1.title;
+                } else {
+                  meal1Label.textContent = meal1Type.charAt(0).toUpperCase() + meal1Type.slice(1);
+                  meal1Text.textContent = 'Not scheduled';
+                }
+              }
+              
+              // Update meal 2 (if applicable)
+              const meal2Label = document.getElementById('meal2Label');
+              const meal2Text = document.getElementById('meal2Text');
+              const meal2Container = meal2Label?.closest('.container-6a');
+              
+              if (meal2Type && meal2Label && meal2Text) {
+                const meal2 = todayMeals[meal2Type];
+                if (meal2) {
+                  meal2Label.textContent = meal2Type.charAt(0).toUpperCase() + meal2Type.slice(1);
+                  meal2Text.textContent = meal2.title;
+                } else {
+                  meal2Label.textContent = meal2Type.charAt(0).toUpperCase() + meal2Type.slice(1);
+                  meal2Text.textContent = 'Not scheduled';
+                }
+                if (meal2Container) meal2Container.style.display = 'flex';
+              } else if (meal2Container) {
+                meal2Container.style.display = 'none';
+              }
+            } else {
+              // No data for today
+              const meal1Text = document.getElementById('meal1Text');
+              const meal2Text = document.getElementById('meal2Text');
+              if (meal1Text) meal1Text.textContent = 'Check full menu';
+              if (meal2Text) meal2Text.textContent = 'Check full menu';
+            }
+          } catch (err) {
+            console.error('Error loading today\'s meals:', err);
+            const meal1Text = document.getElementById('meal1Text');
+            const meal2Text = document.getElementById('meal2Text');
+            if (meal1Text) meal1Text.textContent = 'Menu unavailable';
+            if (meal2Text) meal2Text.textContent = 'Menu unavailable';
+          }
+
+          // 5. Fee Display via fee engine
           let feeBreakdown = null;
           try {
             feeBreakdown = await calculateAndSetMonthlyFee(user.uid);
