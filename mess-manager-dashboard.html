@@ -87,7 +87,10 @@
             <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
               <div class="flex flex-col gap-1">
                 <span class="text-brand-dark text-xs font-bold uppercase tracking-[1.2px]">Weekly Planning</span>
-                <h1 class="text-neutral-text text-[30px] font-extrabold leading-tight tracking-tight">Schedule Editor</h1>
+                <div class="flex flex-wrap items-center gap-3">
+                  <h1 class="text-neutral-text text-[30px] font-extrabold leading-tight tracking-tight">Schedule Editor</h1>
+                  <a href="mess.html" target="_blank" rel="noopener noreferrer" class="text-brand-primary text-sm font-semibold hover:underline whitespace-nowrap">Open student Mess view</a>
+                </div>
                 <span id="weekRangeDisplay" class="text-neutral-muted text-sm font-medium">Loading...</span>
               </div>
               <div class="flex p-1 bg-[#F2F4F5] rounded-xl self-start sm:self-auto">
@@ -236,6 +239,7 @@
       function updateWeekButtons() {
         const thisWeekBtn = document.getElementById('thisWeekBtn');
         const nextWeekBtn = document.getElementById('nextWeekBtn');
+        if (!thisWeekBtn || !nextWeekBtn) return;
         const today = getMonday(new Date());
         const isThisWeek = formatDateKey(currentWeekStart) === formatDateKey(today);
         
@@ -255,7 +259,8 @@
           if (!profile || profile.role !== 'mess-manager') { window.location.href = 'dashboard.html'; return; }
           await loadDashboard();
         });
-        document.getElementById('logoutBtn').addEventListener('click', logOut);
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) logoutBtn.addEventListener('click', logOut);
         lucide.createIcons();
       }
 
@@ -342,8 +347,6 @@
         
         updateWeekButtons();
         
-        console.log('[mess-manager] currentWeekStart:', formatDateKey(currentWeekStart));
-        
         const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
         const container = document.getElementById('scheduleGrid');
         const imgs = ['J0qSt4xdtj.png', '9e14JJiNhV.png', 'RHQM4qeFsA.png'];
@@ -356,18 +359,14 @@
         
         // Fetch saved meals from database
         const weekStartStr = formatDateKey(currentWeekStart);
-        console.log('[mess-manager] Querying week starting:', weekStartStr);
         
         let weeklyData = {};
         try {
           weeklyData = await getWeeklyMealSchedule(weekStartStr);
-          console.log('[mess-manager] Loaded weekly data:', weeklyData);
         } catch (err) {
           console.error('[mess-manager] Error loading schedule:', err);
           weeklyData = {};
         }
-        
-        console.log('[mess-manager] Rendering schedule grid...');
         
         container.innerHTML = days.map((day, i) => {
           const d = new Date(currentWeekStart);
@@ -452,10 +451,7 @@
       };
 
       window.openEditModal = function(date, type, mealId = null) {
-        console.log('openEditModal called:', { date, type, mealId });
-        
         if (!date) {
-          console.error('No date provided to openEditModal');
           alert('Error: Could not determine meal date. Please refresh and try again.');
           return;
         }
@@ -489,14 +485,9 @@
       };
 
       window.saveAndCloseModal = async function(e) {
-        console.log('[saveAndCloseModal] Called with event:', e);
-        console.log('[saveAndCloseModal] currentEditingMeal:', currentEditingMeal);
-        
         const btn = e.currentTarget;
-        console.log('[saveAndCloseModal] Button element:', btn);
         
         if (!btn) {
-          console.error('[saveAndCloseModal] No button found!');
           alert('Error: Could not find save button');
           return;
         }
@@ -510,7 +501,6 @@
           
           // Check if currentEditingMeal exists
           if (!currentEditingMeal || !currentEditingMeal.date) {
-            console.error('[saveAndCloseModal] No date in currentEditingMeal:', currentEditingMeal);
             alert('Error: No date selected. Please close and reopen the modal.');
             btn.innerHTML = originalContent;
             btn.disabled = false;
@@ -523,13 +513,9 @@
           const inputEl = document.querySelector('#editMealModal input[type="text"]');
           const textareaEl = document.querySelector('#editMealModal textarea');
           
-          console.log('[saveAndCloseModal] Form elements:', { selectEl, inputEl, textareaEl });
-          
           const type = selectEl ? selectEl.value.toLowerCase() : 'breakfast';
           const title = inputEl ? inputEl.value.trim() : '';
           const description = textareaEl ? textareaEl.value : '';
-          
-          console.log('[saveAndCloseModal] Form values:', { type, title, description });
           
           if (!title) {
             alert('Please enter a meal title');
@@ -544,8 +530,6 @@
           const uploadedUrl = modal.dataset.imageUrl;
           let imageUrl = uploadedUrl || 'https://codia-f2c.s3.us-west-1.amazonaws.com/image/2026-03-28/J0qSt4xdtj.png';
           
-          console.log('[saveAndCloseModal] Using image URL:', imageUrl);
-          
           // Save to database
           const mealData = {
             date: currentEditingMeal.date,
@@ -555,10 +539,8 @@
             imageUrl: imageUrl,
             id: currentEditingMeal.id
           };
-          console.log('[saveAndCloseModal] Saving meal data:', mealData);
           
           await saveMealSchedule(mealData);
-          console.log('[saveAndCloseModal] Meal saved successfully');
           
           btn.innerHTML = '<i data-lucide="check-circle-2" class="w-4 h-4"></i> Saved!';
           btn.classList.replace('bg-brand-primary', 'bg-green-500');
@@ -618,15 +600,12 @@
           
           // Upload to Imgur in background
           try {
-            console.log('[Imgur] Uploading image...');
             const imgurUrl = await uploadToImgur(file);
-            console.log('[Imgur] Upload successful:', imgurUrl);
             
             // Store the URL for saving
             document.querySelector('#editMealModal').dataset.imageUrl = imgurUrl;
             document.querySelector('#editMealModal img').src = imgurUrl;
           } catch (err) {
-            console.error('[Imgur] Upload failed:', err);
             // Keep local preview, will use default on save
           }
         }
@@ -644,11 +623,8 @@
 
       // Handle save button click with delegation
       document.addEventListener('click', function(e) {
-        console.log('[click handler] Click detected on:', e.target);
         const saveBtn = e.target.closest('button[onclick="saveAndCloseModal(event)"]');
-        console.log('[click handler] Save button found:', saveBtn);
         if (saveBtn && !saveBtn.disabled) {
-          console.log('[click handler] Triggering saveAndCloseModal');
           e.preventDefault();
           e.stopPropagation();
           saveAndCloseModal({ currentTarget: saveBtn });

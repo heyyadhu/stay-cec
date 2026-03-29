@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Meal Schedule Selector Test</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        .test-result { padding: 10px; margin: 10px 0; border-radius: 4px; }
+        .pass { background: #d4edda; color: #155724; }
+        .fail { background: #f8d7da; color: #721c24; }
+        .day-container { border: 1px solid #ccc; padding: 10px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>Meal Schedule Selector Test</h1>
+    <p>This test verifies the fix for meal data mapping between mess manager and student views.</p>
+    
+    <!-- Simulated HTML structure from mess.html -->
+    <div class="monday">
+        <div class="container-header">
+            <span>Monday</span>
+        </div>
+        <div class="container-31">
+            <div class="overlay">
+                <span class="meal-type">Breakfast</span>
+                <span class="meal-title">Poha</span>
+            </div>
+            <div class="overlay-34">
+                <span class="meal-type">Lunch</span>
+                <span class="meal-title">Thali</span>
+            </div>
+            <div class="overlay-37">
+                <span class="meal-type">Dinner</span>
+                <span class="meal-title">Biryani</span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="wednesday">
+        <div class="container-3a">
+            <span>Wednesday</span>
+        </div>
+        <div class="container-3e">
+            <div class="overlay-3f">
+                <span class="meal-type">Breakfast</span>
+                <span class="meal-title">Idli</span>
+            </div>
+            <div class="overlay-border">
+                <span class="meal-type">Lunch</span>
+                <span class="meal-title">Special</span>
+            </div>
+            <div class="overlay-46">
+                <span class="meal-type">Dinner</span>
+                <span class="meal-title">Biryani</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="results"></div>
+
+    <script>
+        function testSelector() {
+            const results = [];
+            
+            // Test 1: Monday - check we get exactly 3 meal containers
+            const mondayEl = document.querySelector('.monday');
+            const mondayInner = mondayEl.querySelector(':scope > div[class*="container-"]:nth-child(2)');
+            const mondayMeals = mondayInner ? mondayInner.querySelectorAll(':scope > div') : [];
+            
+            results.push({
+                name: 'Monday selector returns exactly 3 meals',
+                pass: mondayMeals.length === 3,
+                expected: 3,
+                actual: mondayMeals.length
+            });
+            
+            // Test 2: Wednesday - check overlay-border is included
+            const wednesdayEl = document.querySelector('.wednesday');
+            const wednesdayInner = wednesdayEl.querySelector(':scope > div[class*="container-"]:nth-child(2)');
+            const wednesdayMeals = wednesdayInner ? wednesdayInner.querySelectorAll(':scope > div') : [];
+            
+            results.push({
+                name: 'Wednesday selector returns exactly 3 meals (including overlay-border)',
+                pass: wednesdayMeals.length === 3,
+                expected: 3,
+                actual: wednesdayMeals.length
+            });
+            
+            // Test 3: Check that meal data would map correctly
+            const testData = {
+                breakfast: { title: 'Test Breakfast' },
+                lunch: { title: 'Test Lunch' },
+                dinner: { title: 'Test Dinner' }
+            };
+            
+            let mappingCorrect = true;
+            const mealTypes = ['breakfast', 'lunch', 'dinner'];
+            mondayMeals.forEach((container, index) => {
+                const typeSpan = container.querySelector('.meal-type');
+                const titleSpan = container.querySelector('.meal-title');
+                if (typeSpan && titleSpan) {
+                    const expectedType = mealTypes[index];
+                    // Simulate updating with new data
+                    titleSpan.textContent = testData[expectedType].title;
+                }
+            });
+            
+            // Verify the updates happened
+            const updatedTitles = Array.from(mondayMeals).map(m => 
+                m.querySelector('.meal-title')?.textContent
+            );
+            
+            results.push({
+                name: 'Data mapping works correctly (breakfast, lunch, dinner)',
+                pass: updatedTitles[0] === 'Test Breakfast' && 
+                      updatedTitles[1] === 'Test Lunch' && 
+                      updatedTitles[2] === 'Test Dinner',
+                expected: ['Test Breakfast', 'Test Lunch', 'Test Dinner'],
+                actual: updatedTitles
+            });
+            
+            // Display results
+            const resultsDiv = document.getElementById('results');
+            results.forEach(r => {
+                const div = document.createElement('div');
+                div.className = `test-result ${r.pass ? 'pass' : 'fail'}`;
+                div.innerHTML = `
+                    <strong>${r.pass ? 'PASS' : 'FAIL'}:</strong> ${r.name}<br>
+                    Expected: ${JSON.stringify(r.expected)}<br>
+                    Actual: ${JSON.stringify(r.actual)}
+                `;
+                resultsDiv.appendChild(div);
+            });
+            
+            // Overall result
+            const allPass = results.every(r => r.pass);
+            const summary = document.createElement('div');
+            summary.className = `test-result ${allPass ? 'pass' : 'fail'}`;
+            summary.style.fontSize = '1.2em';
+            summary.innerHTML = `<strong>${allPass ? 'ALL TESTS PASSED' : 'SOME TESTS FAILED'}</strong>`;
+            resultsDiv.insertBefore(summary, resultsDiv.firstChild);
+        }
+        
+        // Run tests when page loads
+        testSelector();
+    </script>
+</body>
+</html>

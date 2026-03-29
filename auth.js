@@ -94,7 +94,8 @@ export async function updateStudentProfile(data) {
  */
 export function requireAuth() {
   return new Promise((resolve, reject) => {
-    onAuthStateChanged(auth, (user) => {
+    const unsub = onAuthStateChanged(auth, (user) => {
+      unsub();
       if (user) {
         resolve(user);
       } else {

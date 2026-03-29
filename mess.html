@@ -290,7 +290,6 @@
 
       async function loadWeeklySchedule() {
         try {
-          console.log('[mess.html] Loading weekly schedule...');
           const today = new Date();
           const monday = getMonday(today);
           
@@ -303,10 +302,8 @@
           };
           
           const weekStart = formatLocalDate(monday);
-          console.log('[mess.html] Week start:', weekStart);
           
           const weeklyData = await getWeeklyMealSchedule(weekStart);
-          console.log('[mess.html] Received weekly data:', weeklyData);
           
           // Update week display
           const weekEnd = new Date(monday);
@@ -324,7 +321,11 @@
           updateDaySchedule('thursday', 3, monday, weeklyData);
           updateDaySchedule('friday', 4, monday, weeklyData);
           updateDaySchedule('saturday', 5, monday, weeklyData);
-          updateDaySchedule('sunday', 6, monday, weeklyData);
+          updateDaySchedule('sunday', 6, monday, weeklyData, false, [
+            'Brunch',
+            'Evening',
+            'Dinner',
+          ]);
           
         } catch (err) {
           console.error('[mess.html] Error loading weekly schedule:', err);
@@ -385,7 +386,16 @@
         }
       }
 
-      function updateDaySchedule(dayClass, dayOffset, monday, weeklyData, isToday = false) {
+      function updateDaySchedule(
+        dayClass,
+        dayOffset,
+        monday,
+        weeklyData,
+        isToday = false,
+        slotLabels = null,
+      ) {
+        const defaultLabels = ['Breakfast', 'Lunch', 'Dinner'];
+        const labels = slotLabels || defaultLabels;
         const date = new Date(monday);
         date.setDate(date.getDate() + dayOffset);
         
@@ -406,8 +416,9 @@
           dateEl.textContent = formatShortDate(date);
         }
         
-        // Get all meal containers - overlay-* classes OR background-* for Tuesday lunch
-        const mealContainers = dayElement.querySelectorAll('[class*="container-"] > div[class*="overlay"], [class*="container-"] > div[class*="background-"]');
+        // Get all meal containers - direct children of the inner container (the one with container- class that holds meals)
+        const innerContainer = dayElement.querySelector(':scope > div[class*="container-"]:nth-child(2)');
+        const mealContainers = innerContainer ? innerContainer.querySelectorAll(':scope > div') : [];
         
         mealContainers.forEach((container, index) => {
           let meal = null;
@@ -415,13 +426,16 @@
           
           if (index === 0) {
             meal = dayData.breakfast;
-            mealLabel = isToday && dayData.breakfast ? 'Breakfast (Today)' : 'Breakfast';
+            mealLabel =
+              isToday && dayData.breakfast
+                ? `${labels[0]} (Today)`
+                : labels[0];
           } else if (index === 1) {
             meal = dayData.lunch;
-            mealLabel = 'Lunch';
+            mealLabel = labels[1];
           } else if (index === 2) {
             meal = dayData.dinner;
-            mealLabel = 'Dinner';
+            mealLabel = labels[2];
           }
           
           if (meal) {

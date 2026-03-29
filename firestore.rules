@@ -3,18 +3,23 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // Must check exists() before .data — missing student doc would otherwise
+    // fail rule evaluation and deny writes (e.g. mealSchedules for mess managers).
     function isWarden() {
       return request.auth != null &&
+        exists(/databases/$(database)/documents/students/$(request.auth.uid)) &&
         get(/databases/$(database)/documents/students/$(request.auth.uid)).data.role == 'warden';
     }
 
     function isHeadWarden() {
       return request.auth != null &&
+        exists(/databases/$(database)/documents/students/$(request.auth.uid)) &&
         get(/databases/$(database)/documents/students/$(request.auth.uid)).data.role == 'head-warden';
     }
 
     function isMessManager() {
       return request.auth != null &&
+        exists(/databases/$(database)/documents/students/$(request.auth.uid)) &&
         get(/databases/$(database)/documents/students/$(request.auth.uid)).data.role == 'mess-manager';
     }
 

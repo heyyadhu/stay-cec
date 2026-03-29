@@ -1136,10 +1136,55 @@ export async function uploadMealImage(file, mealType, date) {
 }
 
 /**
+ * Parse YYYY-MM-DD as a local calendar date. Using `new Date("2026-03-24")`
+ * is UTC midnight and shifts the calendar day in many timezones, which breaks
+ * week keys and Firestore meal matching vs the manager UI.
+ */
+export function parseLocalDateOnly(isoDate) {
+  if (!isoDate || typeof isoDate !== "string") return new Date(NaN);
+  const trimmed = isoDate.trim().slice(0, 10);
+  const parts = trimmed.split("-");
+  if (parts.length !== 3) return new Date(NaN);
+  const y = Number(parts[0]);
+  const m = Number(parts[1]);
+  const d = Number(parts[2]);
+  if (!Number.isFinite(y) || !Number.isFinite(m) || !Number.isFinite(d))
+    return new Date(NaN);
+  return new Date(y, m - 1, d);
+}
+
+/** Normalize stored meal date to YYYY-MM-DD for comparisons and keys. */
+function mealDateToYMD(meal) {
+  if (!meal || meal.date == null) return "";
+  if (meal.date?.toDate) {
+    const d = meal.date.toDate();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  }
+  if (typeof meal.date === "string") {
+    return meal.date.trim().slice(0, 10);
+  }
+  return "";
+}
+
+/**
+ * Map any saved meal type to one of breakfast | lunch | dinner so the
+ * student Mess page (3 slots) and manager grid stay aligned.
+ */
+export function mapMealTypeToSlot(type) {
+  const t = String(type || "")
+    .trim()
+    .toLowerCase();
+  if (t === "breakfast" || t === "brunch") return "breakfast";
+  if (t === "lunch" || t === "evening" || t === "snack") return "lunch";
+  if (t === "dinner") return "dinner";
+  return "lunch";
+}
+
+/**
  * Save or update a meal schedule entry.
  * @param {Object} mealData
  * @param {string} mealData.date - ISO date string (YYYY-MM-DD)
- * @param {string} mealData.type - 'breakfast', 'lunch', or 'dinner'
+ * @param {string} mealData.type - breakfast, lunch, dinner, snack, etc. (normalized on write)
  * @param {string} mealData.title - Meal title
  * @param {string} mealData.description - Meal description/ingredients
  * @param {string} mealData.imageUrl - URL to the meal image
@@ -1149,10 +1194,11 @@ export async function uploadMealImage(file, mealType, date) {
 export async function saveMealSchedule(mealData) {
   try {
     const { date, type, title, description, imageUrl, id } = mealData;
-    
+    const slotType = mapMealTypeToSlot(type);
+
     const data = {
       date,
-      type,
+      type: slotType,
       title,
       description,
       imageUrl,
@@ -1189,44 +1235,16 @@ export async function saveMealSchedule(mealData) {
  */
 export async function getMealSchedules(startDate, endDate) {
   try {
-    console.log('[getMealSchedules] Querying range:', { startDate, endDate });
-    
     // Use simple collection fetch - no ordering to avoid index requirements
     const snap = await getDocs(collection(db, 'mealSchedules'));
     const allMeals = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     
-    console.log('[getMealSchedules] Total meals in DB:', allMeals.length);
-    if (allMeals.length > 0) {
-      console.log('[getMealSchedules] Sample meal raw:', allMeals[0]);
-      console.log('[getMealSchedules] Sample meal date type:', typeof allMeals[0].date, allMeals[0].date);
-      console.log('[getMealSchedules] All meal dates raw:', allMeals.map(m => ({ date: m.date, type: typeof m.date, title: m.title })));
-    }
-    
-    // Filter client-side by date range
-    const filtered = allMeals.filter(meal => {
-      // Handle both string dates and Timestamp objects
-      let mealDate;
-      let rawDate = meal.date;
-      
-      if (meal.date?.toDate) {
-        // Firestore Timestamp - convert to LOCAL YYYY-MM-DD to match schedule keys
-        const d = meal.date.toDate();
-        // Use LOCAL methods to match formatLocalDate() used elsewhere
-        mealDate = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-        console.log(`[getMealSchedules] Timestamp converted: ${rawDate} -> ${mealDate} (local)`);
-      } else if (typeof meal.date === 'string') {
-        mealDate = meal.date;
-      } else {
-        mealDate = meal.date?.toString ? meal.date.toString() : '';
-      }
-      
-      const inRange = mealDate >= startDate && mealDate <= endDate;
-      console.log(`[getMealSchedules] Checking meal "${meal.title}" date ${mealDate}: ${inRange ? 'IN RANGE' : 'out of range'} (range: ${startDate} to ${endDate})`);
-      return inRange;
+    // Filter client-side by date range (string compare works for YYYY-MM-DD)
+    const filtered = allMeals.filter((meal) => {
+      const mealDate = mealDateToYMD(meal);
+      if (!mealDate) return false;
+      return mealDate >= startDate && mealDate <= endDate;
     });
-    
-    console.log('[getMealSchedules] Filtered meals count:', filtered.length);
-    console.log('[getMealSchedules] Filtered meals:', filtered.map(m => ({ date: m.date, title: m.title, type: m.type })));
     
     return filtered;
   } catch (error) {
@@ -1242,9 +1260,11 @@ export async function getMealSchedules(startDate, endDate) {
  */
 export async function getWeeklyMealSchedule(weekStartDate) {
   try {
-    console.log('[getWeeklyMealSchedule] Called with:', weekStartDate);
-    
-    const start = new Date(weekStartDate);
+    const start = parseLocalDateOnly(weekStartDate);
+    if (Number.isNaN(start.getTime())) {
+      console.error('[getWeeklyMealSchedule] Invalid weekStartDate:', weekStartDate);
+      return {};
+    }
     const end = new Date(start);
     end.setDate(end.getDate() + 6);
     
@@ -1258,8 +1278,6 @@ export async function getWeeklyMealSchedule(weekStartDate) {
     
     const startStr = formatLocalDate(start);
     const endStr = formatLocalDate(end);
-    
-    console.log('[getWeeklyMealSchedule] Date range:', { startStr, endStr });
     
     const meals = await getMealSchedules(startStr, endStr);
     
@@ -1276,32 +1294,15 @@ export async function getWeeklyMealSchedule(weekStartDate) {
       };
     }
     
-    console.log('[getWeeklyMealSchedule] Weekly schedule keys:', Object.keys(weeklySchedule));
-    
-    meals.forEach(meal => {
-      // Normalize meal date to string format (use LOCAL time to match schedule keys)
-      let mealDateStr;
-      if (meal.date?.toDate) {
-        // Firestore Timestamp - convert to local YYYY-MM-DD to match schedule keys
-        const d = meal.date.toDate();
-        // Use LOCAL methods (not UTC) to match formatLocalDate() used for schedule keys
-        mealDateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-      } else if (typeof meal.date === 'string') {
-        mealDateStr = meal.date;
-      } else {
-        mealDateStr = meal.date?.toString ? meal.date.toString() : '';
-      }
+    meals.forEach((meal) => {
+      const mealDateStr = mealDateToYMD(meal);
+      const slotKey = mapMealTypeToSlot(meal.type);
       
-      console.log('[getWeeklyMealSchedule] Processing meal:', { date: mealDateStr, type: meal.type, title: meal.title });
       if (weeklySchedule[mealDateStr]) {
-        weeklySchedule[mealDateStr][meal.type] = meal;
-        console.log('[getWeeklyMealSchedule] Added meal to:', mealDateStr, meal.type);
-      } else {
-        console.log('[getWeeklyMealSchedule] Date not in schedule:', mealDateStr, 'Available keys:', Object.keys(weeklySchedule));
+        weeklySchedule[mealDateStr][slotKey] = { ...meal, type: slotKey };
       }
     });
     
-    console.log('[getWeeklyMealSchedule] Final schedule:', weeklySchedule);
     return weeklySchedule;
   } catch (error) {
     console.error('Error fetching weekly schedule:', error);
