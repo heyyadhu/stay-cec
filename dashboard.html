@@ -373,9 +373,12 @@
           // 4. Live Mess Menu - Fetch from database
           try {
             const today = new Date();
+            
+            // Get Monday of current week (same logic as mess.html)
             const day = today.getDay();
             const diff = today.getDate() - day + (day === 0 ? -6 : 1);
-            const monday = new Date(today.setDate(diff));
+            const monday = new Date(today);
+            monday.setDate(diff);
             
             const formatLocalDate = (d) => {
               const year = d.getFullYear();
@@ -387,11 +390,13 @@
             const weekStart = formatLocalDate(monday);
             const weeklyData = await getWeeklyMealSchedule(weekStart);
             
-            const todayKey = formatLocalDate(new Date());
+            // Use fresh today date for key
+            const now = new Date();
+            const todayKey = formatLocalDate(now);
             const todayMeals = weeklyData[todayKey];
             
             if (todayMeals) {
-              const hour = new Date().getHours();
+              const hour = now.getHours();
               
               // Determine which meals to show based on time
               let meal1Type, meal2Type;
