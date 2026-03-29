@@ -1197,29 +1197,36 @@ export async function getMealSchedules(startDate, endDate) {
     
     console.log('[getMealSchedules] Total meals in DB:', allMeals.length);
     if (allMeals.length > 0) {
-      console.log('[getMealSchedules] Sample meal:', allMeals[0]);
-      console.log('[getMealSchedules] All meal dates:', allMeals.map(m => m.date));
+      console.log('[getMealSchedules] Sample meal raw:', allMeals[0]);
+      console.log('[getMealSchedules] Sample meal date type:', typeof allMeals[0].date, allMeals[0].date);
+      console.log('[getMealSchedules] All meal dates raw:', allMeals.map(m => ({ date: m.date, type: typeof m.date, title: m.title })));
     }
     
     // Filter client-side by date range
     const filtered = allMeals.filter(meal => {
       // Handle both string dates and Timestamp objects
       let mealDate;
+      let rawDate = meal.date;
+      
       if (meal.date?.toDate) {
-        // Firestore Timestamp - convert to YYYY-MM-DD
+        // Firestore Timestamp - convert to LOCAL YYYY-MM-DD to match schedule keys
         const d = meal.date.toDate();
+        // Use LOCAL methods to match formatLocalDate() used elsewhere
         mealDate = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        console.log(`[getMealSchedules] Timestamp converted: ${rawDate} -> ${mealDate} (local)`);
       } else if (typeof meal.date === 'string') {
         mealDate = meal.date;
       } else {
         mealDate = meal.date?.toString ? meal.date.toString() : '';
       }
+      
       const inRange = mealDate >= startDate && mealDate <= endDate;
-      console.log(`[getMealSchedules] Checking ${mealDate}: ${inRange ? 'IN RANGE' : 'out of range'}`);
+      console.log(`[getMealSchedules] Checking meal "${meal.title}" date ${mealDate}: ${inRange ? 'IN RANGE' : 'out of range'} (range: ${startDate} to ${endDate})`);
       return inRange;
     });
     
-    console.log('[getMealSchedules] Filtered meals for range:', filtered.length);
+    console.log('[getMealSchedules] Filtered meals count:', filtered.length);
+    console.log('[getMealSchedules] Filtered meals:', filtered.map(m => ({ date: m.date, title: m.title, type: m.type })));
     
     return filtered;
   } catch (error) {
@@ -1272,12 +1279,25 @@ export async function getWeeklyMealSchedule(weekStartDate) {
     console.log('[getWeeklyMealSchedule] Weekly schedule keys:', Object.keys(weeklySchedule));
     
     meals.forEach(meal => {
-      console.log('[getWeeklyMealSchedule] Processing meal:', { date: meal.date, type: meal.type, title: meal.title });
-      if (weeklySchedule[meal.date]) {
-        weeklySchedule[meal.date][meal.type] = meal;
-        console.log('[getWeeklyMealSchedule] Added meal to:', meal.date, meal.type);
+      // Normalize meal date to string format (use LOCAL time to match schedule keys)
+      let mealDateStr;
+      if (meal.date?.toDate) {
+        // Firestore Timestamp - convert to local YYYY-MM-DD to match schedule keys
+        const d = meal.date.toDate();
+        // Use LOCAL methods (not UTC) to match formatLocalDate() used for schedule keys
+        mealDateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      } else if (typeof meal.date === 'string') {
+        mealDateStr = meal.date;
       } else {
-        console.log('[getWeeklyMealSchedule] Date not in schedule:', meal.date);
+        mealDateStr = meal.date?.toString ? meal.date.toString() : '';
+      }
+      
+      console.log('[getWeeklyMealSchedule] Processing meal:', { date: mealDateStr, type: meal.type, title: meal.title });
+      if (weeklySchedule[mealDateStr]) {
+        weeklySchedule[mealDateStr][meal.type] = meal;
+        console.log('[getWeeklyMealSchedule] Added meal to:', mealDateStr, meal.type);
+      } else {
+        console.log('[getWeeklyMealSchedule] Date not in schedule:', mealDateStr, 'Available keys:', Object.keys(weeklySchedule));
       }
     });
     
