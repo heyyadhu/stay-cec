@@ -302,8 +302,10 @@
           };
           
           const weekStart = formatLocalDate(monday);
+          console.log('[Mess.html] Week start:', weekStart);
           
           const weeklyData = await getWeeklyMealSchedule(weekStart);
+          console.log('[Mess.html] Received weekly data:', weeklyData);
           
           // Update week display
           const weekEnd = new Date(monday);
@@ -406,6 +408,7 @@
         const dateKey = `${year}-${month}-${day}`;
         
         const dayData = weeklyData[dateKey] || {};
+        console.log(`[Mess.html] Day ${dateKey}:`, dayData);
         
         const dayElement = document.querySelector(`.${dayClass}`);
         if (!dayElement) return;

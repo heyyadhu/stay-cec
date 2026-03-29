@@ -363,10 +363,19 @@
         let weeklyData = {};
         try {
           weeklyData = await getWeeklyMealSchedule(weekStartStr);
+          console.log('[MessManager] Fetched weekly data:', weeklyData);
         } catch (err) {
           console.error('[mess-manager] Error loading schedule:', err);
           weeklyData = {};
         }
+        
+        // Debug: Show what dates we're looking for
+        console.log('[MessManager] Week start:', weekStartStr);
+        console.log('[MessManager] Days in week:', days.map((day, i) => {
+          const d = new Date(currentWeekStart);
+          d.setDate(d.getDate() + i);
+          return formatDateKey(d);
+        }));
         
         container.innerHTML = days.map((day, i) => {
           const d = new Date(currentWeekStart);
@@ -393,6 +402,11 @@
           const bf = dayData.breakfast || { title: m.bf[0], description: m.bf[1] };
           const lun = dayData.lunch || { title: m.lun[0], description: m.lun[1] };
           const din = dayData.dinner || { title: m.din[0], description: m.din[1] };
+          
+          // Debug logging
+          if (dayData.breakfast || dayData.lunch || dayData.dinner) {
+            console.log(`[MessManager] Day ${dateKey} has meals:`, dayData);
+          }
           
           // Today styling
           const bgClass = isToday ? 'bg-brand-primary/20' : (i % 2 === 0 ? 'bg-[#E6E8E9]' : 'bg-[#F2F4F5]');
@@ -541,6 +555,9 @@
           };
           
           await saveMealSchedule(mealData);
+          
+          // Force refresh from database to verify save worked
+          console.log('[MessManager] Saved meal, refreshing schedule...');
           
           btn.innerHTML = '<i data-lucide="check-circle-2" class="w-4 h-4"></i> Saved!';
           btn.classList.replace('bg-brand-primary', 'bg-green-500');

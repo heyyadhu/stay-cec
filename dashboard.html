@@ -388,12 +388,16 @@
             };
             
             const weekStart = formatLocalDate(monday);
+            console.log('[Dashboard] Fetching meals for week:', weekStart);
             const weeklyData = await getWeeklyMealSchedule(weekStart);
+            console.log('[Dashboard] Received weekly data:', weeklyData);
             
             // Use fresh today date for key
             const now = new Date();
             const todayKey = formatLocalDate(now);
+            console.log('[Dashboard] Today key:', todayKey);
             const todayMeals = weeklyData[todayKey];
+            console.log('[Dashboard] Today meals:', todayMeals);
             
             if (todayMeals) {
               const hour = now.getHours();
